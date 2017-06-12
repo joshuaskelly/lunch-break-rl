@@ -1,0 +1,6 @@
+# Ignore IDE Artifacts
+.vscode
+
+# Ignore Python Artifacts
+*.pyc
+__pycache__
