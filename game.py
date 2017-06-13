@@ -1,28 +1,22 @@
 import tdl
 
-from player import Player
+from scene import Scene
 
 tdl.set_font('terminal32x32_gs_ro.png')
 console = tdl.init(40, 30, 'lunch break roguelike')
 
-p = Player()
-p.position = 10, 10
-
-map = tdl.Console(40, 30)
-map.draw_char(0, 0, '#')
+scene = Scene()
 
 running = True
 while running:
+    # Draw the scene
     console.clear()
-
-
-    console.blit(map)
-    p.draw(console)
-
+    scene.draw(console)
     tdl.flush()
 
+    # Handle input/events
     for event in tdl.event.get():
-        p.handle_events(event)
+        scene.handle_events(event)
 
         if event.type == 'QUIT':
             running = False
