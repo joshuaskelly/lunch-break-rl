@@ -9,7 +9,6 @@ class Scene(object):
         self.entities.append(player.Player())
 
         self.level = level.Level(40, 30)
-        self.level.draw_char(0, 0, '#')
 
         if not Scene.current_scene:
             Scene.current_scene = self
@@ -21,10 +20,12 @@ class Scene(object):
             entity.draw(console)
 
     def handle_events(self, event):
+        self.level.handle_events(event)
+
         for entity in self.entities:
             entity.handle_events(event)
 
     def check_collision(self, x, y):
         char, fg, bg = self.level.get_char(x, y)
-        
+
         return char == ord('#')
