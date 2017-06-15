@@ -1,3 +1,4 @@
+import palette
 import player
 import level
 
@@ -9,7 +10,7 @@ class Scene(object):
     def __init__(self):
         self.entities = []
 
-        self.entities.append(item.Item('!', (10, 10), (255, 0, 255)))
+        self.entities.append(item.Item('!', (10, 10), palette.BRIGHT_MAGENTA))
         self.entities.append(player.Player())
         self.level = level.Level(40, 30)
 
