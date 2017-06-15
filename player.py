@@ -1,11 +1,19 @@
+import events
+
 from entities import character
 
 class Player(character.Character):
     def __init__(self):
         super().__init__('@', fg=(255, 0, 0))
 
+        events.Event.subscribe('UPDATE', self.update)
+
     def update(self):
         pass
+
+    def move(self, x, y):
+        super().move(x, y)
+        events.Event.notify('UPDATE')
 
     def handle_events(self, event):
         if event.type == 'KEYDOWN':

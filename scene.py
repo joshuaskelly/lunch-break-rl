@@ -8,14 +8,9 @@ class Scene(object):
 
     def __init__(self):
         self.entities = []
-        
-        potion = item.Item('p', fg=(255, 0, 255))
-        potion.position = 20, 20
-        self.entities.append(potion)
-        
+
+        self.entities.append(item.Item('!', (10, 10), (255, 0, 255)))
         self.entities.append(player.Player())
-
-
         self.level = level.Level(40, 30)
 
         if not Scene.current_scene:
