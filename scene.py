@@ -1,12 +1,20 @@
 import player
 import level
 
+from entities import item
+
 class Scene(object):
     current_scene = None
 
     def __init__(self):
         self.entities = []
+        
+        potion = item.Item('p', fg=(255, 0, 255))
+        potion.position = 20, 20
+        self.entities.append(potion)
+        
         self.entities.append(player.Player())
+
 
         self.level = level.Level(40, 30)
 
