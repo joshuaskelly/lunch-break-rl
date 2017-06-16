@@ -1,3 +1,4 @@
+import draw
 import palette
 import player
 import level
@@ -11,8 +12,10 @@ class Scene(object):
         self.entities = []
 
         self.entities.append(item.Item('!', (10, 10), palette.BRIGHT_MAGENTA))
-        self.entities.append(player.Player())
+        self.entities.append(player.Player(position=(1, 1)))
         self.level = level.Level(40, 30)
+
+        draw.box(self.level.data, 0, 0, *self.level.data.get_size())
 
         if not Scene.current_scene:
             Scene.current_scene = self
@@ -32,4 +35,4 @@ class Scene(object):
     def check_collision(self, x, y):
         char, fg, bg = self.level.get_char(x, y)
 
-        return char == ord('#')
+        return char != ord(' ')
