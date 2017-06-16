@@ -1,6 +1,28 @@
 import utils
 
 def box(console, x, y, width, height, border=utils.cp437(' ╔╗╚╝║═')):
+    """Draws a box on the given console.
+
+    Args:
+        x: The leftmost column of the box.
+
+        y: The topmost column of the box.
+
+        width: The width of the box.
+
+        height: The height of the box.
+
+        border: A string that contains the characters to render the box. The
+            order should be:
+                0. inside
+                1. top left corner
+                2. top right corner
+                3. bottom left corner
+                4. bottom right corner
+                5. vertical bar
+                6. horizontal bar
+    """
+
     for row in range(y, height + y):
         for col in range(width + x):
             if (col, row) in console:
