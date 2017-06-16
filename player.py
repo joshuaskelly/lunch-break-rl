@@ -4,8 +4,8 @@ import palette
 from entities import character
 
 class Player(character.Character):
-    def __init__(self):
-        super().__init__('@', fg=palette.BRIGHT_RED)
+    def __init__(self, char='@', position=(0, 0), fg=palette.BRIGHT_RED, bg=palette.BLACK):
+        super().__init__(char, position, fg, bg)
 
         events.Event.subscribe('UPDATE', self.update)
 
