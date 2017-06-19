@@ -1,6 +1,8 @@
 import utils
 
-def box(console, x, y, width, height, border=utils.cp437(' ╔╗╚╝║═')):
+DEFAULT_NINE_SLICE = utils.cp437('╔═╗║ ║╚═╝')
+
+def box(console, x, y, width, height, border=DEFAULT_NINE_SLICE):
     """Draws a box on the given console.
 
     Args:
@@ -26,17 +28,23 @@ def box(console, x, y, width, height, border=utils.cp437(' ╔╗╚╝║═'))
     for row in range(y, height + y):
         for col in range(width + x):
             if (col, row) in console:
-                if col == x or col == width + x - 1:
+                if col == x:
+                    console.draw_char(col, row, border[3])
+                
+                elif col == width + x - 1:
                     console.draw_char(col, row, border[5])
 
-                elif row == y or row == height + y - 1:
-                    console.draw_char(col, row, border[6])
+                elif row == y:
+                    console.draw_char(col, row, border[1])
+                    
+                elif row == height + y - 1:
+                    console.draw_char(col, row, border[7])
 
                 else:
-                    console.draw_char(col, row, border[0])
+                    console.draw_char(col, row, border[4])
 
     corner_coords = (x, y), (x + width - 1, y), (x, y + height - 1), (x + width - 1, y + height - 1)
-    corners = border[1:5]
+    corners = [border[i] for i in [0, 2, 6, 8]]
 
     for i, c in enumerate(corner_coords):
         if c in console:
