@@ -2,6 +2,7 @@ import draw
 import palette
 import player
 import level
+from ui import window
 
 from entities import item
 
@@ -15,7 +16,8 @@ class Scene(object):
         self.entities.append(player.Player(position=(1, 1)))
         self.level = level.Level(40, 30)
 
-        draw.box(self.level.data, 0, 0, *self.level.data.get_size())
+        w = window.Window(30, 0, 10, 30)
+        self.entities.append(w)
 
         if not Scene.current_scene:
             Scene.current_scene = self
