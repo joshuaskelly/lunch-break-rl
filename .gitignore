@@ -4,3 +4,6 @@
 # Ignore Python Artifacts
 *.pyc
 __pycache__
+
+# Ignore Twitch Bot Config
+chat.cfg
