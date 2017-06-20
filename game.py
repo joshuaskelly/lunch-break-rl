@@ -34,4 +34,4 @@ while running:
 
         if event.type == 'QUIT':
             running = False
-            observer.stop()
+            #observer.stop()

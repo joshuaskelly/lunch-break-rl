@@ -2,7 +2,7 @@ import draw
 import palette
 import player
 import level
-from ui import window
+from ui import playerwindow
 
 from entities import item
 
@@ -14,9 +14,10 @@ class Scene(object):
 
         self.entities.append(item.Item('!', (10, 10), palette.BRIGHT_MAGENTA))
         self.entities.append(player.Player(position=(1, 1)))
+        self.entities.append(player.Player(position=(10, 10), fg=palette.BRIGHT_BLUE))
         self.level = level.Level(40, 30)
 
-        w = window.Window(30, 0, 10, 30, 'Players')
+        w = playerwindow.PlayerWindow(30, 0, 10, 30, 'Players')
         self.entities.append(w)
 
         if not Scene.current_scene:
