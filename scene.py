@@ -16,7 +16,7 @@ class Scene(object):
         self.entities.append(player.Player(position=(1, 1)))
         self.level = level.Level(40, 30)
 
-        w = window.Window(30, 0, 10, 30)
+        w = window.Window(30, 0, 10, 30, 'Players')
         self.entities.append(w)
 
         if not Scene.current_scene:

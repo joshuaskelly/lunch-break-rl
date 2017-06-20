@@ -8,11 +8,21 @@ class Window(object):
         self.y = y
         self.width = width
         self.height = height
-        self.data = tdl.Console(0, 0, width, height)
+        self.data = tdl.Console(width, height)
+        self.title = title
 
     def update(self):
-        draw.box(self.data, 0, 0, self.width - 1, self.height - 1)
+        draw.box(self.data, 0, 0, self.width, self.height)
+
+        if self.title:
+            center_of_box = self.width // 2
+            center_of_title = len(self.title) // 2
+            x = max(center_of_box - center_of_title, 1)
+            self.data.draw_str(x, 0, self.title[:self.width - 2])
 
     def draw(self, console):
         self.update()
-        console.blit(self.data, x, y)
+        console.blit(self.data, self.x, self.y)
+
+    def handle_events(self, event):
+        pass
