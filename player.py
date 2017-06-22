@@ -33,14 +33,16 @@ class Player(character.Character):
 
         elif event.type == 'TWITCHCHATEVENT':
             if event.nickname == self.nickname:
-                if event.message.upper() == '!UP':
-                    self.move(0, -1)
+                commands = event.message.split(' ')
+                for command in commands:
+                    if command.upper() == '!UP':
+                        self.move(0, -1)
 
-                elif event.message.upper() == '!DOWN':
-                    self.move(0, 1)
+                    elif command.upper() == '!DOWN':
+                        self.move(0, 1)
 
-                elif event.message.upper() == '!LEFT':
-                    self.move(-1, 0)
+                    elif command.upper() == '!LEFT':
+                        self.move(-1, 0)
 
-                elif event.message.upper() == '!RIGHT':
-                    self.move(1, 0)
+                    elif command.upper() == '!RIGHT':
+                        self.move(1, 0)
