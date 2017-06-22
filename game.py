@@ -1,5 +1,6 @@
 import configparser
 import os
+import time
 
 import tdl
 
@@ -8,18 +9,19 @@ from twitchobserver import Observer
 from scene import Scene
 
 tdl.set_font('terminal32x32_gs_ro.png')
-console = tdl.init(40, 30, 'lunch break roguelike')
+console = tdl.init(40, 30, 'lunch break roguelike', renderer='OPENGL')
 
 scene = Scene()
 
+current_time = time.time()
+
+# Twitch Observer
 config = configparser.ConfigParser()
 cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'chat.cfg')
 config.read(cfg_path)
-
 nickname = config['DEFAULT']['Nickname'],
 password = config['DEFAULT']['Password']
 channel = config['DEFAULT']['Channel']
-
 observer = Observer(nickname, password, channel)
 observer.start()
 
@@ -41,3 +43,6 @@ while running:
         elif event.type == 'QUIT':
             running = False
             observer.stop()
+
+    scene.update(time.time() - current_time)
+    current_time = time.time()

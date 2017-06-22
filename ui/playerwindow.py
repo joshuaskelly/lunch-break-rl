@@ -1,3 +1,4 @@
+import palette
 import player
 import scene
 from ui import progressbar
@@ -18,6 +19,7 @@ class PlayerWindow(window.Window):
             self.data.draw_str(1, row, entity.nickname[:self.width - 2], fg=entity.fg)
             row += 1
 
+        self.data.draw_str(2, self.height - 1, '(!join)', fg=palette.BRIGHT_YELLOW)
         console.blit(self.data, self.x, self.y)
 
     def handle_events(self, event):

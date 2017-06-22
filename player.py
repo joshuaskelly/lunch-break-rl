@@ -8,14 +8,11 @@ class Player(character.Character):
         super().__init__(char, position, fg, bg)
         self.nickname = 'Player'
 
-        events.Event.subscribe('UPDATE', self.update)
-
-    def update(self):
+    def update(self, time):
         pass
 
     def move(self, x, y):
         super().move(x, y)
-        events.Event.notify('UPDATE')
 
     def handle_events(self, event):
         if event.type == 'KEYDOWN':

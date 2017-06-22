@@ -14,7 +14,7 @@ class Window(object):
         self.title = title
         self.children = []
 
-    def update(self):
+    def update(self, time):
         draw.box(self.data, 0, 0, self.width, self.height)
 
         if self.title:
@@ -24,10 +24,9 @@ class Window(object):
             self.data.draw_str(x, 0, self.title[:self.width - 2])
 
         for child in self.children:
-            child.update()
+            child.update(time)
 
     def draw(self, console):
-        self.update()
         for child in self.children:
             child.draw(self.data)
 

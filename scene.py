@@ -40,3 +40,7 @@ class Scene(object):
         char, fg, bg = self.level.get_char(x, y)
 
         return char != ord(' ')
+
+    def update(self, time):
+        for entity in self.entities:
+            entity.update(time)

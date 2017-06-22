@@ -14,7 +14,7 @@ class TwitchChatManager(object):
         if event.type == 'TWITCHCHATEVENT':
             if event.command == 'PRIVMSG':
                 if event.message.upper() == '!JOIN':
-                    p = player.Player(event.nickname[0], (1, 1), palette.colors[random.randint(1, len(palette.colors))])
+                    p = player.Player(event.nickname[0], (1, 1), palette.colors[random.randint(1, len(palette.colors) - 1)])
                     p.nickname = event.nickname
                     s.entities.append(p)
 
@@ -25,3 +25,6 @@ class TwitchChatManager(object):
 
                         if entity.nickname == event.nickname:
                             s.entities.remove(entity)
+
+    def update(self, time):
+        pass

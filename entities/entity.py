@@ -9,8 +9,11 @@ class Entity(object):
         if self.position in console:
             console.draw_char(*self.position, self.char, self.fg, self.bg)
 
-    def update(self):
+    def update(self, time):
         pass
 
     def handle_events(self, event):
+        pass
+
+    def update(self, time):
         pass

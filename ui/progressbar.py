@@ -7,9 +7,6 @@ class ProgressBar(object):
         self.x = x
         self.y = y
 
-    def update(self):
-        pass
-
     def draw(self, console):
         w = int(self.current_value / self.max_value * self.width)
         v = '{}/{}'.format(self.current_value, self.max_value)
@@ -21,4 +18,7 @@ class ProgressBar(object):
             console.draw_char(self.x + i, self.y, c, bg=self.color)
 
     def handle_events(self, event):
+        pass
+    
+    def update(self, time):
         pass
