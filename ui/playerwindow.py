@@ -15,7 +15,7 @@ class PlayerWindow(window.Window):
             if not isinstance(entity, player.Player):
                 continue
 
-            self.data.draw_str(1, row, entity.nickname, fg=entity.fg)
+            self.data.draw_str(1, row, entity.nickname[:self.width - 2], fg=entity.fg)
             row += 1
 
         console.blit(self.data, self.x, self.y)

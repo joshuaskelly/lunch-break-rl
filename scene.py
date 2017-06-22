@@ -5,6 +5,7 @@ import level
 from ui import playerwindow
 
 from entities import item
+from twitchchatmanager import TwitchChatManager
 
 class Scene(object):
     current_scene = None
@@ -12,9 +13,9 @@ class Scene(object):
     def __init__(self):
         self.entities = []
 
-        self.entities.append(item.Item('!', (10, 10), palette.BRIGHT_MAGENTA))
-        self.entities.append(player.Player(position=(1, 1)))
-        self.entities.append(player.Player(position=(10, 10), fg=palette.BRIGHT_BLUE))
+        self.entities.append(TwitchChatManager())
+        #self.entities.append(player.Player(position=(1, 1)))
+        #self.entities.append(player.Player(position=(10, 10), fg=palette.BRIGHT_BLUE))
         self.level = level.Level(40, 30)
 
         w = playerwindow.PlayerWindow(30, 0, 10, 30, 'Players')
