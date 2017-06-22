@@ -3,7 +3,7 @@ import os
 
 import tdl
 
-from twitchobserver import TwitchChatObserver
+from twitchobserver import Observer
 
 from scene import Scene
 
@@ -16,10 +16,12 @@ config = configparser.ConfigParser()
 cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'chat.cfg')
 config.read(cfg_path)
 
-nickname, password, channel = config['DEFAULT']['Nickname'], config['DEFAULT']['Password'], '#' + config['DEFAULT']['Channel']
+nickname = config['DEFAULT']['Nickname'],
+password = config['DEFAULT']['Password']
+channel = config['DEFAULT']['Channel']
 
-#observer = TwitchChatObserver(nickname, password, channel)
-#observer.start()
+observer = Observer(nickname, password, channel)
+observer.start()
 
 running = True
 while running:
@@ -29,9 +31,13 @@ while running:
     tdl.flush()
 
     # Handle input/events
-    for event in tdl.event.get():
+    for event in list(tdl.event.get()) + observer.get_events():
         scene.handle_events(event)
 
-        if event.type == 'QUIT':
+        if event.type == 'TWITCHCHATEVENT':
+            if event.message:
+                print(event.message)
+
+        elif event.type == 'QUIT':
             running = False
-            #observer.stop()
+            observer.stop()

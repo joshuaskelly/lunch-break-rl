@@ -12,7 +12,6 @@ class PlayerWindow(window.Window):
 
         row = 1
         for entity in scene.Scene.current_scene.entities:
-            print(row)
             if not isinstance(entity, player.Player):
                 continue
 
