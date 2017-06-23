@@ -4,7 +4,9 @@ import os
 import tdl
 
 class Level(object):
-    def __init__(self, width, height):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
         self.data = tdl.Console(width, height)
         self.painting = False
         self.erasing = False
@@ -16,7 +18,7 @@ class Level(object):
         return self.data.get_char(x, y)
 
     def draw(self, console):
-        console.blit(self.data)
+        console.blit(self.data, self.x, self.y)
 
     def handle_events(self, event):
         if event.type == 'MOUSEDOWN':
@@ -39,20 +41,22 @@ class Level(object):
 
         if event.type == 'MOUSEMOTION':
             pos = event.cell
+            pos = pos[0] - self.x, pos[1] - self.y
+            
+            if pos in self.data:
+                if self.painting:
+                    self.draw_char(*pos, '#')
 
-            if self.painting:
-                self.draw_char(*pos, '#')
-
-            elif self.erasing:
-                self.draw_char(*pos, ' ')
+                elif self.erasing:
+                    self.draw_char(*pos, ' ')
 
 
-        if event.type == 'KEYDOWN':
-            if event.keychar.upper() == 'S':
-                self.save()
+            if event.type == 'KEYDOWN':
+                if event.keychar.upper() == 'S':
+                    self.save()
 
-            elif event.keychar.upper() == 'L':
-                self.load()
+                elif event.keychar.upper() == 'L':
+                    self.load()
 
     def save(self):
         print('Saving Level Data')
@@ -75,3 +79,6 @@ class Level(object):
         for i, t in enumerate(self.data):
             char, fg, bg = data[i]
             self.data.draw_char(*t, chr(char), fg, bg)
+
+    def update(self, time):
+        pass

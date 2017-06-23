@@ -15,6 +15,12 @@ class Window(object):
         self.children = []
 
     def update(self, time):
+        for child in self.children:
+            child.update(time)
+
+    def draw(self, console):
+        self.data.clear()
+
         draw.box(self.data, 0, 0, self.width, self.height)
 
         if self.title:
@@ -23,10 +29,6 @@ class Window(object):
             x = max(center_of_box - center_of_title, 1)
             self.data.draw_str(x, 0, self.title[:self.width - 2])
 
-        for child in self.children:
-            child.update(time)
-
-    def draw(self, console):
         for child in self.children:
             child.draw(self.data)
 

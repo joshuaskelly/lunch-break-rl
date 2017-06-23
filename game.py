@@ -10,10 +10,11 @@ from scene import Scene
 
 tdl.set_font('terminal32x32_gs_ro.png')
 console = tdl.init(40, 30, 'lunch break roguelike', renderer='OPENGL')
+tdl.set_fps(30)
 
 scene = Scene()
 
-current_time = time.time()
+last_time = time.time()
 
 # Twitch Observer
 config = configparser.ConfigParser()
@@ -44,5 +45,5 @@ while running:
             running = False
             observer.stop()
 
-    scene.update(time.time() - current_time)
-    current_time = time.time()
+    scene.update(time.time() - last_time)
+    last_time = time.time()

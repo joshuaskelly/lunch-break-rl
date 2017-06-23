@@ -3,6 +3,7 @@ import palette
 import player
 import level
 from ui import playerwindow
+from ui import levelwindow
 
 from entities import item
 from twitchchatmanager import TwitchChatManager
@@ -14,24 +15,26 @@ class Scene(object):
         self.entities = []
 
         self.entities.append(TwitchChatManager())
-        #self.entities.append(player.Player(position=(1, 1)))
-        #self.entities.append(player.Player(position=(10, 10), fg=palette.BRIGHT_BLUE))
-        self.level = level.Level(40, 30)
+        w = levelwindow.LevelWindow(0, 0, 29, 30, 'Lunch Break RL')
+        self.entities.append(w)
 
-        w = playerwindow.PlayerWindow(30, 0, 10, 30, 'Players')
+        self.level = level.Level(1, 1, 27, 28)
+        self.entities.append(self.level)
+
+        w = playerwindow.PlayerWindow(29, 0, 11, 30, 'Players')
         self.entities.append(w)
 
         if not Scene.current_scene:
             Scene.current_scene = self
 
     def draw(self, console):
-        self.level.draw(console)
+        #self.level.draw(console)
 
         for entity in self.entities:
             entity.draw(console)
 
     def handle_events(self, event):
-        self.level.handle_events(event)
+        #self.level.handle_events(event)
 
         for entity in self.entities:
             entity.handle_events(event)
