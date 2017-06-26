@@ -12,6 +12,7 @@ class LevelWindow(window.Window):
         self.progressbar.show_text = False
         self.children.append(self.progressbar)
         self.time = 0
+        self.seconds_per_tick = 3
 
     def draw(self, console):
         super().draw(console)
@@ -20,5 +21,9 @@ class LevelWindow(window.Window):
         super().update(time)
 
         self.time += time
-        v = self.time * 95.23 % self.progressbar.max_value
+
+        if self.time > self.seconds_per_tick:
+            self.time = 0
+
+        v = self.time / self.seconds_per_tick * self.progressbar.max_value
         self.progressbar.current_value = v

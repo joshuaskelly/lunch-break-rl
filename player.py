@@ -14,6 +14,9 @@ class Player(character.Character):
     def move(self, x, y):
         super().move(x, y)
 
+    def tick(self):
+        pass
+
     def handle_events(self, event):
         if event.type == 'KEYDOWN':
             if event.keychar.upper() == 'UP':
@@ -43,3 +46,6 @@ class Player(character.Character):
 
                     elif command.upper() == '!RIGHT':
                         self.move(1, 0)
+
+        elif event.type == 'TICK':
+            self.tick()

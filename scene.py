@@ -1,3 +1,5 @@
+import tdl
+
 import draw
 import palette
 import player
@@ -8,14 +10,23 @@ from ui import levelwindow
 from entities import item
 from twitchchatmanager import TwitchChatManager
 
+
+class TickEvent(object):
+    def __init__(self):
+        self.type = 'TICK'
+
+
 class Scene(object):
     current_scene = None
 
     def __init__(self):
         self.entities = []
+        self.seconds_per_tick = 10
+        self.timer = 0
 
         self.entities.append(TwitchChatManager())
         w = levelwindow.LevelWindow(0, 0, 29, 30, 'Lunch Break RL')
+        w.seconds_per_tick = self.seconds_per_tick
         self.entities.append(w)
 
         self.level = level.Level(1, 1, 27, 28)
@@ -47,3 +58,8 @@ class Scene(object):
     def update(self, time):
         for entity in self.entities:
             entity.update(time)
+
+        self.timer += time
+        if self.timer > self.seconds_per_tick:
+            self.timer = 0
+            tdl.event.push(TickEvent())
