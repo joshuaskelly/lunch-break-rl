@@ -21,7 +21,7 @@ class Scene(object):
 
     def __init__(self):
         self.entities = []
-        self.seconds_per_tick = 10
+        self.seconds_per_tick = 2
         self.timer = 0
 
         self.entities.append(TwitchChatManager())
@@ -51,7 +51,11 @@ class Scene(object):
             entity.handle_events(event)
 
     def check_collision(self, x, y):
-        char, fg, bg = self.level.get_char(x, y)
+        """Returns True if player cannot move into coords"""
+
+        #if not (x - self.level.x, y - self.level.y) in self.level.data:
+
+        char, fg, bg = self.level.get_char(x - self.level.x, y - self.level.y)
 
         return char != ord(' ')
 
