@@ -1,3 +1,5 @@
+import random
+
 class Action(object):
     def __init__(self):
         self.parent = None
@@ -27,3 +29,15 @@ class MoveAction(Action):
     def perform(self, owner):
         if self.prerequiste(owner):
             owner.move(*self.dest)
+
+
+class IdleAction(Action):
+    def prerequiste(self, owner):
+        return True
+
+    def perform(self, owner):
+        x = random.randint(-1, 1)
+        y = random.randint(-1, 1)
+        move = MoveAction((x, y))
+        owner.brain.add_action(move)
+        owner.brain.add_action(IdleAction())

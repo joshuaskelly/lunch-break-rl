@@ -7,6 +7,7 @@ import level
 from ui import playerwindow
 from ui import levelwindow
 
+from ai import action
 from entities import item
 from twitchchatmanager import TwitchChatManager
 
@@ -35,6 +36,11 @@ class Scene(object):
         w = playerwindow.PlayerWindow(29, 0, 11, 30, 'Players')
         self.entities.append(w)
 
+        npc = player.Player(char='k', position=(10, 10), fg=palette.BRIGHT_RED)
+        npc.nickname = 'kobold'
+        npc.brain.add_action(action.IdleAction())
+        self.entities.append(npc)
+
         if not Scene.current_scene:
             Scene.current_scene = self
 
@@ -53,7 +59,8 @@ class Scene(object):
     def check_collision(self, x, y):
         """Returns True if player cannot move into coords"""
 
-        #if not (x - self.level.x, y - self.level.y) in self.level.data:
+        if not (x - self.level.x, y - self.level.y) in self.level.data:
+            return True
 
         char, fg, bg = self.level.get_char(x - self.level.x, y - self.level.y)
 

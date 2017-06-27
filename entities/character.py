@@ -12,7 +12,7 @@ class Character(entity.Entity):
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
 
-        if self.can_move(*dest):
+        if self.can_move(x, y):
             self.position = self.position[0] + x, self.position[1] + y
 
     def can_move(self, x, y):
