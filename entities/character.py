@@ -16,7 +16,8 @@ class Character(entity.Entity):
             self.position = self.position[0] + x, self.position[1] + y
 
     def can_move(self, x, y):
-        return not scene.Scene.current_scene.check_collision(x, y)
+        dest = self.position[0] + x, self.position[1] + y
+        return not scene.Scene.current_scene.check_collision(*dest)
 
     def tick(self):
         self.brain.perform_action()

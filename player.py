@@ -34,15 +34,27 @@ class Player(character.Character):
         elif event.type == 'TWITCHCHATEVENT':
             if event.nickname == self.nickname:
                 commands = event.message.split(' ')
+                batched_move = action.BatchedMoveAction()
+
                 for command in commands:
                     if command.upper() == '!UP':
-                        self.brain.add_action(action.MoveAction((0, -1)))
+                        move = action.MoveAction((0, -1))
+                        move.parent = batched_move
+                        self.brain.add_action(move)
 
                     elif command.upper() == '!DOWN':
-                        self.brain.add_action(action.MoveAction((0, 1)))
+                        move = action.MoveAction((0, 1))
+                        move.parent = batched_move
+                        self.brain.add_action(move)
 
                     elif command.upper() == '!LEFT':
-                        self.brain.add_action(action.MoveAction((-1, 0)))
+                        move = action.MoveAction((-1, 0))
+                        move.parent = batched_move
+                        self.brain.add_action(move)
 
                     elif command.upper() == '!RIGHT':
-                        self.brain.add_action(action.MoveAction((1, 0)))
+                        move = action.MoveAction((1, 0))
+                        move.parent = batched_move
+                        self.brain.add_action(move)
+                
+                self.brain.add_action(batched_move)

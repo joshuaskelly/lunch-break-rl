@@ -11,7 +11,14 @@ class Brain(object):
             if current_action.prerequiste(self.owner):
                 current_action.perform(self.owner)
 
+            else:
+                if current_action.parent and self.actions:
+                    while self.actions[0] != current_action.parent:
+                        self.actions.pop(0)
+
+                    current_action = self.actions.pop(0)
+                    current_action.on_fail(self.owner)
+
     def add_action(self, new_action):
         if isinstance(new_action, action.Action):
-            print('Adding action to queue')
             self.actions.append(new_action)

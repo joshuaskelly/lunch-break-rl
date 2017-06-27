@@ -37,11 +37,7 @@ while running:
     for event in list(tdl.event.get()) + observer.get_events():
         scene.handle_events(event)
 
-        if event.type == 'TWITCHCHATEVENT':
-            if event.message:
-                print(event.message)
-
-        elif event.type == 'QUIT':
+        if event.type == 'QUIT':
             running = False
             observer.stop()
 
