@@ -36,8 +36,12 @@ class IdleAction(Action):
         return True
 
     def perform(self, owner):
-        x = random.randint(-1, 1)
-        y = random.randint(-1, 1)
-        move = MoveAction((x, y))
-        owner.brain.add_action(move)
+        moves = (1, 0), (-1, 0), (0, 1), (0, -1)
+
+        number_of_moves = random.randint(1, 3)
+
+        for _ in range(number_of_moves):
+            move = MoveAction(moves[random.randint(0, 3)])
+            owner.brain.add_action(move)
+            
         owner.brain.add_action(IdleAction())
