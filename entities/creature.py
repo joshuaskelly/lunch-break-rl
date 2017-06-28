@@ -8,6 +8,7 @@ class Creature(entity.Entity):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg=(0, 0, 0))
         self.brain = brain.Brain(self)
+        self.name = 'Creature'
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y

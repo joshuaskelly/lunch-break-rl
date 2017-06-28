@@ -1,5 +1,7 @@
 import random
 
+from ui import console
+
 class Action(object):
     def __init__(self):
         self.parent = None
@@ -29,6 +31,7 @@ class MoveAction(Action):
     def perform(self, owner):
         if self.prerequiste(owner):
             owner.move(*self.dest)
+            console.Console.current_console.print('{} is moving'.format(owner.name))
 
 
 class IdleAction(Action):
@@ -43,5 +46,6 @@ class IdleAction(Action):
         for _ in range(number_of_moves):
             move = MoveAction(moves[random.randint(0, 3)])
             owner.brain.add_action(move)
-            
+
         owner.brain.add_action(IdleAction())
+        console.Console.current_console.print('{} is thinking...'.format(owner.name))

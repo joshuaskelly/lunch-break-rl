@@ -1,5 +1,6 @@
 import palette
 import scene
+
 from entities import player
 from ui import progressbar
 from ui import window
@@ -24,3 +25,4 @@ class PlayerWindow(window.Window):
 
     def handle_events(self, event):
         pass
+    

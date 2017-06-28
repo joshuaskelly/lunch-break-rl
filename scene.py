@@ -3,6 +3,7 @@ import tdl
 import draw
 import palette
 import level
+from ui import console
 from ui import playerwindow
 from ui import levelwindow
 
@@ -35,6 +36,9 @@ class Scene(object):
 
         w = playerwindow.PlayerWindow(29, 0, 11, 30, 'Players')
         self.entities.append(w)
+
+        self.console = console.Console(0, 24, 29, 6, title=None)
+        self.entities.append(self.console)
 
         npc = creature.Creature(char='k', position=(10, 10), fg=palette.BRIGHT_RED)
         npc.nickname = 'kobold'
