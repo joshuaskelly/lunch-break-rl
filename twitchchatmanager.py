@@ -11,7 +11,7 @@ class TwitchChatManager(object):
     def handle_events(self, event):
         s = scene.Scene.current_scene
 
-        if event.type == 'TWITCHCHATEVENT':
+        if event.type == 'TWITCHCHATMESSAGE':
             if event.message:
                 if event.message.upper() == '!JOIN':
                     p = player.Player(event.nickname[0], (1, 20), palette.colors[random.randint(1, len(palette.colors) - 1)])
