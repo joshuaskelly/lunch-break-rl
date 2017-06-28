@@ -1,6 +1,6 @@
 import palette
-import player
 import scene
+from entities import player
 from ui import progressbar
 from ui import window
 

@@ -2,9 +2,9 @@ import events
 import palette
 
 from ai import action
-from entities import character
+from entities import creature
 
-class Player(character.Character):
+class Player(creature.Creature):
     def __init__(self, char='@', position=(0, 0), fg=palette.BRIGHT_RED, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.nickname = 'Player'

@@ -2,12 +2,12 @@ import tdl
 
 import draw
 import palette
-import player
 import level
 from ui import playerwindow
 from ui import levelwindow
 
 from ai import action
+from entities import creature
 from entities import item
 from twitchchatmanager import TwitchChatManager
 
@@ -36,7 +36,7 @@ class Scene(object):
         w = playerwindow.PlayerWindow(29, 0, 11, 30, 'Players')
         self.entities.append(w)
 
-        npc = player.Player(char='k', position=(10, 10), fg=palette.BRIGHT_RED)
+        npc = creature.Creature(char='k', position=(10, 10), fg=palette.BRIGHT_RED)
         npc.nickname = 'kobold'
         npc.brain.add_action(action.IdleAction())
         self.entities.append(npc)

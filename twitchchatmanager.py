@@ -1,8 +1,9 @@
 import random
 
 import palette
-import player
 import scene
+
+from entities import player
 
 class TwitchChatManager(object):
     def draw(self, console):

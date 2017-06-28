@@ -4,7 +4,7 @@ from ai import brain
 from ai import action
 from entities import entity
 
-class Character(entity.Entity):
+class Creature(entity.Entity):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg=(0, 0, 0))
         self.brain = brain.Brain(self)
