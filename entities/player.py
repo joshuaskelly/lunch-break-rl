@@ -31,7 +31,7 @@ class Player(creature.Creature):
             elif event.keychar.upper() == 'RIGHT':
                 self.brain.add_action(action.MoveAction((1, 0)))
 
-        elif event.type == 'TWITCHCHATEVENT':
+        elif event.type == 'TWITCHCHATMESSAGE':
             if event.nickname == self.nickname:
                 commands = event.message.split(' ')
                 batched_move = action.BatchedMoveAction()

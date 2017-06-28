@@ -4,6 +4,7 @@ import palette
 import scene
 
 from entities import player
+from ui import console
 
 class TwitchChatManager(object):
     def draw(self, console):
@@ -18,6 +19,7 @@ class TwitchChatManager(object):
                     p = player.Player(event.nickname[0], (1, 20), palette.colors[random.randint(1, len(palette.colors) - 1)])
                     p.nickname = event.nickname
                     s.entities.append(p)
+                    console.Console.current_console.print('{} has joined!'.format(event.nickname))
 
                 elif event.message.upper() == '!LEAVE':
                     for entity in s.entities:
@@ -26,6 +28,7 @@ class TwitchChatManager(object):
 
                         if entity.nickname == event.nickname:
                             s.entities.remove(entity)
+                            console.Console.current_console.print('{} has left.'.format(event.nickname))
 
     def update(self, time):
         pass
