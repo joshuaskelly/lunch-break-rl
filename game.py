@@ -23,8 +23,9 @@ config.read(cfg_path)
 nickname = config['DEFAULT']['Nickname'],
 password = config['DEFAULT']['Password']
 channel = config['DEFAULT']['Channel']
-observer = Observer(nickname, password, channel)
+observer = Observer(nickname, password)
 observer.start()
+observer.join_channel(channel)
 
 running = True
 while running:
