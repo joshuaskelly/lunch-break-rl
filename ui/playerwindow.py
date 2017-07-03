@@ -20,6 +20,7 @@ class PlayerWindow(window.Window):
             self.data.draw_str(1, row, entity.name[:self.width - 2], fg=entity.fg)
 
             pb = progressbar.ProgressBar(1, row + 1, self.width - 2, entity.max_health, palette.BRIGHT_RED)
+            pb.current_value = entity.current_health
             pb.draw(self.data)
             row += 3
 

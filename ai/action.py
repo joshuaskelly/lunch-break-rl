@@ -29,9 +29,8 @@ class MoveAction(Action):
         return owner.can_move(*self.dest)
 
     def perform(self, owner):
-        if self.prerequiste(owner):
-            owner.move(*self.dest)
-            console.Console.current_console.print('{} is moving'.format(owner.name))
+        owner.move(*self.dest)
+        console.Console.current_console.print('{} is moving'.format(owner.name))
 
 
 class IdleAction(Action):

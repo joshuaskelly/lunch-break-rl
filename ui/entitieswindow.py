@@ -23,6 +23,7 @@ class EntitiesWindow(window.Window):
 
                 if hasattr(entity, 'max_health') and hasattr(entity, 'current_health'):
                     pb = progressbar.ProgressBar(1, row, self.width - 2, entity.max_health, palette.BRIGHT_RED)
+                    pb.current_value = entity.current_health
                     pb.draw(self.data)
                     row += 1
 
