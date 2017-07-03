@@ -18,7 +18,7 @@ class EntitiesWindow(window.Window):
                 continue
 
             if hasattr(entity, 'name'):
-                self.data.draw_str(1, row, entity.name[:self.width - 2], fg=entity.fg)
+                self.data.draw_str(1, row, '{}:{}'.format(entity.char, entity.name[:self.width - 4]), fg=entity.fg)
                 row += 1
 
                 if hasattr(entity, 'max_health') and hasattr(entity, 'current_health'):
