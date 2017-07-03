@@ -17,8 +17,11 @@ class PlayerWindow(window.Window):
             if not isinstance(entity, player.Player):
                 continue
 
-            self.data.draw_str(1, row, entity.nickname[:self.width - 2], fg=entity.fg)
-            row += 1
+            self.data.draw_str(1, row, entity.name[:self.width - 2], fg=entity.fg)
+
+            pb = progressbar.ProgressBar(1, row + 1, self.width - 2, entity.max_health, palette.BRIGHT_RED)
+            pb.draw(self.data)
+            row += 3
 
         self.data.draw_str(2, self.height - 1, '(!join)', fg=palette.BRIGHT_YELLOW)
         console.blit(self.data, self.x, self.y)

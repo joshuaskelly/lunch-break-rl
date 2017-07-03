@@ -9,7 +9,7 @@ from twitchobserver import Observer
 from scene import Scene
 
 tdl.set_font('terminal32x32_gs_ro.png')
-console = tdl.init(40, 30, 'lunch break roguelike', renderer='OPENGL')
+console = tdl.init(54, 30, 'lunch break roguelike', renderer='OPENGL')
 tdl.set_fps(30)
 
 scene = Scene()

@@ -7,7 +7,7 @@ from entities import creature
 class Player(creature.Creature):
     def __init__(self, char='@', position=(0, 0), fg=palette.BRIGHT_RED, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
-        self.nickname = 'Player'
+        self.name = 'Player'
 
     def update(self, time):
         pass
@@ -32,7 +32,7 @@ class Player(creature.Creature):
                 self.brain.add_action(action.MoveAction((1, 0)))
 
         elif event.type == 'TWITCHCHATMESSAGE':
-            if event.nickname == self.nickname:
+            if event.nickname == self.name:
                 commands = event.message.split(' ')
                 batched_move = action.BatchedMoveAction()
 

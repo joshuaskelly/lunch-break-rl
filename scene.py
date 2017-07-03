@@ -4,11 +4,13 @@ import draw
 import palette
 import level
 from ui import console
+from ui import entitieswindow
 from ui import playerwindow
 from ui import levelwindow
 
 from ai import action
 from entities import creature
+from entities import entity
 from entities import item
 from twitchchatmanager import TwitchChatManager
 
@@ -27,23 +29,39 @@ class Scene(object):
         self.timer = 0
 
         self.entities.append(TwitchChatManager())
-        w = levelwindow.LevelWindow(0, 0, 29, 30, 'Lunch Break RL')
+        w = levelwindow.LevelWindow(11, 0, 31, 30, 'Lunch Break RL')
         w.seconds_per_tick = self.seconds_per_tick
         self.entities.append(w)
 
-        self.level = level.Level(1, 1, 27, 28)
+        self.level = level.Level(12, 1, 29, 28)
         self.entities.append(self.level)
 
-        w = playerwindow.PlayerWindow(29, 0, 11, 30, 'Players')
+        w = playerwindow.PlayerWindow(29+13, 0, 11, 30, 'Players')
         self.entities.append(w)
 
-        self.console = console.Console(0, 23, 29, 6, title=None)
+        w = entitieswindow.EntitiesWindow(0, 0, 11, 30)
+        self.entities.append(w)
+
+        self.console = console.Console(11, 23, 31, 6, title=None)
         self.entities.append(self.console)
 
-        npc = creature.Creature(char='k', position=(10, 10), fg=palette.BRIGHT_RED)
-        npc.nickname = 'kobold'
+        npc = creature.Creature(char='K', position=(15, 10), fg=palette.BRIGHT_RED)
+        npc.name = 'kobold'
         npc.brain.add_action(action.IdleAction())
         self.entities.append(npc)
+
+        npc = creature.Creature(char='K', position=(15, 11), fg=palette.BRIGHT_RED)
+        npc.name = 'kobold'
+        npc.brain.add_action(action.IdleAction())
+        self.entities.append(npc)
+
+        item = entity.Entity(char='!', position=(20, 17), fg=palette.BRIGHT_MAGENTA)
+        item.name = 'potion'
+        self.entities.append(item)
+
+        item = entity.Entity(char=']', position=(30, 17), fg=palette.BRIGHT_YELLOW)
+        item.name = 'chainmail'
+        self.entities.append(item)
 
         if not Scene.current_scene:
             Scene.current_scene = self

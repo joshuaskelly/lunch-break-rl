@@ -16,8 +16,10 @@ class TwitchChatManager(object):
         if event.type == 'TWITCHCHATMESSAGE':
             if event.message:
                 if event.message.upper() == '!JOIN':
-                    p = player.Player(event.nickname[0], (1, 20), palette.colors[random.randint(1, len(palette.colors) - 1)])
-                    p.nickname = event.nickname
+                    level = scene.Scene.current_scene.level
+                    pos = level.x + random.randint(0, 10), level.y + random.randint(0, 10)
+                    p = player.Player(event.nickname[0], pos, palette.colors[random.randint(1, len(palette.colors) - 1)])
+                    p.name = event.nickname
                     s.entities.append(p)
                     console.Console.current_console.print('{} has joined!'.format(event.nickname))
 
@@ -26,7 +28,7 @@ class TwitchChatManager(object):
                         if not isinstance(entity, player.Player):
                             continue
 
-                        if entity.nickname == event.nickname:
+                        if entity.name == event.nickname:
                             s.entities.remove(entity)
                             console.Console.current_console.print('{} has left.'.format(event.nickname))
 

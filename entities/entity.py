@@ -4,6 +4,7 @@ class Entity(object):
         self.position = position
         self.fg = fg
         self.bg = bg
+        self.name = self.__class__.__name__
 
     def draw(self, console):
         if self.position in console:

@@ -9,6 +9,8 @@ class Creature(entity.Entity):
         super().__init__(char, position, fg, bg=(0, 0, 0))
         self.brain = brain.Brain(self)
         self.name = 'Creature'
+        self.current_health = 10
+        self.max_health = 10
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
