@@ -20,6 +20,31 @@ class Action(object):
 class BatchedMoveAction(Action):
     pass
 
+
+class PerformHeldItemAction(Action):
+    def __init__(self, target):
+        super().__init__()
+        self.target = target
+
+    def prerequiste(self, owner):
+        return True
+
+    def perform(self, owner):
+        held_action = owner.held_item.get_action()
+
+
+class AttackAction(Action):
+    def __init__(self, target):
+        super().__init__()
+        self.target = target
+
+    def prerequiste(self, owner):
+        # Check if target is in range?
+        return True
+
+    def perform(self, owner):
+        self.target.current_health -= 1
+
 class MoveAction(Action):
     def __init__(self, dest):
         super().__init__()
@@ -30,7 +55,7 @@ class MoveAction(Action):
 
     def perform(self, owner):
         owner.move(*self.dest)
-        console.Console.current_console.print('{} is moving'.format(owner.name))
+        #console.Console.current_console.print('{} is moving'.format(owner.name))
 
 
 class IdleAction(Action):
@@ -47,4 +72,29 @@ class IdleAction(Action):
             owner.brain.add_action(move)
 
         owner.brain.add_action(IdleAction())
-        console.Console.current_console.print('{} is thinking...'.format(owner.name))
+        #console.Console.current_console.print('{} is thinking...'.format(owner.name))
+
+class EquipItemAction(Action):
+    def __init__(self, item):
+        super().__init__()
+        self.item = item
+
+    def prerequiste(self, owner):
+        return True
+
+    def perform(self, owner):
+        owner.held_item = self.item
+        self.item.remove()
+        console.Console.current_console.print('{} is equipping {}'.format(owner.name, self.item.name))
+
+class UseItemAction(Action):
+    def __init__(self, item):
+        super().__init__()
+        self.item = item
+
+    def prerequiste(self, owner):
+        return True
+
+    def perform(self, owner):
+        self.item.use(owner)
+        self.item.remove()

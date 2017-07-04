@@ -55,13 +55,13 @@ class Scene(object):
         npc.brain.add_action(action.IdleAction())
         self.entities.append(npc)
 
-        item = entity.Entity(char='!', position=(20, 17), fg=palette.BRIGHT_MAGENTA)
-        item.name = 'potion'
-        self.entities.append(item)
+        i = item.UsableItem(char='!', position=(20, 7), fg=palette.BRIGHT_MAGENTA)
+        i.name = 'potion'
+        self.entities.append(i)
 
-        item = entity.Entity(char=']', position=(30, 17), fg=palette.BRIGHT_YELLOW)
-        item.name = 'chainmail'
-        self.entities.append(item)
+        i = item.HeldItem(char='s', position=(25, 7), fg=palette.BRIGHT_YELLOW)
+        i.name = 'sword'
+        self.entities.append(i)
 
         if not Scene.current_scene:
             Scene.current_scene = self

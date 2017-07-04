@@ -1,3 +1,5 @@
+import scene
+
 class Entity(object):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
         self.char = char
@@ -18,3 +20,10 @@ class Entity(object):
 
     def update(self, time):
         pass
+
+    def get_action(self):
+        return None
+
+    def remove(self):
+        if self in scene.Scene.current_scene.entities:
+            scene.Scene.current_scene.entities.remove(self)

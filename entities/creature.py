@@ -3,6 +3,7 @@ import scene
 from ai import brain
 from ai import action
 from entities import entity
+from entities import item
 from ui import console
 
 class Creature(entity.Entity):
@@ -12,23 +13,22 @@ class Creature(entity.Entity):
         self.name = 'Creature'
         self.current_health = 10
         self.max_health = 10
+        self.held_item = item.Fist('f')
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
 
-        occupied = None
+        action_to_perform = None
 
-        for entity in scene.Scene.current_scene.entities:
-            if not isinstance(entity, Creature):
+        for e in scene.Scene.current_scene.entities:
+            if not isinstance(e, entity.Entity):
                 continue
 
-            if dest == entity.position:
-                occupied = entity
-                break
+            if dest == e.position:
+                action_to_perform = e.get_action()
 
-        if occupied:
-            console.Console.current_console.print('{} attacks {}'.format(self.name, entity.name))
-            entity.current_health -= 1
+        if action_to_perform and action_to_perform.prerequiste(self):
+            action_to_perform.perform(self)
 
         elif self.can_move(x, y):
             self.position = self.position[0] + x, self.position[1] + y
@@ -43,3 +43,6 @@ class Creature(entity.Entity):
     def handle_events(self, event):
         if event.type == 'TICK':
             self.tick()
+
+    def get_action(self):
+        return action.AttackAction(self)
