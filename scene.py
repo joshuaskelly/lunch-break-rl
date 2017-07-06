@@ -1,8 +1,10 @@
 import tdl
 
+import dungeonmaster
 import draw
 import palette
 import level
+
 from ui import console
 from ui import entitieswindow
 from ui import playerwindow
@@ -29,11 +31,12 @@ class Scene(object):
         self.timer = 0
 
         self.entities.append(TwitchChatManager())
-        w = levelwindow.LevelWindow(11, 0, 31, 30, 'Lunch Break RL')
+        self.entities.append(dungeonmaster.DungeonMaster())
+        w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
         w.seconds_per_tick = self.seconds_per_tick
         self.entities.append(w)
 
-        self.level = level.Level(12, 1, 29, 28)
+        self.level = level.Level(12, 1, 29, 22)
         self.entities.append(self.level)
 
         w = playerwindow.PlayerWindow(29+13, 0, 11, 30, 'Players')
@@ -42,7 +45,7 @@ class Scene(object):
         w = entitieswindow.EntitiesWindow(0, 0, 11, 30)
         self.entities.append(w)
 
-        self.console = console.Console(11, 23, 31, 6, title=None)
+        self.console = console.Console(11, 24, 31, 6, title=None)
         self.entities.append(self.console)
 
         npc = creature.Creature(char='K', position=(15, 10), fg=palette.BRIGHT_RED)
@@ -55,12 +58,17 @@ class Scene(object):
         npc.brain.add_action(action.IdleAction())
         self.entities.append(npc)
 
-        i = item.UsableItem(char='!', position=(20, 7), fg=palette.BRIGHT_MAGENTA)
+        i = item.Potion(char='!', position=(20, 7), fg=palette.BRIGHT_MAGENTA)
         i.name = 'potion'
         self.entities.append(i)
 
-        i = item.HeldItem(char='s', position=(25, 7), fg=palette.BRIGHT_YELLOW)
+        i = item.Sword(position=(25, 7), fg=palette.BRIGHT_YELLOW)
         i.name = 'sword'
+        self.entities.append(i)
+
+        i = item.HeldItem(char='a', position=(25, 8), fg=palette.BRIGHT_YELLOW)
+        i.name = 'ax'
+        i.damage = 2
         self.entities.append(i)
 
         if not Scene.current_scene:

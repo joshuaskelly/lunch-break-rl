@@ -1,5 +1,8 @@
 import random
 
+import scene
+
+from entities import item
 from ui import console
 
 class Action(object):
@@ -43,7 +46,13 @@ class AttackAction(Action):
         return True
 
     def perform(self, owner):
-        self.target.current_health -= 1
+        weapon = owner.held_item
+        damage_dealt = 1
+        if weapon and hasattr(weapon, 'damage'):
+            damage_dealt = weapon.damage
+
+        self.target.current_health -= damage_dealt
+        console.Console.current_console.print('{} attacks {}'.format(owner.name, self.target.name))
 
 class MoveAction(Action):
     def __init__(self, dest):
@@ -83,8 +92,15 @@ class EquipItemAction(Action):
         return True
 
     def perform(self, owner):
+        old_item = owner.held_item
+        old_item.position = self.item.position
+
         owner.held_item = self.item
         self.item.remove()
+
+        if old_item and not isinstance(old_item, item.Fist):
+            scene.Scene.current_scene.entities.append(old_item)
+
         console.Console.current_console.print('{} is equipping {}'.format(owner.name, self.item.name))
 
 class UseItemAction(Action):

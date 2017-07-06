@@ -18,7 +18,7 @@ class Entity(object):
     def handle_events(self, event):
         pass
 
-    def update(self, time):
+    def tick(self):
         pass
 
     def get_action(self):

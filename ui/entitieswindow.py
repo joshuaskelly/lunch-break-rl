@@ -1,6 +1,7 @@
 import palette
 import scene
 
+from entities import entity
 from entities import player
 from ui import progressbar
 from ui import window
@@ -13,17 +14,20 @@ class EntitiesWindow(window.Window):
         super().draw(console)
 
         row = 1
-        for entity in scene.Scene.current_scene.entities:
-            if isinstance(entity, player.Player):
+        for e in scene.Scene.current_scene.entities:
+            if isinstance(e, player.Player):
                 continue
 
-            if hasattr(entity, 'name'):
-                self.data.draw_str(1, row, '{}:{}'.format(entity.char, entity.name[:self.width - 4]), fg=entity.fg)
+            if not (0, row) in self.data:
+                break
+
+            if isinstance(e, entity.Entity):
+                self.data.draw_str(1, row, '{}:{}'.format(e.char, e.name[:self.width - 4]), fg=e.fg)
                 row += 1
 
-                if hasattr(entity, 'max_health') and hasattr(entity, 'current_health'):
-                    pb = progressbar.ProgressBar(1, row, self.width - 2, entity.max_health, palette.BRIGHT_RED)
-                    pb.current_value = entity.current_health
+                if hasattr(e, 'max_health') and hasattr(e, 'current_health'):
+                    pb = progressbar.ProgressBar(1, row, self.width - 2, e.max_health, palette.BRIGHT_RED)
+                    pb.current_value = e.current_health
                     pb.draw(self.data)
                     row += 1
 
