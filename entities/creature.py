@@ -39,8 +39,16 @@ class Creature(entity.Entity):
 
     def update(self, time):
         if self.current_health <= 0:
-            console.Console.current_console.print('{} perishes!'.format(self.name))
-            self.remove()
+            self.die()
+
+    def die(self):
+        if self.held_item != item.Fist:
+            i = self.held_item
+            i.position = self.position
+            scene.Scene.current_scene.entities.append(i)
+            
+        console.Console.current_console.print('{} perishes!'.format(self.name))
+        self.remove()
 
     def tick(self):
         self.brain.perform_action()
