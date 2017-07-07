@@ -48,11 +48,16 @@ class AttackAction(Action):
     def perform(self, owner):
         weapon = owner.held_item
         damage_dealt = 1
-        if weapon and hasattr(weapon, 'damage'):
-            damage_dealt = weapon.damage
+        verb = 'attacks'
+        if weapon:
+            if hasattr(weapon, 'damage'):
+                damage_dealt = weapon.damage
+
+            if hasattr(weapon, 'verb'):
+                verb = weapon.verb
 
         self.target.current_health -= damage_dealt
-        console.Console.current_console.print('{} attacks {}'.format(owner.name, self.target.name))
+        console.Console.current_console.print('{} {} {}'.format(owner.name, verb, self.target.name))
 
 class MoveAction(Action):
     def __init__(self, dest):

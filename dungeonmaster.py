@@ -20,7 +20,7 @@ class DungeonMaster(object):
     def tick(self):
         roll = random.random()
 
-        if roll <= 0.5:
+        if roll <= 0.25:
             roll = random.random()
             current_scene = scene.Scene.current_scene
             level = current_scene.level

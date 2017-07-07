@@ -37,11 +37,12 @@ class Creature(entity.Entity):
         dest = self.position[0] + x, self.position[1] + y
         return not scene.Scene.current_scene.check_collision(*dest)
 
-    def tick(self):
+    def update(self, time):
         if self.current_health <= 0:
             console.Console.current_console.print('{} perishes!'.format(self.name))
             self.remove()
 
+    def tick(self):
         self.brain.perform_action()
 
     def handle_events(self, event):

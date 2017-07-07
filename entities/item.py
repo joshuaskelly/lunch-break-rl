@@ -40,6 +40,7 @@ class Fist(HeldItem):
         super().__init__(char, position, fg, bg)
 
         self.damage = 1
+        self.verb = 'punches'
 
 
 class Sword(HeldItem):
@@ -48,3 +49,4 @@ class Sword(HeldItem):
 
         self.damage = 3
         self.name = 'sword'
+        self.verb = 'slashes'

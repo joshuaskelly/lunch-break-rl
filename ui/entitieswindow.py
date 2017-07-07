@@ -18,7 +18,7 @@ class EntitiesWindow(window.Window):
             if isinstance(e, player.Player):
                 continue
 
-            if not (0, row) in self.data:
+            if row >= self.height:
                 break
 
             if isinstance(e, entity.Entity):

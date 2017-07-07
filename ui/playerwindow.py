@@ -17,6 +17,9 @@ class PlayerWindow(window.Window):
             if not isinstance(entity, player.Player):
                 continue
 
+            if row >= self.height - 1:
+                break
+
             self.data.draw_str(1, row, entity.name[:self.width - 2], fg=entity.fg)
 
             pb = progressbar.ProgressBar(1, row + 1, self.width - 2, entity.max_health, palette.BRIGHT_RED)

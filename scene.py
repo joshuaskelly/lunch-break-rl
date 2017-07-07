@@ -68,7 +68,8 @@ class Scene(object):
 
         i = item.HeldItem(char='a', position=(25, 8), fg=palette.BRIGHT_YELLOW)
         i.name = 'ax'
-        i.damage = 2
+        i.verb  = 'chops'
+        i.damage = 4
         self.entities.append(i)
 
         if not Scene.current_scene:
