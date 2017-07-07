@@ -10,7 +10,7 @@ class Player(creature.Creature):
         self.name = 'Player'
 
     def update(self, time):
-        pass
+        super().update(time)
 
     def move(self, x, y):
         super().move(x, y)

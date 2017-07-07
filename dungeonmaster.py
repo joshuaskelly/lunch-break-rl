@@ -20,11 +20,11 @@ class DungeonMaster(object):
     def tick(self):
         roll = random.random()
 
-        if roll <= 0.25:
+        if roll <= 0.125:
             roll = random.random()
             current_scene = scene.Scene.current_scene
             level = current_scene.level
-            position = random.randint(0, level.width) + level.x, random.randint(0, level.height + level.y)
+            position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
 
             if roll <= 0.2:
                 npc = creature.Creature(char='K', position=position, fg=palette.BRIGHT_RED)
