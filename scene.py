@@ -1,5 +1,6 @@
 import tdl
 
+import dungeongenerator
 import dungeonmaster
 import draw
 import palette
@@ -36,7 +37,9 @@ class Scene(object):
         w.seconds_per_tick = self.seconds_per_tick
         self.entities.append(w)
 
-        self.level = level.Level(12, 1, 29, 22)
+        self.level = dungeongenerator.generate_level(29, 22) #level.Level(12, 1, 29, 22)
+        self.level.x = 12
+        self.level.y = 1
         self.entities.append(self.level)
 
         w = playerwindow.PlayerWindow(29+13, 0, 11, 30, 'Players')
@@ -66,7 +69,7 @@ class Scene(object):
         i.name = 'sword'
         self.entities.append(i)
 
-        i = item.HeldItem(char='a', position=(25, 8), fg=palette.BRIGHT_YELLOW)
+        i = item.HeldItem(char='a', position=(15, 9), fg=palette.BRIGHT_YELLOW)
         i.name = 'ax'
         i.verb  = 'chops'
         i.damage = 4

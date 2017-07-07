@@ -26,9 +26,13 @@ class EntitiesWindow(window.Window):
                 row += 1
 
                 if hasattr(e, 'max_health') and hasattr(e, 'current_health'):
-                    pb = progressbar.ProgressBar(1, row, self.width - 2, e.max_health, palette.BRIGHT_RED)
+                    pb = progressbar.ProgressBar(1, row, self.width - 3, e.max_health, palette.BRIGHT_RED)
                     pb.current_value = e.current_health
                     pb.draw(self.data)
+
+                    weapon = e.held_item
+                    self.data.draw_char(self.width - 2, row, weapon.char, fg=weapon.fg)
+
                     row += 1
 
                 row +=1

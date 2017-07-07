@@ -42,7 +42,7 @@ class Creature(entity.Entity):
             self.die()
 
     def die(self):
-        if self.held_item != item.Fist:
+        if not isinstance(self.held_item, item.Fist):
             i = self.held_item
             i.position = self.position
             scene.Scene.current_scene.entities.append(i)
