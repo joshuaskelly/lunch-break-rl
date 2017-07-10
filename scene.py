@@ -75,26 +75,28 @@ class Scene(object):
             Scene.current_scene = self
 
     def draw(self, console):
-        #self.level.draw(console)
-
         for entity in self.entities:
             entity.draw(console)
 
     def handle_events(self, event):
-        #self.level.handle_events(event)
-
         for entity in self.entities:
             entity.handle_events(event)
 
     def check_collision(self, x, y):
-        """Returns True if player cannot move into coords"""
+        """Returns True if player can move into coords"""
 
         if not (x - self.level.x, y - self.level.y) in self.level.data:
-            return True
+            return False
 
         char, fg, bg = self.level.get_char(x - self.level.x, y - self.level.y)
 
-        return char != ord(' ')
+        return char == ord(' ')
+
+    def check_visibility(self, x, y):
+        #x -= self.level.x
+        #y -= self.level.y
+
+        return (x, y) in self.level.visible_tiles
 
     def update(self, time):
         for entity in self.entities:
@@ -104,3 +106,5 @@ class Scene(object):
         if self.timer > self.seconds_per_tick:
             self.timer = 0
             tdl.event.push(TickEvent())
+
+            self.level.update_fov()

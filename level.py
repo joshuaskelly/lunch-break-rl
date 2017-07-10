@@ -3,6 +3,11 @@ import os
 
 import tdl
 
+import palette
+import scene
+
+from entities import player
+
 class Level(object):
     def __init__(self, x, y, width, height):
         self.x = x
@@ -12,6 +17,7 @@ class Level(object):
         self.data = tdl.Console(width, height)
         self.painting = False
         self.erasing = False
+        self.visible_tiles = set()
 
     def draw_char(self, x, y, fg=Ellipsis, bg=Ellipsis):
         self.data.draw_char(x, y, fg, bg)
@@ -20,7 +26,18 @@ class Level(object):
         return self.data.get_char(x, y)
 
     def draw(self, console):
-        console.blit(self.data, self.x, self.y)
+        for x, y in self.data:
+            ch, fg, bg = self.data.get_char(x, y)
+            x += self.x
+            y += self.y
+
+            if (x, y) in self.visible_tiles:
+                fg = palette.WHITE
+            
+            else:
+                fg = palette.BRIGHT_BLACK
+            
+            console.draw_char(x, y, ch, fg, bg)
 
     def handle_events(self, event):
         if event.type == 'MOUSEDOWN':
@@ -84,3 +101,16 @@ class Level(object):
 
     def update(self, time):
         pass
+
+    def update_fov(self):
+        current_scene = scene.Scene.current_scene
+        self.visible_tiles = set()
+
+        for e in current_scene.entities:
+            if not isinstance(e, player.Player):
+                continue
+
+            x, y = e.position
+            visible_tiles = tdl.map.quick_fov(x, y, current_scene.check_collision)
+
+            self.visible_tiles = self.visible_tiles.union(visible_tiles)

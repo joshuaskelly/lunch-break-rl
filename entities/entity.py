@@ -10,7 +10,9 @@ class Entity(object):
 
     def draw(self, console):
         if self.position in console:
-            console.draw_char(*self.position, self.char, self.fg, self.bg)
+
+            if scene.Scene.current_scene.check_visibility(*self.position):
+                console.draw_char(*self.position, self.char, self.fg, self.bg)
 
     def update(self, time):
         pass

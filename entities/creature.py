@@ -35,7 +35,7 @@ class Creature(entity.Entity):
 
     def can_move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
-        return not scene.Scene.current_scene.check_collision(*dest)
+        return scene.Scene.current_scene.check_collision(*dest)
 
     def update(self, time):
         if self.current_health <= 0:
