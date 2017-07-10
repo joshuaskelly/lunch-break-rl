@@ -1,3 +1,5 @@
+import palette
+
 from ai import action
 from entities import entity
 from ui import console
@@ -44,7 +46,7 @@ class Fist(HeldItem):
 
 
 class Sword(HeldItem):
-    def __init__(self, char='s', position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
+    def __init__(self, char='s', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg)
 
         self.damage = 3

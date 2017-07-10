@@ -33,7 +33,6 @@ class DungeonMaster(object):
 
             elif roll <= 0.3:
                 s = item.Sword(position=position, fg=palette.BRIGHT_YELLOW)
-                s.name = 'sword'
                 current_scene.entities.append(s)
 
             elif roll <= 0.4:
