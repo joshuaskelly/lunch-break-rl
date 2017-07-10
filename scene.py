@@ -12,7 +12,7 @@ from ui import playerwindow
 from ui import levelwindow
 
 from ai import action
-from entities import creature
+from entities import kobold
 from entities import entity
 from entities import item
 from twitchchatmanager import TwitchChatManager
@@ -51,14 +51,10 @@ class Scene(object):
         self.console = console.Console(11, 24, 31, 6, title=None)
         self.entities.append(self.console)
 
-        npc = creature.Creature(char='K', position=(15, 10), fg=palette.BRIGHT_RED)
-        npc.name = 'kobold'
-        npc.brain.add_action(action.IdleAction())
+        npc = kobold.Kobold(position=(15, 10))
         self.entities.append(npc)
 
-        npc = creature.Creature(char='K', position=(15, 11), fg=palette.BRIGHT_RED)
-        npc.name = 'kobold'
-        npc.brain.add_action(action.IdleAction())
+        npc = kobold.Kobold(position=(15, 11))
         self.entities.append(npc)
 
         i = item.Potion(char='!', position=(20, 7), fg=palette.BRIGHT_MAGENTA)

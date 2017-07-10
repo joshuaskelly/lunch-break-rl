@@ -5,6 +5,7 @@ import scene
 
 from ai import action
 from entities import creature
+from entities import kobold
 from entities import item
 
 class DungeonMaster(object):
@@ -27,10 +28,8 @@ class DungeonMaster(object):
             position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
 
             if roll <= 0.2:
-                npc = creature.Creature(char='K', position=position, fg=palette.BRIGHT_RED)
-                npc.name = 'kobold'
-                npc.brain.add_action(action.IdleAction())
-                current_scene.entities.append(npc)
+                k = kobold.Kobold(position=position)
+                current_scene.entities.append(k)
 
             elif roll <= 0.3:
                 s = item.Sword(position=position, fg=palette.BRIGHT_YELLOW)
