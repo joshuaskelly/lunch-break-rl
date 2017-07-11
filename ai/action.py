@@ -42,7 +42,18 @@ class AttackAction(Action):
         self.target = target
 
     def prerequiste(self, owner):
-        # Check if target is in range?
+        dx = owner.position[0] - self.target.position[0]
+        dy = owner.position[1] - self.target.position[1]
+
+        if abs(dx) > 1:
+            return False
+
+        if abs(dy) > 1:
+            return False
+
+        if abs(dx) == 1 and abs(dy) == 1:
+            return False
+
         return True
 
     def perform(self, owner):
