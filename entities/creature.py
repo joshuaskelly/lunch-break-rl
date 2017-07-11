@@ -67,3 +67,20 @@ class Creature(entity.Entity):
 
     def get_action(self):
         return action.AttackAction(self)
+
+    @property
+    def visible_entities(self):
+        current_scene = scene.Scene.current_scene
+        result = []
+
+        for e in current_scene.entities:
+            if not isinstance(e, entity.Entity):
+                continue
+
+            if e == self:
+                continue
+
+            if e.position in self.visible_tiles:
+                result.append(e)
+
+        return result
