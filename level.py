@@ -110,7 +110,4 @@ class Level(object):
             if not isinstance(e, player.Player):
                 continue
 
-            x, y = e.position
-            visible_tiles = tdl.map.quick_fov(x, y, current_scene.check_collision)
-
-            self.visible_tiles = self.visible_tiles.union(visible_tiles)
+            self.visible_tiles = self.visible_tiles.union(e.visible_tiles)

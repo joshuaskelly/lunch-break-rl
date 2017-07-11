@@ -1,3 +1,5 @@
+import tdl
+
 import scene
 
 from ai import brain
@@ -14,6 +16,7 @@ class Creature(entity.Entity):
         self.current_health = 10
         self.max_health = 10
         self.held_item = item.Fist('f')
+        self.visible_tiles = set()
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
@@ -41,6 +44,10 @@ class Creature(entity.Entity):
         if self.current_health <= 0:
             self.die()
 
+    def update_fov(self):
+        x, y = self.position
+        self.visible_tiles = tdl.map.quick_fov(x, y, scene.Scene.current_scene.check_collision)
+
     def die(self):
         if not isinstance(self.held_item, item.Fist):
             i = self.held_item
@@ -52,6 +59,7 @@ class Creature(entity.Entity):
 
     def tick(self):
         self.brain.perform_action()
+        self.update_fov()
 
     def handle_events(self, event):
         if event.type == 'TICK':

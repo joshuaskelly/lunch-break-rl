@@ -21,7 +21,7 @@ class EntitiesWindow(window.Window):
             if row >= self.height - 1:
                 break
 
-            if isinstance(e, entity.Entity):
+            if isinstance(e, entity.Entity) and e.visible:
                 self.data.draw_str(1, row, '{}:{}'.format(e.char, e.name[:self.width - 4]), fg=e.fg)
                 row += 1
 

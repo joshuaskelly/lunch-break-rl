@@ -17,7 +17,7 @@ class Action(object):
         pass
 
     def on_fail(self, owner):
-        print('Action failed')
+        pass
 
 
 class BatchedMoveAction(Action):
@@ -57,7 +57,8 @@ class AttackAction(Action):
                 verb = weapon.verb
 
         self.target.current_health -= damage_dealt
-        console.Console.current_console.print('{} {} {}'.format(owner.name, verb, self.target.name))
+        if owner.visible:
+            console.Console.current_console.print('{} {} {}'.format(owner.name, verb, self.target.name))
 
 class MoveAction(Action):
     def __init__(self, dest):
@@ -106,7 +107,8 @@ class EquipItemAction(Action):
         if old_item and not isinstance(old_item, item.Fist):
             scene.Scene.current_scene.entities.append(old_item)
 
-        console.Console.current_console.print('{} is equipping {}'.format(owner.name, self.item.name))
+        if owner.visible:
+            console.Console.current_console.print('{} is equiping {}'.format(owner.name, self.item.name))
 
 class UseItemAction(Action):
     def __init__(self, item):

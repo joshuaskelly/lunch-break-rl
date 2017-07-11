@@ -26,6 +26,12 @@ class Entity(object):
     def get_action(self):
         return None
 
+    @property
+    def visible(self):
+        """Returns True if in Players' visiblity"""
+        x, y = self.position
+        return (x, y) in scene.Scene.current_scene.level.visible_tiles
+
     def remove(self):
         if self in scene.Scene.current_scene.entities:
             scene.Scene.current_scene.entities.remove(self)

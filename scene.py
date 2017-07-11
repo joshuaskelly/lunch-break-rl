@@ -93,18 +93,15 @@ class Scene(object):
         return char == ord(' ')
 
     def check_visibility(self, x, y):
-        #x -= self.level.x
-        #y -= self.level.y
-
         return (x, y) in self.level.visible_tiles
 
     def update(self, time):
         for entity in self.entities:
             entity.update(time)
 
+        self.level.update_fov()
+
         self.timer += time
         if self.timer > self.seconds_per_tick:
             self.timer = 0
             tdl.event.push(TickEvent())
-
-            self.level.update_fov()
