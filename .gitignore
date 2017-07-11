@@ -3,6 +3,7 @@
 
 # Ignore Python Artifacts
 *.pyc
+.pylintrc
 __pycache__
 
 # Ignore Twitch Bot Config
