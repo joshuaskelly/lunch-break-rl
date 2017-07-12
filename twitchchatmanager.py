@@ -6,6 +6,15 @@ import scene
 from entities import player
 from ui import console
 
+regular_viewers = [
+    'daemianend',
+    'cuddigan',
+    'fourbitfriday',
+    'falseparklocation',
+    'pythooonuser',
+    'gui2203'
+]
+
 class TwitchChatManager(object):
     def draw(self, console):
         pass
@@ -21,7 +30,14 @@ class TwitchChatManager(object):
                     if not event.nickname in player_names:
                         level = scene.Scene.current_scene.level
                         pos = level.x + random.randint(0, 10), level.y + random.randint(0, 10)
-                        p = player.Player(event.nickname[0], pos, palette.colors[random.randint(1, len(palette.colors) - 1)])
+
+                        if event.nickname.lower() in regular_viewers:
+                            player_color = palette.BRIGHT_BLUE
+
+                        else:
+                            player_color = palette.get_nearest((255, 163, 0))
+
+                        p = player.Player(event.nickname[0], pos, fg=player_color)
                         p.name = event.nickname
                         s.entities.append(p)
                         console.Console.current_console.print('{} has joined!'.format(event.nickname))

@@ -35,3 +35,4 @@ class Entity(object):
     def remove(self):
         if self in scene.Scene.current_scene.entities:
             scene.Scene.current_scene.entities.remove(self)
+            self.position = None

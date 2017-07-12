@@ -22,6 +22,7 @@ class Creature(entity.Entity):
         dest = self.position[0] + x, self.position[1] + y
 
         action_to_perform = None
+        target_entity = None
 
         for e in scene.Scene.current_scene.entities:
             if not isinstance(e, entity.Entity):
@@ -29,11 +30,16 @@ class Creature(entity.Entity):
 
             if dest == e.position:
                 action_to_perform = e.get_action()
+                target_entity = e
+                break
 
         if action_to_perform and action_to_perform.prerequiste(self):
             action_to_perform.perform(self)
 
-        elif self.can_move(x, y):
+        if target_entity and target_entity.position == dest:
+            return
+
+        if self.can_move(x, y):
             self.position = self.position[0] + x, self.position[1] + y
 
     def can_move(self, x, y):
@@ -53,7 +59,7 @@ class Creature(entity.Entity):
             i = self.held_item
             i.position = self.position
             scene.Scene.current_scene.entities.append(i)
-            
+
         console.Console.current_console.print('{} perishes!'.format(self.name))
         self.remove()
 

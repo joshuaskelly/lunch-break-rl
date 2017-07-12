@@ -36,25 +36,28 @@ class Player(creature.Creature):
                 commands = event.message.split(' ')
                 batched_move = action.BatchedMoveAction()
 
-                for command in commands:
-                    if command.upper() == '!UP':
-                        move = action.MoveAction((0, -1))
-                        move.parent = batched_move
-                        self.brain.add_action(move)
+                if commands[0].upper() == '!MOVE':
+                    moves = ''.join(commands[1:])
 
-                    elif command.upper() == '!DOWN':
-                        move = action.MoveAction((0, 1))
-                        move.parent = batched_move
-                        self.brain.add_action(move)
+                    for command in moves:
+                        if command.upper() == 'U':
+                            move = action.MoveAction((0, -1))
+                            move.parent = batched_move
+                            self.brain.add_action(move)
 
-                    elif command.upper() == '!LEFT':
-                        move = action.MoveAction((-1, 0))
-                        move.parent = batched_move
-                        self.brain.add_action(move)
+                        elif command.upper() == 'D':
+                            move = action.MoveAction((0, 1))
+                            move.parent = batched_move
+                            self.brain.add_action(move)
 
-                    elif command.upper() == '!RIGHT':
-                        move = action.MoveAction((1, 0))
-                        move.parent = batched_move
-                        self.brain.add_action(move)
-                
+                        elif command.upper() == 'L':
+                            move = action.MoveAction((-1, 0))
+                            move.parent = batched_move
+                            self.brain.add_action(move)
+
+                        elif command.upper() == 'R':
+                            move = action.MoveAction((1, 0))
+                            move.parent = batched_move
+                            self.brain.add_action(move)
+
                 self.brain.add_action(batched_move)

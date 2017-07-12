@@ -14,6 +14,7 @@ from ui import levelwindow
 from ai import action
 from entities import kobold
 from entities import entity
+from entities import player
 from entities import item
 from twitchchatmanager import TwitchChatManager
 
@@ -75,12 +76,15 @@ class Scene(object):
             Scene.current_scene = self
 
     def draw(self, console):
-        for entity in self.entities:
-            entity.draw(console)
+        for e in [n for n in self.entities if not isinstance(n, player.Player)]:
+            e.draw(console)
+
+        for e in [n for n in self.entities if isinstance(n, player.Player)]:
+            e.draw(console)
 
     def handle_events(self, event):
-        for entity in self.entities:
-            entity.handle_events(event)
+        for e in self.entities:
+            e.handle_events(event)
 
     def check_collision(self, x, y):
         """Returns True if player can move into coords"""

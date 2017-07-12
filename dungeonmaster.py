@@ -21,11 +21,20 @@ class DungeonMaster(object):
     def tick(self):
         roll = random.random()
 
-        if roll <= 0.125:
+        if roll <= 0.2:
             roll = random.random()
             current_scene = scene.Scene.current_scene
             level = current_scene.level
+
             position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
+            tries = 0
+
+            while not scene.Scene.current_scene.check_collision(*position) and tries < 10:
+                position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
+                tries += 1
+
+            if tries == 10:
+                return
 
             if roll <= 0.2:
                 k = kobold.Kobold(position=position)
