@@ -43,12 +43,12 @@ class TwitchChatManager(object):
                         console.Console.current_console.print('{} has joined!'.format(event.nickname))
 
                 elif event.message.upper() == '!LEAVE':
-                    for entity in s.entities:
-                        if not isinstance(entity, player.Player):
+                    for e in s.entities:
+                        if not isinstance(e, player.Player):
                             continue
 
-                        if entity.name == event.nickname:
-                            s.entities.remove(entity)
+                        if e.name == event.nickname:
+                            e.die()
                             console.Console.current_console.print('{} has left.'.format(event.nickname))
 
     def update(self, time):
