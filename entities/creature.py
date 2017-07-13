@@ -61,7 +61,7 @@ class Creature(entity.Entity):
         #    self.die()
         #    return
 
-        if hasattr(self.held_item, 'on_hurt'):
+        if self.current_health > 0 and hasattr(self.held_item, 'on_hurt'):
             self.held_item.on_hurt(damage, hurt_action)
 
     def die(self):

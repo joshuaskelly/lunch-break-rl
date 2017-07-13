@@ -62,10 +62,16 @@ class Dagger(HeldItem):
         self.verb = 'stabs'
 
     def on_hurt(self, damage, hurt_action):
+        if hasattr(hurt_action, 'tags'):
+            if 'counter' in hurt_action.tags:
+                return
+
         owner = hurt_action.target
         attacker = hurt_action.owner
 
         counter = action.AttackAction(attacker)
-        if counter.prerequiste(owner):
-            counter.perform(owner)
+        counter.tags = ['counter']
 
+        if counter.prerequiste(owner):
+            console.Console.current_console.print('{} counter attacks!'.format(owner.name))
+            counter.perform(owner)
