@@ -54,6 +54,16 @@ class Creature(entity.Entity):
         x, y = self.position
         self.visible_tiles = tdl.map.quick_fov(x, y, scene.Scene.current_scene.check_collision)
 
+    def hurt(self, damage, hurt_action):
+        self.current_health -= damage
+
+        #if self.current_health <= 0:
+        #    self.die()
+        #    return
+
+        if hasattr(self.held_item, 'on_hurt'):
+            self.held_item.on_hurt(damage, hurt_action)
+
     def die(self):
         if not isinstance(self.held_item, item.Fist):
             i = self.held_item

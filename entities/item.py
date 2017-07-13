@@ -52,3 +52,20 @@ class Sword(HeldItem):
         self.damage = 3
         self.name = 'sword'
         self.verb = 'slashes'
+
+class Dagger(HeldItem):
+    def __init__(self, char='d', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+        super().__init__(char, position, fg, bg)
+
+        self.damage = 2
+        self.name = 'dagger'
+        self.verb = 'stabs'
+
+    def on_hurt(self, damage, hurt_action):
+        owner = hurt_action.target
+        attacker = hurt_action.owner
+
+        counter = action.AttackAction(attacker)
+        if counter.prerequiste(owner):
+            counter.perform(owner)
+

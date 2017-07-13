@@ -41,13 +41,17 @@ class DungeonMaster(object):
                 current_scene.entities.append(k)
 
             elif roll <= 0.3:
-                s = item.Sword(position=position, fg=palette.BRIGHT_YELLOW)
+                s = item.Sword(position=position)
                 current_scene.entities.append(s)
 
             elif roll <= 0.4:
                 p = item.Potion(char='!', position=position, fg=palette.BRIGHT_MAGENTA)
                 p.name = 'potion'
                 current_scene.entities.append(p)
+
+            elif roll <= 0.5:
+                d = item.Dagger(position=position)
+                current_scene.entities.append(d)
 
     def handle_events(self, event):
         if event.type == 'TICK':
