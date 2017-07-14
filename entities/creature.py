@@ -1,9 +1,11 @@
 import tdl
 
+import palette
 import scene
 
 from ai import brain
 from ai import action
+from entities import animation
 from entities import entity
 from entities import item
 from ui import console
@@ -50,16 +52,17 @@ class Creature(entity.Entity):
         if self.current_health <= 0:
             self.die()
 
+        super().update(time)
+
     def update_fov(self):
         x, y = self.position
         self.visible_tiles = tdl.map.quick_fov(x, y, scene.Scene.current_scene.check_collision)
 
     def hurt(self, damage, hurt_action):
         self.current_health -= damage
-
-        #if self.current_health <= 0:
-        #    self.die()
-        #    return
+        ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
+        ani.parent = self
+        self.children.append(ani)
 
         if self.current_health > 0 and hasattr(self.held_item, 'on_hurt'):
             self.held_item.on_hurt(damage, hurt_action)
@@ -80,6 +83,8 @@ class Creature(entity.Entity):
     def handle_events(self, event):
         if event.type == 'TICK':
             self.tick()
+
+        super().handle_events(event)
 
     def get_action(self):
         return action.AttackAction(self)

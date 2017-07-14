@@ -7,6 +7,7 @@ class Entity(object):
         self.fg = fg
         self.bg = bg
         self.name = self.__class__.__name__
+        self.children = []
 
     def draw(self, console):
         if self.position in console:
@@ -14,11 +15,16 @@ class Entity(object):
             if scene.Scene.current_scene.check_visibility(*self.position):
                 console.draw_char(*self.position, self.char, self.fg, self.bg)
 
+        for child in self.children:
+            child.draw(console)
+
     def update(self, time):
-        pass
+        for child in self.children:
+            child.update(time)
 
     def handle_events(self, event):
-        pass
+        for child in self.children:
+            child.handle_events(event)
 
     def tick(self):
         pass

@@ -20,7 +20,7 @@ last_time = time.time()
 config = configparser.ConfigParser()
 cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'chat.cfg')
 config.read(cfg_path)
-nickname = config['DEFAULT']['Nickname'],
+nickname = config['DEFAULT']['Nickname']
 password = config['DEFAULT']['Password']
 channel = config['DEFAULT']['Channel']
 observer = Observer(nickname, password)
