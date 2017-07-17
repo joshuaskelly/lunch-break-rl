@@ -58,6 +58,13 @@ class Creature(entity.Entity):
         x, y = self.position
         self.visible_tiles = tdl.map.quick_fov(x, y, scene.Scene.current_scene.check_collision)
 
+    def drop_held_item(self):
+        if not isinstance(self.held_item, item.Fist):
+            i = self.held_item
+            i.position = self.position
+            scene.Scene.current_scene.entities.append(i)
+            self.held_item = item.Fist('f')
+
     def hurt(self, damage, hurt_action):
         self.current_health -= damage
         ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
@@ -68,11 +75,7 @@ class Creature(entity.Entity):
             self.held_item.on_hurt(damage, hurt_action)
 
     def die(self):
-        if not isinstance(self.held_item, item.Fist):
-            i = self.held_item
-            i.position = self.position
-            scene.Scene.current_scene.entities.append(i)
-
+        self.drop_held_item()
         console.Console.current_console.print('{} perishes!'.format(self.name))
         self.remove()
 

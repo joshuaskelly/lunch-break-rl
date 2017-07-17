@@ -34,9 +34,9 @@ class Player(creature.Creature):
         elif event.type == 'TWITCHCHATMESSAGE':
             if event.nickname == self.name:
                 commands = event.message.split(' ')
-                batched_move = action.BatchedMoveAction()
 
-                if commands[0].upper() == '!MOVE':
+                if commands[0].upper() == '!MOVE' or commands[0].upper() == '!MV':
+                    batched_move = action.BatchedMoveAction()
                     moves = ''.join(commands[1:])
 
                     for command in moves:
@@ -60,4 +60,7 @@ class Player(creature.Creature):
                             move.parent = batched_move
                             self.brain.add_action(move)
 
-                self.brain.add_action(batched_move)
+                    self.brain.add_action(batched_move)
+
+                elif commands[0].upper() == '!DROP':
+                    self.drop_held_item()
