@@ -16,6 +16,15 @@ class Action(object):
         #DO SOMETHING
         pass
 
+    def fail(self, owner):
+        if self.parent:
+            while owner.brain.actions[0].parent == self.parent:
+                owner.brain.actions.pop(0)
+
+            if self.parent == owner.brain.actions[0]:
+                parent_action = owner.brain.actions.pop(0)
+                parent_action.on_fail(owner)
+
     def on_fail(self, owner):
         pass
 

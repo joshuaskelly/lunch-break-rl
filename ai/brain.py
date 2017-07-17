@@ -12,12 +12,7 @@ class Brain(object):
                 current_action.perform(self.owner)
 
             else:
-                if current_action.parent and self.actions:
-                    while self.actions[0] != current_action.parent:
-                        self.actions.pop(0)
-
-                    current_action = self.actions.pop(0)
-                    current_action.on_fail(self.owner)
+                current_action.fail(self.owner)
 
     def add_action(self, new_action):
         if isinstance(new_action, action.Action):
