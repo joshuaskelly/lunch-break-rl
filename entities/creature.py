@@ -38,6 +38,10 @@ class Creature(entity.Entity):
         if action_to_perform and action_to_perform.prerequiste(self):
             action_to_perform.perform(self)
 
+            next_action = self.brain.actions[0]
+            if isinstance(next_action, action.MoveAction) and next_action.parent:
+                next_action.fail(self)
+
         if target_entity and target_entity.position == dest:
             return
 
