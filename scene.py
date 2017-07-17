@@ -68,6 +68,9 @@ class Scene(object):
         i = item.Dagger(position=(15, 7), fg=palette.BRIGHT_YELLOW)
         self.entities.append(i)
 
+        i = item.Glove(position=(17, 9))
+        self.entities.append(i)
+
         i = item.HeldItem(char='a', position=(15, 9), fg=palette.BRIGHT_YELLOW)
         i.name = 'ax'
         i.verb  = 'chops'

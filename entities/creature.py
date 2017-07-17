@@ -31,8 +31,13 @@ class Creature(entity.Entity):
                 continue
 
             if dest == e.position:
-                action_to_perform = e.get_action()
                 target_entity = e
+
+                action_to_perform = self.held_item.get_special_action(e)
+
+                if not action_to_perform:
+                    action_to_perform = e.get_action()
+
                 break
 
         if action_to_perform and action_to_perform.prerequiste(self):

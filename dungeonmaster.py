@@ -53,6 +53,10 @@ class DungeonMaster(object):
                 d = item.Dagger(position=position)
                 current_scene.entities.append(d)
 
+            elif roll <= 0.8:
+                d = item.Glove(position=position)
+                current_scene.entities.append(d)
+
     def handle_events(self, event):
         if event.type == 'TICK':
             self.tick()

@@ -9,6 +9,9 @@ class Item(entity.Entity):
     def get_action(self):
         pass
 
+    def get_special_action(self, target):
+        return None
+
 
 class HeldItem(Item):
     def get_action(self):
@@ -75,3 +78,17 @@ class Dagger(HeldItem):
         if counter.prerequiste(owner):
             console.Console.current_console.print('{} counter attacks!'.format(owner.name))
             counter.perform(owner)
+
+class Glove(HeldItem):
+    def __init__(self, char='g', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+        super().__init__(char, position, fg, bg)
+
+        self.name = 'glove'
+        self.verb = 'throws'
+        self.range = 5
+
+    def get_perform_action(self, target):
+        return action.ThrowAction(target)
+
+    def get_special_action(self, target):
+        return action.ThrowAction(target)
