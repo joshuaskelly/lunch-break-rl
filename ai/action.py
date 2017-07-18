@@ -4,6 +4,8 @@ import tdl
 
 import scene
 
+from entities import animation
+from entities import creature
 from entities import item
 from ui import console
 
@@ -186,13 +188,26 @@ class ThrowAction(Action):
         elif dy != 0:
             dest = dest[0], dest[1] + dy * weapon_range
 
-        path = tdl.map.bresenham(*owner.position, *dest)
+        path = tdl.map.bresenham(*self.target.position, *dest)
 
-        #level = scene.Scene.current_scene.level
-        #for point in path:
+        current_scene = scene.Scene.current_scene
+        level = current_scene.level
+        for point in path[1:]:
+            if current_scene.is_solid(*point):
+                break
+
+            entities = current_scene.get_entity_at(*point)
+            if entities:
+                for e in entities:
+                    if isinstance(e, creature.Creature):
+                        break
+
+            dest = point
 
         # TODO: Make sure this isn't off the map, or inside geo, or inside another creature
-        self.target.position = path[-1]
+        ani = animation.ThrowMotion(self.target, self.target.position, dest, 1.0)
+        self.target.children.append(ani)
+        self.target.position = dest
 
         if owner.visible:
             console.Console.current_console.print('{} {} {}'.format(owner.name, weapon.verb, self.target.name))

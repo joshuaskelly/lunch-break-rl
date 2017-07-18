@@ -12,10 +12,11 @@ from ui import playerwindow
 from ui import levelwindow
 
 from ai import action
-from entities import kobold
+from entities import animation
 from entities import entity
-from entities import player
 from entities import item
+from entities import kobold
+from entities import player
 from twitchchatmanager import TwitchChatManager
 
 
@@ -58,6 +59,9 @@ class Scene(object):
         npc = kobold.Kobold(position=(15, 11))
         self.entities.append(npc)
 
+        ani = animation.ThrowMotion(npc, npc.position, (25, 11), 2.0)
+        npc.children.append(ani)
+
         i = item.Potion(char='!', position=(20, 7), fg=palette.BRIGHT_MAGENTA)
         i.name = 'potion'
         self.entities.append(i)
@@ -92,14 +96,30 @@ class Scene(object):
             e.handle_events(event)
 
     def check_collision(self, x, y):
-        """Returns True if player can move into coords"""
+        """Returns True if player can move into the given world coords
 
+        x: The x-coordinate in world space
+        y: The y-coordinate in world space
+        """
+
+        # Convert from world to local space
         if not (x - self.level.x, y - self.level.y) in self.level.data:
             return False
 
         char, fg, bg = self.level.get_char(x - self.level.x, y - self.level.y)
 
         return char == ord(' ')
+
+    def is_solid(self, x, y):
+        return not self.check_collision(x, y)
+
+    def get_entity_at(self, x, y):
+        result = []
+        for e in self.entities:
+            if hasattr(e, 'position') and e.position == (x, y):
+                result.append(e)
+
+        return result
 
     def check_visibility(self, x, y):
         return (x, y) in self.level.visible_tiles
