@@ -180,7 +180,7 @@ class ThrowAction(Action):
 
         dx = self.target.position[0] - owner.position[0]
         dy = self.target.position[1] - owner.position[1]
-        dest = owner.position
+        dest = self.target.position
 
         if dx != 0:
             dest = dest[0] + dx * weapon_range, dest[1]
@@ -189,6 +189,7 @@ class ThrowAction(Action):
             dest = dest[0], dest[1] + dy * weapon_range
 
         path = tdl.map.bresenham(*self.target.position, *dest)
+        dest = self.target.position
 
         current_scene = scene.Scene.current_scene
         level = current_scene.level

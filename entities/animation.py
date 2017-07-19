@@ -58,6 +58,7 @@ class ThrowMotion(Animation):
         super().__init__()
         self.parent = parent
         self.points = tdl.map.bresenham(*source, *dest)
+        self.dest = dest
         self.time = time
         self.time_to_next = 0
         self.frame_time = time / len(self.points)
@@ -79,10 +80,8 @@ class ThrowMotion(Animation):
             return
 
         level = scene.Scene.current_scene.level
-        #dx = self.parent.position[0] + level.x
-        #dy = self.parent.position[1] + level.y
-        #ch, fg, bg = level.get_char(dx, dy)
+        ch, fg, bg = level.get_char(*self.dest)
 
         p = self.parent
-        #console.draw_char(*self.parent.position, ch, fg, bg)
+        console.draw_char(*self.parent.position, ch, fg, bg)
         console.draw_char(*self.current_point, p.char, p.fg, p.bg)
