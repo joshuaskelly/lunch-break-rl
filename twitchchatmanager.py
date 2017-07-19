@@ -13,7 +13,8 @@ regular_viewers = [
     'falseparklocation',
     'pythooonuser',
     'gui2203',
-    'nimphious'
+    'nimphious',
+    'loggercito'
 ]
 
 class TwitchChatManager(object):
@@ -32,7 +33,10 @@ class TwitchChatManager(object):
                         level = scene.Scene.current_scene.level
                         pos = level.x + random.randint(0, 10), level.y + random.randint(0, 10)
 
-                        if event.nickname.lower() in regular_viewers:
+                        if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
+                            player_color = palette.get_nearest((131, 118, 156))
+
+                        elif event.nickname.lower() in regular_viewers:
                             player_color = palette.BRIGHT_BLUE
 
                         else:
