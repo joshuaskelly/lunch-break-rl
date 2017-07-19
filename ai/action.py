@@ -7,6 +7,7 @@ import scene
 from entities import animation
 from entities import creature
 from entities import item
+from entities import player
 from ui import console
 
 class Action(object):
@@ -190,6 +191,8 @@ class ThrowAction(Action):
 
         path = tdl.map.bresenham(*self.target.position, *dest)
         dest = self.target.position
+        action_to_perform = None
+        target_entity = None
 
         current_scene = scene.Scene.current_scene
         level = current_scene.level
@@ -201,14 +204,32 @@ class ThrowAction(Action):
             if entities:
                 for e in entities:
                     if isinstance(e, creature.Creature):
+                        if isinstance(self.target, item.HeldItem):
+                            if isinstance(e, player.Player):
+                                act = self.target.get_action()
+                                action_to_perform = act.perform
+                                target_entity = e
+
+                            else:
+                                # DO ATTACK ROLL
+                                pass
+
+                        elif isinstance(self.target, item.UsableItem):
+                            action_to_perform = self.target.use
+                            target_entity = e
+
                         break
 
             dest = point
 
         # TODO: Make sure this isn't off the map, or inside geo, or inside another creature
+        print('Throwing from {} to {}'.format(self.target.position, dest))
         ani = animation.ThrowMotion(self.target, self.target.position, dest, 1.0)
         self.target.children.append(ani)
         self.target.position = dest
+
+        if action_to_perform:
+            action_to_perform(target_entity)
 
         if owner.visible:
             console.Console.current_console.print('{} {} {}'.format(owner.name, weapon.verb, self.target.name))

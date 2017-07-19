@@ -21,7 +21,7 @@ class DungeonMaster(object):
     def tick(self):
         roll = random.random()
 
-        if roll <= 0.1:
+        if roll <= 0.15:
             roll = random.random()
             current_scene = scene.Scene.current_scene
             level = current_scene.level
@@ -36,24 +36,24 @@ class DungeonMaster(object):
             if tries == 10:
                 return
 
-            if roll <= 0.4:
+            if roll <= 0.6:
                 k = kobold.Kobold(position=position)
                 current_scene.entities.append(k)
 
-            elif roll <= 0.5:
+            elif roll <= 0.7:
                 s = item.Sword(position=position)
                 current_scene.entities.append(s)
 
-            elif roll <= 0.6:
+            elif roll <= 0.8:
                 p = item.Potion(char='!', position=position, fg=palette.BRIGHT_MAGENTA)
                 p.name = 'potion'
                 current_scene.entities.append(p)
 
-            elif roll <= 0.7:
+            elif roll <= 0.9:
                 d = item.Dagger(position=position)
                 current_scene.entities.append(d)
 
-            elif roll <= 0.8:
+            elif roll <= 1:
                 d = item.Glove(position=position)
                 current_scene.entities.append(d)
 

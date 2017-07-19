@@ -82,6 +82,8 @@ class ThrowMotion(Animation):
         level = scene.Scene.current_scene.level
         ch, fg, bg = level.get_char(*self.dest)
 
-        p = self.parent
-        console.draw_char(*self.parent.position, ch, fg, bg)
+        x, y = self.parent.position
+        if (x, y) in console:
+            p = self.parent
+            console.draw_char(*self.parent.position, ch, fg, bg)
         console.draw_char(*self.current_point, p.char, p.fg, p.bg)
