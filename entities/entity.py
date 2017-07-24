@@ -8,11 +8,11 @@ class Entity(object):
         self.bg = bg
         self.name = self.__class__.__name__
         self.children = []
+        self.hidden = False
 
     def draw(self, console):
         if self.position in console:
-
-            if scene.Scene.current_scene.check_visibility(*self.position):
+            if self.visible:
                 console.draw_char(*self.position, self.char, self.fg, self.bg)
 
         for child in self.children:
@@ -34,9 +34,10 @@ class Entity(object):
 
     @property
     def visible(self):
-        """Returns True if in Players' visiblity"""
-        x, y = self.position
-        return (x, y) in scene.Scene.current_scene.level.visible_tiles
+        if self.hidden:
+            return False
+
+        return self.position in scene.Scene.current_scene.level.visible_tiles
 
     def remove(self):
         if self in scene.Scene.current_scene.entities:

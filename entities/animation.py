@@ -18,6 +18,9 @@ class Animation(entity.Entity):
     def handle_events(self, event):
         pass
 
+    def on_done(self):
+        pass
+
 
 class FlashBackground(Animation):
     def __init__(self, bg=(255, 255, 255), interval=0.25, repeat=2):
@@ -42,6 +45,7 @@ class FlashBackground(Animation):
 
         if self.times_flashed > self.times_to_flash:
             self.parent.children.remove(self)
+            self.on_done()
 
     def draw(self, console):
         if not self.parent.visible:
@@ -57,6 +61,7 @@ class ThrowMotion(Animation):
     def __init__(self, parent, source, dest, time):
         super().__init__()
         self.parent = parent
+        self.parent.hidden = True
         self.points = tdl.map.bresenham(*source, *dest)
         self.dest = dest
         self.time = time
@@ -73,17 +78,13 @@ class ThrowMotion(Animation):
                 self.current_point = self.points.pop(0)
 
             else:
+                self.parent.hidden = False
                 self.parent.children.remove(self)
+                self.on_done()
 
     def draw(self, console):
         if not scene.Scene.current_scene.check_visibility(*self.current_point):
             return
 
-        level = scene.Scene.current_scene.level
-        ch, fg, bg = level.get_char(*self.dest)
-
-        x, y = self.parent.position
-        if (x, y) in console:
-            p = self.parent
-            console.draw_char(*self.parent.position, ch, fg, bg)
+        p = self.parent
         console.draw_char(*self.current_point, p.char, p.fg, p.bg)

@@ -54,6 +54,7 @@ class AttackAction(Action):
     def __init__(self, target):
         super().__init__()
         self.target = target
+        self.weapon = None
 
     def prerequiste(self, owner):
         dx = owner.position[0] - self.target.position[0]
@@ -73,15 +74,17 @@ class AttackAction(Action):
     def perform(self, owner):
         self.owner = owner
 
-        weapon = owner.held_item
+        if not self.weapon:
+            self.weapon = owner.held_item
+
         damage_dealt = 1
         verb = 'attacks'
-        if weapon:
-            if hasattr(weapon, 'damage'):
-                damage_dealt = weapon.damage
 
-            if hasattr(weapon, 'verb'):
-                verb = weapon.verb
+        if hasattr(self.weapon, 'damage'):
+            damage_dealt = self.weapon.damage
+
+        if hasattr(self.weapon, 'verb'):
+            verb = self.weapon.verb
 
         if owner.visible:
             console.Console.current_console.print('{} {} {}'.format(owner.name, verb, self.target.name))
@@ -172,6 +175,7 @@ class ThrowAction(Action):
 
     def perform(self, owner):
         self.owner = owner
+        thrown_entity = self.target
 
         weapon = owner.held_item
         weapon_range = 3
@@ -179,57 +183,70 @@ class ThrowAction(Action):
         if hasattr(weapon, 'range'):
             weapon_range = weapon.range
 
-        dx = self.target.position[0] - owner.position[0]
-        dy = self.target.position[1] - owner.position[1]
-        dest = self.target.position
+        # Determine direction of throw
+        dx = thrown_entity.position[0] - owner.position[0]
+        dy = thrown_entity.position[1] - owner.position[1]
+        dest = thrown_entity.position
 
+        # Determine destination of throw
         if dx != 0:
             dest = dest[0] + dx * weapon_range, dest[1]
 
         elif dy != 0:
             dest = dest[0], dest[1] + dy * weapon_range
 
-        path = tdl.map.bresenham(*self.target.position, *dest)
-        dest = self.target.position
+        path = tdl.map.bresenham(*thrown_entity.position, *dest)
+        dest = thrown_entity.position
         action_to_perform = None
         target_entity = None
 
         current_scene = scene.Scene.current_scene
         level = current_scene.level
+        done = False
         for point in path[1:]:
             if current_scene.is_solid(*point):
                 break
 
             entities = current_scene.get_entity_at(*point)
             if entities:
-                for e in entities:
-                    if isinstance(e, creature.Creature):
-                        if isinstance(self.target, item.HeldItem):
-                            if isinstance(e, player.Player):
-                                act = self.target.get_action()
+                for hit_entity in entities:
+                    if isinstance(hit_entity, creature.Creature):
+                        if isinstance(thrown_entity, item.HeldItem):
+                            # Have player equip thrown_entity item
+                            if isinstance(hit_entity, player.Player) and hit_entity.held_item is None:
+                                act = thrown_entity.get_action()
                                 action_to_perform = act.perform
-                                target_entity = e
+                                target_entity = hit_entity
 
+                            # Perform an attack roll otherwise
                             else:
-                                # DO ATTACK ROLL
-                                pass
+                                act = hit_entity.get_action()
+                                action_to_perform = act.perform
+                                target_entity = hit_entity
 
-                        elif isinstance(self.target, item.UsableItem):
-                            action_to_perform = self.target.use
-                            target_entity = e
+                        # Use potion on target player
+                        elif isinstance(thrown_entity, item.UsableItem):
+                            action_to_perform = thrown_entity.use
+                            target_entity = hit_entity
 
+                        done = True
                         break
+
+            if done:
+                break
 
             dest = point
 
-        # TODO: Make sure this isn't off the map, or inside geo, or inside another creature
-        print('Throwing from {} to {}'.format(self.target.position, dest))
-        ani = animation.ThrowMotion(self.target, self.target.position, dest, 1.0)
-        self.target.children.append(ani)
-        self.target.position = dest
+        ani = animation.ThrowMotion(thrown_entity, thrown_entity.position, dest, 1.0)
+        thrown_entity.children.append(ani)
+        thrown_entity.position = dest
 
-        if action_to_perform:
-            action_to_perform(target_entity)
+        def action_callback():
+            if action_to_perform:
+                action_to_perform(target_entity)
 
-        if owner.visible:
-            console.Console.current_console.print('{} {} {}'.format(owner.name, weapon.verb, self.target.name))
+            if owner.visible:
+                console.Console.current_console.print('{} {} {}'.format(owner.name, weapon.verb, thrown_entity.name))
+
+        ani.on_done = action_callback
+
