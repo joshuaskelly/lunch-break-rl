@@ -108,7 +108,7 @@ class Scene(object):
 
         char, fg, bg = self.level.get_char(x - self.level.x, y - self.level.y)
 
-        return char == ord(' ')
+        return char == ord(' ') or char == ord('.')
 
     def is_solid(self, x, y):
         return not self.check_collision(x, y)

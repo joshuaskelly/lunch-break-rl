@@ -18,6 +18,7 @@ class Level(object):
         self.painting = False
         self.erasing = False
         self.visible_tiles = set()
+        self.seen_tiles = set()
 
     def draw_char(self, x, y, fg=Ellipsis, bg=Ellipsis):
         self.data.draw_char(x, y, fg, bg)
@@ -31,13 +32,14 @@ class Level(object):
             x += self.x
             y += self.y
 
-            if (x, y) in self.visible_tiles:
-                fg = palette.WHITE
-            
-            else:
-                fg = palette.BRIGHT_BLACK
-            
-            console.draw_char(x, y, ch, fg, bg)
+            if (x, y) in self.seen_tiles:
+                if (x, y) in self.visible_tiles:
+                    fg = palette.WHITE
+
+                else:
+                    fg = palette.BRIGHT_BLACK
+
+                console.draw_char(x, y, ch, fg, bg)
 
     def handle_events(self, event):
         if event.type == 'MOUSEDOWN':
@@ -61,7 +63,7 @@ class Level(object):
         if event.type == 'MOUSEMOTION':
             pos = event.cell
             pos = pos[0] - self.x, pos[1] - self.y
-            
+
             if pos in self.data:
                 if self.painting:
                     self.draw_char(*pos, '#')
@@ -111,3 +113,4 @@ class Level(object):
                 continue
 
             self.visible_tiles = self.visible_tiles.union(e.visible_tiles)
+            self.seen_tiles = self.seen_tiles.union(e.visible_tiles)
