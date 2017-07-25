@@ -31,7 +31,10 @@ class TwitchChatManager(object):
 
                     if not event.nickname in player_names:
                         level = scene.Scene.current_scene.level
-                        pos = level.x + random.randint(0, 10), level.y + random.randint(0, 10)
+
+                        pos = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
+                        while not scene.Scene.current_scene.check_collision(*pos):
+                            pos = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
 
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
                             player_color = palette.get_nearest((131, 118, 156))

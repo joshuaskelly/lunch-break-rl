@@ -11,9 +11,8 @@ class Entity(object):
         self.hidden = False
 
     def draw(self, console):
-        if self.position in console:
-            if self.visible:
-                console.draw_char(*self.position, self.char, self.fg, self.bg)
+        if self.visible:
+            console.draw_char(*self.position, self.char, self.fg, self.bg)
 
         for child in self.children:
             child.draw(console)
@@ -35,6 +34,9 @@ class Entity(object):
     @property
     def visible(self):
         if self.hidden:
+            return False
+
+        if not self.position:
             return False
 
         return self.position in scene.Scene.current_scene.level.visible_tiles
