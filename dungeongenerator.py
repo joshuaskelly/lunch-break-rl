@@ -19,18 +19,75 @@ def generate_level(width, height):
     BOTTOM = 0b0100
     LEFT = 0b1000
 
-    map = '6CX' + \
-          '3F8' + \
-          'X38'
+    #floor = [0x6,0xC,0x0,
+    #       0x3,0xF,0x8,
+    #       0x0,0x3,0x8]
+
+    floor = [0x0,0x0,0x0,
+             0x0,0x0,0x0,
+             0x0,0x0,0x0]
+
+    cursor = random.randint(0, 2)
+
+    def up():
+        nonlocal floor
+        nonlocal cursor
+        if cursor >= 3:
+            floor[cursor] |= TOP
+            cursor -= 3
+            floor[cursor] |= BOTTOM
+
+            return cursor
+
+        return None
+
+    def down():
+        nonlocal floor
+        nonlocal cursor
+        if cursor <= 5:
+            floor[cursor] |= BOTTOM
+            cursor += 3
+            floor[cursor] |= TOP
+            return cursor
+
+        return None
+
+    def right():
+        nonlocal floor
+        nonlocal cursor
+        if cursor not in [2, 5, 8]:
+            floor[cursor] |= RIGHT
+            cursor += 1
+            floor[cursor] |= LEFT
+            return cursor
+        return None
+
+    def left():
+        nonlocal floor
+        nonlocal cursor
+        if cursor not in [0, 3, 6]:
+            floor[cursor] |= LEFT
+            cursor -= 1
+            floor[cursor] |= RIGHT
+            return cursor
+        return None
+
+    possible_moves = [up, down, left, right]
+
+    moves = random.randint(8, 20)
+    while moves > 0:
+        current_cursor = possible_moves[random.randint(0,3)]()
+        if current_cursor:
+            moves -= 1
 
     room_templates = [
-        '####.####' + \
-        '#.......#' + \
-        '#.......#' + \
-        '.........' + \
-        '#.......#' + \
-        '#.......#' + \
-        '####.####',
+        'XXXXXXXXX' + \
+        'XXXXXXXXX' + \
+        'XXXXXXXXX' + \
+        'XXXXXXXXX' + \
+        'XXXXXXXXX' + \
+        'XXXXXXXXX' + \
+        'XXXXXXXXX',
         '####.####' + \
         '#.......#' + \
         '#.......#' + \
@@ -145,14 +202,13 @@ def generate_level(width, height):
         con.draw_str(0, 0, room_templates[i])
         rooms[i] = con
 
-    # Build out map
-    for i, m in enumerate(map):
+    # Build out floor
+    for i, m in enumerate(floor):
         x = i % 3 * 9 + 1
         y = i // 3 * 7
 
-        if m != 'X':
-            current_room = rooms[int(m, base=16)]
-            new_level.data.blit(current_room, x, y)
+        current_room = rooms[m]
+        new_level.data.blit(current_room, x, y)
 
     for (x, y) in new_level.data:
         ch, fg, bg = new_level.data.get_char(x, y)
