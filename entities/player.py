@@ -1,8 +1,10 @@
 import events
 import palette
+import scene
 
 from ai import action
 from entities import creature
+from entities import entity
 
 class Player(creature.Creature):
     def __init__(self, char='@', position=(0, 0), fg=palette.BRIGHT_RED, bg=palette.BLACK):
@@ -64,3 +66,36 @@ class Player(creature.Creature):
 
                 elif commands[0].upper() == '!DROP':
                     self.drop_held_item()
+
+                elif commands[0].upper() == '!THROW':
+                    direction = commands[1:]
+
+                    if not direction:
+                        return
+
+                    direction = direction[0]
+
+                    target_entity = None
+                    dest = self.position
+
+                    if direction.upper() == 'U':
+                        dest = dest[0], dest[1] - 1
+
+                    elif direction.upper() == 'D':
+                        dest = dest[0], dest[1] + 1
+
+                    if direction.upper() == 'L':
+                        dest = dest[0] - 1, dest[1]
+
+                    if direction.upper() == 'R':
+                        dest = dest[0] + 1, dest[1]
+
+                    es = [e for e in scene.Scene.current_scene.entities if isinstance(e, entity.Entity) and e.position == dest]
+                    print(es)
+
+                    if es:
+                        target_entity = es[0]
+
+                    if target_entity:
+                        act = action.ThrowAction(target_entity)
+                        self.brain.actions.append(act)
