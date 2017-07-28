@@ -33,6 +33,10 @@ class Scene(object):
         self.seconds_per_tick = 2
         self.timer = 0
 
+        self.init_scene()
+
+    def init_scene(self):
+        self.entities = []
         self.entities.append(TwitchChatManager())
         #self.entities.append(dungeonmaster.DungeonMaster())
         w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
@@ -73,6 +77,10 @@ class Scene(object):
     def handle_events(self, event):
         for e in self.entities:
             e.handle_events(event)
+
+            if event.type == 'KEYDOWN':
+                if event.keychar.upper() == 'G':
+                    self.init_scene()
 
     def check_collision(self, x, y):
         """Returns True if player can move into the given world coords

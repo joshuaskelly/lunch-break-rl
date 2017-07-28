@@ -32,7 +32,7 @@ class Level(object):
             x += self.x
             y += self.y
 
-            if (x, y) in self.seen_tiles:
+            if True or (x, y) in self.seen_tiles:
                 if (x, y) in self.visible_tiles:
                     fg = palette.WHITE
 
