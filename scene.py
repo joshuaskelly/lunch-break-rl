@@ -1,3 +1,5 @@
+import random
+
 import tdl
 
 import dungeongenerator
@@ -5,6 +7,7 @@ import dungeonmaster
 import draw
 import palette
 import level
+import utils
 
 from ui import console
 from ui import entitieswindow
@@ -36,7 +39,8 @@ class Scene(object):
         self.init_scene()
 
     def init_scene(self):
-        self.entities = []
+        # Persist players in level
+        self.entities = [p for p in self.entities if isinstance(p, player.Player)]
         self.entities.append(TwitchChatManager())
         #self.entities.append(dungeonmaster.DungeonMaster())
         w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
@@ -57,12 +61,18 @@ class Scene(object):
         self.console = console.Console(11, 24, 31, 6, title=None)
         self.entities.append(self.console)
 
+        # Add generated entities to scene
         for en in new_entities:
             pos = en.position
             pos = pos[0] + self.level.x, pos[1] + self.level.y
             en.position = pos
 
             self.entities.append(en)
+
+        # Place players near stair
+        for p in [p for p in self.entities if isinstance(p, player.Player)]:
+            p.max_health += 1
+            p.position = self.get_location_near_stairs()
 
         if not Scene.current_scene:
             Scene.current_scene = self
@@ -121,3 +131,23 @@ class Scene(object):
         if self.timer > self.seconds_per_tick:
             self.timer = 0
             tdl.event.push(TickEvent())
+
+    def get_location_near_stairs(self):
+        # Find stair location
+        stair_location = [e for e in self.entities if hasattr(e, 'name') and e.name == 'Stairs Up'][0].position
+        stair_location = stair_location[0] - self.level.x, stair_location[1] - self.level.y
+
+        # Find open areas around stairs
+        rect = utils.rect(stair_location[0] - 3, stair_location[1] - 3, 7, 7)
+        filled_location = [e.position for e in self.entities if hasattr(e, 'position')]
+        possible_locations = []
+        for point in rect:
+            ch, fg, bg = self.level.data.get_char(*point)
+            if ch == ord('.'):
+                possible_locations.append(point)
+
+        possible_locations = list(set(possible_locations).difference(set(filled_location)))
+        pos = possible_locations[random.randint(0, len(possible_locations) - 1)]
+        pos = pos[0] + self.level.x, pos[1] + self.level.y
+
+        return pos

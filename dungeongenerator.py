@@ -10,6 +10,7 @@ from data import room_templates
 from entities import entity
 from entities import kobold
 from entities import item
+from entities import stairs
 
 def generate_level(width, height):
     new_entities = []
@@ -122,7 +123,7 @@ def generate_level(width, height):
 
             coord = potential_coords[random.randint(0, len(potential_coords) - 1)]
 
-            ent = entity.Entity('>', coord, fg=palette.BRIGHT_YELLOW)
+            ent = stairs.StairsDown('>', coord, fg=palette.BRIGHT_YELLOW)
             ent.name = "Stairs Down"
             new_entities.append(ent)
 

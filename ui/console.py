@@ -7,8 +7,9 @@ class Console(window.Window):
 
         self.messages = []
 
-        if not Console.current_console:
-            Console.current_console = self
+        #if not Console.current_console:
+        # TODO: Fix this? Or live with it?
+        Console.current_console = self
 
     def print(self, message):
         self.messages.append(message[:self.width-2])
