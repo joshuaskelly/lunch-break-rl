@@ -2,6 +2,7 @@ import random
 
 import palette
 import scene
+import utils
 
 from entities import player
 from ui import console
@@ -33,8 +34,24 @@ class TwitchChatManager(object):
                         level = scene.Scene.current_scene.level
 
                         pos = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
-                        while not scene.Scene.current_scene.check_collision(*pos):
-                            pos = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
+
+                        stair_location = [e for e in scene.Scene.current_scene.entities if hasattr(e, 'name') and e.name == 'Stairs Up'][0].position
+                        stair_location = stair_location[0] - scene.Scene.current_scene.level.x, stair_location[1] - scene.Scene.current_scene.level.y
+
+                        rect = utils.rect(stair_location[0] - 2, stair_location[1] - 2, 5, 5)
+                        filled_location = [e.position for e in scene.Scene.current_scene.entities if hasattr(e, 'position')]
+                        possible_locations = []
+                        for point in rect:
+                            ch, fg, bg = scene.Scene.current_scene.level.data.get_char(*point)
+                            if ch == ord('.'):
+                                possible_locations.append(point)
+
+                        possible_locations = list(set(possible_locations).difference(set(filled_location)))
+                        pos = possible_locations[random.randint(0, len(possible_locations) - 1)]
+                        pos = pos[0] + level.x, pos[1] + level.y
+
+                        #while not scene.Scene.current_scene.check_collision(*pos):
+                        #    pos = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
 
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
                             player_color = palette.get_nearest((131, 118, 156))

@@ -91,7 +91,6 @@ class Player(creature.Creature):
                         dest = dest[0] + 1, dest[1]
 
                     es = [e for e in scene.Scene.current_scene.entities if isinstance(e, entity.Entity) and e.position == dest]
-                    print(es)
 
                     if es:
                         target_entity = es[0]

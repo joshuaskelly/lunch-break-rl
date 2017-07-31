@@ -4,8 +4,10 @@ import tdl
 
 import level
 import palette
+import utils
 
 from data import room_templates
+from entities import entity
 from entities import kobold
 from entities import item
 
@@ -87,24 +89,42 @@ def generate_level(width, height):
     for i, m in enumerate(floor):
         x = i % 3 * 9 + 1
         y = i // 3 * 7
-        m &= MASK
 
         current_room = tdl.Console(9, 7)
-        templates = room_templates[m]
+        templates = room_templates[m & MASK]
         room = templates[random.randint(0, len(templates) - 1)]
         current_room.draw_str(0, 0, room)
 
         new_level.data.blit(current_room, x, y)
 
-    for i in floor:
-        if i & STAIRUP:
-            # Place stair up >
-            # i = 3
-            pass
+        if m & STAIRUP:
+            rect = utils.rect(x, y, 9, 7)
+            potential_coords = []
+            for point in rect:
+                ch, fg, bg = new_level.data.get_char(*point)
+                if ch == ord('.'):
+                    potential_coords.append(point)
 
-        if i & STAIRDOWN:
-            # Place stair down <
-            pass
+            coord = potential_coords[random.randint(0, len(potential_coords) - 1)]
+
+            ent = entity.Entity('<', coord, fg=palette.BRIGHT_YELLOW)
+            ent.name = "Stairs Up"
+            new_entities.append(ent)
+
+
+        if m & STAIRDOWN:
+            rect = utils.rect(x, y, 9, 7)
+            potential_coords = []
+            for point in rect:
+                ch, fg, bg = new_level.data.get_char(*point)
+                if ch == ord('.'):
+                    potential_coords.append(point)
+
+            coord = potential_coords[random.randint(0, len(potential_coords) - 1)]
+
+            ent = entity.Entity('>', coord, fg=palette.BRIGHT_YELLOW)
+            ent.name = "Stairs Down"
+            new_entities.append(ent)
 
     # Placing Entities
     for (x, y) in new_level.data:
