@@ -72,6 +72,8 @@ class Scene(object):
         # Place players near stair
         for p in [p for p in self.entities if isinstance(p, player.Player)]:
             p.max_health += 1
+            p.current_health += 1
+            p.brain.actions = []
             p.position = self.get_location_near_stairs()
 
         if not Scene.current_scene:

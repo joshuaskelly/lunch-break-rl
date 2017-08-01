@@ -33,6 +33,7 @@ class StairsDown(Stairs):
                 return isinstance(owner, player.Player)
 
             def perform(self, owner):
+                owner.current_health = owner.max_health
                 scene.Scene.current_scene.init_scene()
 
         return NextLevel()

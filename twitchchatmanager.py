@@ -15,7 +15,14 @@ regular_viewers = [
     'pythooonuser',
     'gui2203',
     'nimphious',
-    'loggercito'
+    'loggercito',
+    'firedrgn',
+    'kingdred405',
+    'slayerdarth',
+    'smyyth',
+    'paspartout',
+    'nixrod',
+    'glasscaskettv'
 ]
 
 class TwitchChatManager(object):
@@ -33,10 +40,10 @@ class TwitchChatManager(object):
                     if not event.nickname in player_names:
                         # Set player color
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
-                            player_color = palette.BRIGHT_RED
+                            player_color = palette.BRIGHT_BLUE
 
                         elif event.nickname.lower() in regular_viewers:
-                            player_color = palette.BRIGHT_BLUE
+                            player_color = palette.BRIGHT_RED
 
                         else:
                             player_color = palette.get_nearest((255, 163, 0))
