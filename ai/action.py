@@ -230,7 +230,7 @@ class ThrowAction(Action):
             # Cancel any pending actions
             target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
             if target_next_action:
-                target_next_action.fail()
+                target_next_action.fail(self.target)
 
         if isinstance(target_entity, creature.Creature):
             # Do something?
@@ -245,7 +245,7 @@ class ThrowAction(Action):
                 action_to_perform(target_entity)
 
             if owner.visible:
-                console.Console.current_console.print('{} {} {}'.format(owner.name, weapon.verb, thrown_entity.name))
+                console.Console.current_console.print('{} {} {}'.format(owner.name, 'throws', thrown_entity.name))
 
         ani.on_done = action_callback
 
@@ -264,4 +264,4 @@ class SwapPosition(Action):
         if isinstance(self.target, creature.Creature):
             target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
             if target_next_action:
-                target_next_action.fail(owner)
+                target_next_action.fail(self.target)

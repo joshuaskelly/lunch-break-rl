@@ -74,7 +74,13 @@ class Scene(object):
             p.max_health += 1
             p.current_health += 1
             p.brain.actions = []
-            p.position = self.get_location_near_stairs()
+            p.visible_tiles = set()
+
+            pos = self.get_location_near_stairs()
+            while pos not in self.level.data:
+                pos = self.get_location_near_stairs()
+
+            p.position = pos
 
         if not Scene.current_scene:
             Scene.current_scene = self
