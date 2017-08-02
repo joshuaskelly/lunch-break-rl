@@ -3,6 +3,7 @@ import random
 import tdl
 
 import scene
+import utils
 
 from entities import animation
 from entities import creature
@@ -47,7 +48,7 @@ class PerformHeldItemAction(Action):
         return True
 
     def perform(self, owner):
-        held_action = owner.held_item.get_action()
+        held_action = owner.held_item.get_action(owner)
 
 
 class AttackAction(Action):
@@ -159,19 +160,7 @@ class ThrowAction(Action):
         self.target = target
 
     def prerequiste(self, owner):
-        dx = owner.position[0] - self.target.position[0]
-        dy = owner.position[1] - self.target.position[1]
-
-        if abs(dx) > 1:
-            return False
-
-        if abs(dy) > 1:
-            return False
-
-        if abs(dx) == 1 and abs(dy) == 1:
-            return False
-
-        return True
+        return utils.is_next_to(owner, self.target)
 
     def perform(self, owner):
         self.owner = owner
@@ -214,13 +203,13 @@ class ThrowAction(Action):
                         if isinstance(thrown_entity, item.HeldItem):
                             # Have player equip thrown_entity item
                             if isinstance(hit_entity, player.Player) and hit_entity.held_item is None:
-                                act = thrown_entity.get_action()
+                                act = thrown_entity.get_action(owner)
                                 action_to_perform = act.perform
                                 target_entity = hit_entity
 
                             # Perform an attack roll otherwise
                             else:
-                                act = hit_entity.get_action()
+                                act = hit_entity.get_action(owner)
                                 action_to_perform = act.perform
                                 target_entity = hit_entity
 
@@ -237,6 +226,16 @@ class ThrowAction(Action):
 
             dest = point
 
+        if isinstance(thrown_entity, creature.Creature):
+            # Cancel any pending actions
+            target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
+            if target_next_action:
+                target_next_action.fail()
+
+        if isinstance(target_entity, creature.Creature):
+            # Do something?
+            pass
+
         ani = animation.ThrowMotion(thrown_entity, thrown_entity.position, dest, 1.0)
         thrown_entity.children.append(ani)
         thrown_entity.position = dest
@@ -250,3 +249,19 @@ class ThrowAction(Action):
 
         ani.on_done = action_callback
 
+
+class SwapPosition(Action):
+    def __init__(self, target):
+        self.target = target
+
+    def prerequiste(self, owner):
+        return utils.is_next_to(owner, self.target)
+
+    def perform(self, owner):
+        self.target.position = owner.position
+
+        # Cancel any pending actions
+        if isinstance(self.target, creature.Creature):
+            target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
+            if target_next_action:
+                target_next_action.fail(owner)

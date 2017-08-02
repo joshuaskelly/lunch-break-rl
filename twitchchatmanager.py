@@ -22,7 +22,8 @@ regular_viewers = [
     'smyyth',
     'paspartout',
     'nixrod',
-    'glasscaskettv'
+    'glasscaskettv',
+    '109thanos'
 ]
 
 class TwitchChatManager(object):

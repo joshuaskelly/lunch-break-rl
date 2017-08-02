@@ -8,6 +8,7 @@ from ai import action
 from entities import animation
 from entities import entity
 from entities import item
+from entities import player
 from ui import console
 
 class Creature(entity.Entity):
@@ -26,6 +27,7 @@ class Creature(entity.Entity):
         action_to_perform = None
         target_entity = None
 
+        # Determine bump action
         for e in scene.Scene.current_scene.entities:
             if not isinstance(e, entity.Entity):
                 continue
@@ -33,18 +35,26 @@ class Creature(entity.Entity):
             if dest == e.position:
                 target_entity = e
 
+                # Let special item actions override bumped entity's default action
                 action_to_perform = self.held_item.get_special_action(e)
 
+                # Get bumped entity's default action
                 if not action_to_perform:
-                    action_to_perform = e.get_action()
+                    action_to_perform = e.get_action(self)
 
                 break
 
+        # Perform the action if possible
         if action_to_perform and action_to_perform.prerequiste(self):
             action_to_perform.perform(self)
 
+            # Because we have bumped, cancel our move action
             next_action = self.brain.actions[0] if self.brain.actions else None
-            if next_action and isinstance(next_action, action.MoveAction) and next_action.parent:
+            if next_action and \
+                not isinstance(action_to_perform, action.SwapPosition) and \
+                isinstance(next_action, action.MoveAction) and \
+                next_action.parent:
+
                 next_action.fail(self)
 
         if target_entity and target_entity.position == dest:
@@ -98,7 +108,10 @@ class Creature(entity.Entity):
 
         super().handle_events(event)
 
-    def get_action(self):
+    def get_action(self, other=None):
+        if isinstance(self, player.Player) and isinstance(other, player.Player):
+            return action.SwapPosition(self)
+
         return action.AttackAction(self)
 
     @property

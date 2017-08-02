@@ -6,7 +6,7 @@ from ui import console
 
 
 class Item(entity.Entity):
-    def get_action(self):
+    def get_action(self, other=None):
         pass
 
     def get_special_action(self, target):
@@ -14,7 +14,7 @@ class Item(entity.Entity):
 
 
 class HeldItem(Item):
-    def get_action(self):
+    def get_action(self, other=None):
         return action.EquipItemAction(self)
 
     def get_perform_action(self, target):
@@ -22,7 +22,7 @@ class HeldItem(Item):
 
 
 class UsableItem(Item):
-    def get_action(self):
+    def get_action(self, other=None):
         return action.UseItemAction(self)
 
     def use(self, target):

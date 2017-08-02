@@ -27,7 +27,10 @@ class StairsDown(Stairs):
         super().__init__(char, position, fg, bg)
         self.dark_fg = palette.YELLOW
 
-    def get_action(self):
+    def get_action(self, other=None):
+        if not isinstance(other, player.Player):
+            return None
+
         class NextLevel(action.Action):
             def prerequiste(self, owner):
                 return isinstance(owner, player.Player)

@@ -28,7 +28,14 @@ class Entity(object):
     def tick(self):
         pass
 
-    def get_action(self):
+    def get_action(self, other=None):
+        """Returns an action
+
+        other: An entity that is requesting the action. Usually this is
+            because it wants to perform an action on this entity.
+
+        Returns: An Action or None
+        """
         return None
 
     @property
