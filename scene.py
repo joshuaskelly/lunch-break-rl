@@ -24,8 +24,9 @@ from twitchchatmanager import TwitchChatManager
 
 
 class TickEvent(object):
-    def __init__(self):
+    def __init__(self, tick_number):
         self.type = 'TICK'
+        self.tick_number = tick_number
 
 
 class Scene(object):
@@ -35,12 +36,13 @@ class Scene(object):
         self.entities = []
         self.seconds_per_tick = 2
         self.timer = 0
+        self.tick_count = 0
 
         self.init_scene()
 
     def init_scene(self):
         # Persist players in level
-        self.entities = [p for p in self.entities if isinstance(p, player.Player)]
+        self.entities = [p for p in self.entities if isinstance(p, player.Player) and not p.idle]
         self.entities.append(TwitchChatManager())
         #self.entities.append(dungeonmaster.DungeonMaster())
         w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
@@ -138,7 +140,8 @@ class Scene(object):
         self.timer += time
         if self.timer > self.seconds_per_tick:
             self.timer = 0
-            tdl.event.push(TickEvent())
+            self.tick_count += 1
+            tdl.event.push(TickEvent(self.tick_count))
 
     def get_location_near_stairs(self):
         # Find stair location
@@ -150,6 +153,9 @@ class Scene(object):
         filled_location = [e.position for e in self.entities if hasattr(e, 'position')]
         possible_locations = []
         for point in rect:
+            if point not in self.level.data:
+                continue
+
             ch, fg, bg = self.level.data.get_char(*point)
             if ch == ord('.'):
                 possible_locations.append(point)

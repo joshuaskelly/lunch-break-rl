@@ -20,6 +20,7 @@ class Creature(entity.Entity):
         self.max_health = 10
         self.held_item = item.Fist('f')
         self.visible_tiles = set()
+        self.state = 'NORMAL'
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
@@ -98,13 +99,13 @@ class Creature(entity.Entity):
         console.Console.current_console.print('{} perishes!'.format(self.name))
         self.remove()
 
-    def tick(self):
+    def tick(self, tick_number):
         self.brain.perform_action()
         self.update_fov()
 
     def handle_events(self, event):
         if event.type == 'TICK':
-            self.tick()
+            self.tick(event.tick_number)
 
         super().handle_events(event)
 

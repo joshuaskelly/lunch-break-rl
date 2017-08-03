@@ -25,7 +25,7 @@ class Entity(object):
         for child in self.children:
             child.handle_events(event)
 
-    def tick(self):
+    def tick(self, tick_number):
         pass
 
     def get_action(self, other=None):

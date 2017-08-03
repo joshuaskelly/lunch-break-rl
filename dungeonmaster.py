@@ -18,7 +18,7 @@ class DungeonMaster(object):
     def update(self, time):
         pass
 
-    def tick(self):
+    def tick(self, tick_number):
         roll = random.random()
 
         if roll <= 0.15:
@@ -59,4 +59,4 @@ class DungeonMaster(object):
 
     def handle_events(self, event):
         if event.type == 'TICK':
-            self.tick()
+            self.tick(event.tick_number)
