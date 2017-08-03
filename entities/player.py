@@ -21,9 +21,13 @@ class Player(creature.Creature):
         super().tick(tick_number)
         self._current_tick = tick_number
 
-        if self._has_taken_action:
+        if self._has_taken_action or self.state == 'EXITED':
             self._last_action_tick = tick_number
             self._has_taken_action = False
+
+    def draw(self, console):
+        if self.state != 'EXITED':
+            super().draw(console)
 
     @property
     def idle(self):
@@ -34,6 +38,9 @@ class Player(creature.Creature):
 
     def handle_events(self, event):
         super().handle_events(event)
+
+        if self.state == "EXITED":
+            return
 
         if event.type == 'TWITCHCHATMESSAGE':
             if event.nickname == self.name:

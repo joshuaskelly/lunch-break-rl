@@ -109,7 +109,6 @@ def generate_level(width, height):
             coord = potential_coords[random.randint(0, len(potential_coords) - 1)]
 
             ent = stairs.Stairs(position=coord)
-            ent.name = "Stairs Up"
             new_entities.append(ent)
 
 
@@ -124,7 +123,6 @@ def generate_level(width, height):
             coord = potential_coords[random.randint(0, len(potential_coords) - 1)]
 
             ent = stairs.StairsDown(position=coord)
-            ent.name = "Stairs Down"
             new_entities.append(ent)
 
     # Placing Entities

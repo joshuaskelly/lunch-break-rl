@@ -21,6 +21,9 @@ def is_next_to(e1, e2):
 
     Returns True if they are orthogonally adjacent
     """
+    if not e1 or not e2:
+        return False
+
     dx = abs(e1.position[0] - e2.position[0])
     dy = abs(e1.position[1] - e2.position[1])
 

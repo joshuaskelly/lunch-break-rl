@@ -9,6 +9,7 @@ class Stairs(entity.Entity):
     def __init__(self, char='<', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg)
         self.dark_fg = palette.YELLOW
+        self.name = 'Up'
 
     def draw(self, console):
         level = scene.Scene.current_scene.level
@@ -26,6 +27,7 @@ class StairsDown(Stairs):
     def __init__(self, char='>', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg)
         self.dark_fg = palette.YELLOW
+        self.name = 'Down'
 
     def get_action(self, other=None):
         if not isinstance(other, player.Player):
@@ -37,6 +39,11 @@ class StairsDown(Stairs):
 
             def perform(self, owner):
                 owner.current_health = owner.max_health
-                scene.Scene.current_scene.init_scene()
+                owner.state = 'EXITED'
+                owner.position = -1, -1
+
+                # TODO: Fix the below
+                # Start a countdown timer
+                scene.Scene.current_scene.change_level()
 
         return NextLevel()
