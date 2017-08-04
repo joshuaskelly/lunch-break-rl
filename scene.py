@@ -24,12 +24,6 @@ from entities import stairs
 from twitchchatmanager import TwitchChatManager
 
 
-class TickEvent(object):
-    def __init__(self, tick_number):
-        self.type = 'TICK'
-        self.tick_number = tick_number
-
-
 class Scene(object):
     current_scene = None
 
@@ -155,7 +149,6 @@ class Scene(object):
         if self.change_level_requested:
             console.Console.current_console.print('{} turns left.'.format(self._change_level_on_tick - tick_number))
 
-
             if self._change_level_on_tick - tick_number <= 0 or self.active_player_count() == 0:
                 console.Console.current_console.print('NEXT LEVEL!')
                 self.init_scene()
@@ -165,13 +158,6 @@ class Scene(object):
             entity.update(time)
 
         self.level.update_fov()
-
-        self.timer += time
-        if self.timer > self.seconds_per_tick:
-            self.timer = 0
-            self.tick_count += 1
-            self.tick(self.tick_count)
-            tdl.event.push(TickEvent(self.tick_count))
 
     def get_location_near_stairs(self):
         # Find stair location

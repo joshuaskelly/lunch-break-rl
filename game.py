@@ -8,39 +8,73 @@ from twitchobserver import Observer
 
 from scene import Scene
 
-tdl.set_font('terminal32x32_gs_ro.png')
-console = tdl.init(54, 30, 'lunch break roguelike', renderer='OPENGL')
-tdl.set_fps(30)
 
-scene = Scene()
+class TickEvent(object):
+    def __init__(self, tick_number):
+        self.type = 'TICK'
+        self.tick_number = tick_number
 
-last_time = time.time()
 
-# Twitch Observer
-config = configparser.ConfigParser()
-cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'chat.cfg')
-config.read(cfg_path)
-nickname = config['DEFAULT']['Nickname']
-password = config['DEFAULT']['Password']
-channel = config['DEFAULT']['Channel']
-observer = Observer(nickname, password)
-observer.start()
-observer.join_channel(channel)
+class Game(object):
+    args = {}
+    scene_root = None
+    config = None
 
-running = True
-while running:
-    # Draw the scene
-    console.clear()
-    scene.draw(console)
-    tdl.flush()
+    def __init__(self, args):
+        # Configure game settings
+        config = configparser.ConfigParser()
+        cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.cfg')
+        config.read(cfg_path)
+        Game.config = config
 
-    # Handle input/events
-    for event in list(tdl.event.get()) + observer.get_events():
-        scene.handle_events(event)
+        # Configure tdl
+        tdl.set_font('terminal32x32_gs_ro.png')
+        tdl.set_fps(int(Game.config['ENGINE']['fps']))
+        self.console = tdl.init(54, 30, 'lunch break roguelike', renderer=Game.config['ENGINE']['renderer'])
+        self._last_time = time.time()
 
-        if event.type == 'QUIT':
-            running = False
-            observer.stop()
+        # Set static attributes
+        Game.scene_root = Scene()
+        Game.args = args
 
-    scene.update(time.time() - last_time)
-    last_time = time.time()
+        # Twitch Observer
+        nickname = Game.config['TWITCH']['Nickname']
+        password = Game.config['TWITCH']['Password']
+        channel = Game.config['TWITCH']['Channel']
+        self.observer = Observer(nickname, password)
+        self.observer.start()
+        self.observer.join_channel(channel)
+
+    def run(self):
+        tick_count = 0
+        timer = 0
+        last_time = 0
+        seconds_per_tick = int(Game.config['GAME']['turn'])
+
+        running = True
+        while running:
+            # Draw the scene
+            self.console.clear()
+            Game.scene_root.draw(self.console)
+            tdl.flush()
+
+            # Handle input/events
+            for event in list(tdl.event.get()) + self.observer.get_events():
+                Game.scene_root.handle_events(event)
+
+                if event.type == 'QUIT':
+                    running = False
+                    self.observer.stop()
+
+            # Update scene
+            time_elapsed = time.time() - last_time
+            timer += time_elapsed
+            last_time = time.time()
+            Game.scene_root.update(time_elapsed)
+
+            # Send out tick event
+            if timer > seconds_per_tick:
+                timer = 0
+                tick_count += 1
+                tdl.event.push(TickEvent(tick_count))
+

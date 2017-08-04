@@ -3,10 +3,12 @@ import os
 
 import tdl
 
+import game
 import palette
 import scene
 
 from entities import player
+
 
 class Level(object):
     def __init__(self, x, y, width, height):
@@ -32,7 +34,7 @@ class Level(object):
             x += self.x
             y += self.y
 
-            if (x, y) in self.seen_tiles:
+            if (x, y) in self.seen_tiles or game.Game.args.no_fog_of_war == 'true':
                 if (x, y) in self.visible_tiles:
                     fg = palette.WHITE
 
@@ -114,3 +116,7 @@ class Level(object):
 
             self.visible_tiles = self.visible_tiles.union(e.visible_tiles)
             self.seen_tiles = self.seen_tiles.union(e.visible_tiles)
+
+        if game.Game.args.no_fog_of_war:
+            self.visible_tiles = self.visible_tiles.union([(v[0] + self.x, v[1] + self.y) for v in self.data])
+            self.seen_tiles = self.seen_tiles.union([(s[0] + self.x, s[1] + self.y) for s in self.data])
