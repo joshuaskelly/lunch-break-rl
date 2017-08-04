@@ -3,10 +3,9 @@ import os
 import time
 
 import tdl
-
 from twitchobserver import Observer
 
-from scene import Scene
+from scenes.gamescene import GameScene
 
 
 class TickEvent(object):
@@ -16,11 +15,13 @@ class TickEvent(object):
 
 
 class Game(object):
-    args = {}
+    args = None
     scene_root = None
     config = None
 
     def __init__(self, args):
+        Game.args = args
+
         # Configure game settings
         config = configparser.ConfigParser()
         cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.cfg')
@@ -34,8 +35,7 @@ class Game(object):
         self._last_time = time.time()
 
         # Set static attributes
-        Game.scene_root = Scene()
-        Game.args = args
+        Game.scene_root = GameScene()
 
         # Twitch Observer
         nickname = Game.config['TWITCH']['Nickname']
@@ -76,5 +76,5 @@ class Game(object):
             if timer > seconds_per_tick:
                 timer = 0
                 tick_count += 1
-                tdl.event.push(TickEvent(tick_count))
+                Game.scene_root.tick(tick_count)
 

@@ -1,13 +1,13 @@
 import tdl
 
 import draw
-import palette
-from ui import progressbar
+from entities import entity
 
-class Window(object):
+
+class Window(entity.Entity):
     def __init__(self, x, y, width, height, title=''):
-        self.x = x
-        self.y = y
+        super().__init__(' ', position=(x, y))
+
         self.width = width
         self.height = height
         self.data = tdl.Console(width, height)

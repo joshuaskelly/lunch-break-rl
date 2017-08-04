@@ -45,5 +45,6 @@ class ArgHelper(object):
 
 
 if __name__ == '__main__':
-    g = game.Game(ArgHelper())
+    arg = ArgHelper()
+    g = game.Game(arg)
     g.run()

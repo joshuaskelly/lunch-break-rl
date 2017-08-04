@@ -1,9 +1,9 @@
 import palette
-import scene
-
 from ai import action
 from entities import entity
 from entities import player
+from scenes import gamescene
+
 
 class Stairs(entity.Entity):
     def __init__(self, char='<', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
@@ -12,7 +12,7 @@ class Stairs(entity.Entity):
         self.name = 'Up'
 
     def draw(self, console):
-        level = scene.Scene.current_scene.level
+        level = gamescene.GameScene.current_scene.level_scene.level
 
         if self.visible:
             console.draw_char(*self.position, self.char, self.fg, self.bg)
@@ -42,8 +42,7 @@ class StairsDown(Stairs):
                 owner.state = 'EXITED'
                 owner.position = -1, -1
 
-                # TODO: Fix the below
                 # Start a countdown timer
-                scene.Scene.current_scene.change_level()
+                gamescene.GameScene.current_scene.level_scene.change_level()
 
         return NextLevel()

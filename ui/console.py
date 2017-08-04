@@ -1,7 +1,9 @@
 from ui import window
 
+
 class Console(window.Window):
     current_console = None
+
     def __init__(self, x, y, width, height, title='Players'):
         super().__init__(x, y, width, height, title)
 

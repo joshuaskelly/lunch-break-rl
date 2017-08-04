@@ -1,5 +1,10 @@
-class ProgressBar(object):
+from entities import entity
+
+
+class ProgressBar(entity.Entity):
     def __init__(self, x, y, width, max, color):
+        super().__init__(' ', position=(x, y))
+
         self.max_value = max
         self.current_value = max
         self.width = width

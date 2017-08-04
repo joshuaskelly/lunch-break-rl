@@ -1,15 +1,15 @@
 import tdl
 
 import palette
-import scene
-
-from ai import brain
 from ai import action
+from ai import brain
 from entities import animation
 from entities import entity
 from entities import item
 from entities import player
+from scenes import gamescene
 from ui import console
+
 
 class Creature(entity.Entity):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
@@ -29,7 +29,7 @@ class Creature(entity.Entity):
         target_entity = None
 
         # Determine bump action
-        for e in scene.Scene.current_scene.entities:
+        for e in gamescene.GameScene.current_scene.level_scene.entities:
             if not isinstance(e, entity.Entity):
                 continue
 
@@ -66,7 +66,7 @@ class Creature(entity.Entity):
 
     def can_move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
-        return scene.Scene.current_scene.check_collision(*dest)
+        return gamescene.GameScene.current_scene.level_scene.check_collision(*dest)
 
     def update(self, time):
         if self.current_health <= 0:
@@ -76,13 +76,13 @@ class Creature(entity.Entity):
 
     def update_fov(self):
         x, y = self.position
-        self.visible_tiles = tdl.map.quick_fov(x, y, scene.Scene.current_scene.check_collision)
+        self.visible_tiles = tdl.map.quick_fov(x, y, gamescene.GameScene.current_scene.level_scene.check_collision)
 
     def drop_held_item(self):
         if not isinstance(self.held_item, item.Fist):
             i = self.held_item
             i.position = self.position
-            scene.Scene.current_scene.entities.append(i)
+            gamescene.GameScene.current_scene.level_scene.entities.append(i)
             self.held_item = item.Fist('f')
 
     def hurt(self, damage, hurt_action):
@@ -99,15 +99,11 @@ class Creature(entity.Entity):
         console.Console.current_console.print('{} perishes!'.format(self.name))
         self.remove()
 
-    def tick(self, tick_number):
+    def tick(self, tick):
+        super().tick(tick)
+
         self.brain.perform_action()
         self.update_fov()
-
-    def handle_events(self, event):
-        if event.type == 'TICK':
-            self.tick(event.tick_number)
-
-        super().handle_events(event)
 
     def get_action(self, other=None):
         if isinstance(self, player.Player) and isinstance(other, player.Player):
@@ -117,7 +113,7 @@ class Creature(entity.Entity):
 
     @property
     def visible_entities(self):
-        current_scene = scene.Scene.current_scene
+        current_scene = gamescene.GameScene.current_scene
         result = []
 
         for e in current_scene.entities:

@@ -1,10 +1,6 @@
-import random
-
 import palette
-import scene
-import utils
-
-from entities import player
+from entities import player, entity
+from scenes import gamescene
 from ui import console
 
 regular_viewers = [
@@ -26,12 +22,12 @@ regular_viewers = [
     '109thanos'
 ]
 
-class TwitchChatManager(object):
-    def draw(self, console):
-        pass
+class TwitchChatManager(entity.Entity):
+    def __init__(self):
+        super().__init__(' ')
 
     def handle_events(self, event):
-        s = scene.Scene.current_scene
+        s = gamescene.GameScene.current_scene.level_scene
 
         if event.type == 'TWITCHCHATMESSAGE':
             if event.message:
@@ -50,7 +46,7 @@ class TwitchChatManager(object):
                             player_color = palette.get_nearest((255, 163, 0))
 
                         # Add player
-                        p = player.Player(event.nickname[0], scene.Scene.current_scene.get_location_near_stairs(), fg=player_color)
+                        p = player.Player(event.nickname[0], gamescene.GameScene.current_scene.level_scene.get_location_near_stairs(), fg=player_color)
                         p.name = event.nickname
                         s.entities.append(p)
                         console.Console.current_console.print('{} has joined!'.format(event.nickname))
@@ -63,6 +59,3 @@ class TwitchChatManager(object):
                         if e.name == event.nickname:
                             e.die()
                             console.Console.current_console.print('{} has left.'.format(event.nickname))
-
-    def update(self, time):
-        pass

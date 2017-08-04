@@ -1,22 +1,14 @@
 import tdl
 
-import scene
-
 from entities import entity
+from scenes import gamescene
+
 
 class Animation(entity.Entity):
     def __init__(self):
+        super().__init__(' ')
+
         self.parent = None
-
-    def draw(self, console):
-        pass
-
-    def update(self, time):
-        if self.parent:
-            pass
-
-    def handle_events(self, event):
-        pass
 
     def on_done(self):
         pass
@@ -25,6 +17,7 @@ class Animation(entity.Entity):
 class FlashBackground(Animation):
     def __init__(self, bg=(255, 255, 255), interval=0.25, repeat=2):
         super().__init__()
+
         self.time = 0
         self.interval = interval
         self.times_flashed = 0
@@ -57,9 +50,11 @@ class FlashBackground(Animation):
 
         console.draw_char(*pos, char, fg, self.current_bg)
 
+
 class ThrowMotion(Animation):
     def __init__(self, parent, source, dest, time):
         super().__init__()
+
         self.parent = parent
         self.parent.hidden = True
         self.points = tdl.map.bresenham(*source, *dest)
@@ -83,7 +78,7 @@ class ThrowMotion(Animation):
                 self.on_done()
 
     def draw(self, console):
-        if not scene.Scene.current_scene.check_visibility(*self.current_point):
+        if not gamescene.GameScene.current_scene.level_scene.check_visibility(*self.current_point):
             return
 
         p = self.parent

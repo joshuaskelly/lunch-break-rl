@@ -1,19 +1,17 @@
-import pickle
 import os
+import pickle
 
 import tdl
 
 import game
 import palette
-import scene
+from entities import player, entity
+from scenes import gamescene
 
-from entities import player
 
-
-class Level(object):
+class Level(entity.Entity):
     def __init__(self, x, y, width, height):
-        self.x = x
-        self.y = y
+        super().__init__(' ', position=(x, y))
         self.width = width
         self.height = height
         self.data = tdl.Console(width, height)
@@ -107,7 +105,7 @@ class Level(object):
         pass
 
     def update_fov(self):
-        current_scene = scene.Scene.current_scene
+        current_scene = gamescene.GameScene.current_scene.level_scene
         self.visible_tiles = set()
 
         for e in current_scene.entities:

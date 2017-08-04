@@ -1,5 +1,6 @@
 # Ignore IDE Artifacts
 .vscode
+.idea
 
 # Ignore Python Artifacts
 *.pyc

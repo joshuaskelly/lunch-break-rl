@@ -1,4 +1,5 @@
-import scene
+from scenes import gamescene
+
 
 class Entity(object):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
@@ -10,6 +11,22 @@ class Entity(object):
         self.children = []
         self.hidden = False
 
+    @property
+    def x(self):
+        return self.position[0]
+
+    @x.setter
+    def x(self, value):
+        self.position = value, self.position[1]
+
+    @property
+    def y(self):
+        return self.position[1]
+
+    @y.setter
+    def y(self, value):
+        self.position = self.position[0], value
+
     def draw(self, console):
         if self.visible:
             console.draw_char(*self.position, self.char, self.fg, self.bg)
@@ -18,15 +35,24 @@ class Entity(object):
             child.draw(console)
 
     def update(self, time):
+        """Perform per frame logic.
+        
+        time: Time elapsed since last update in seconds.
+        """
         for child in self.children:
             child.update(time)
+
+    def tick(self, tick):
+        """Perform per tick logic.
+        
+        tick: The total number of ticks that have elapsed since game launch
+        """
+        for child in self.children:
+            child.tick(tick)
 
     def handle_events(self, event):
         for child in self.children:
             child.handle_events(event)
-
-    def tick(self, tick_number):
-        pass
 
     def get_action(self, other=None):
         """Returns an action
@@ -46,9 +72,9 @@ class Entity(object):
         if not self.position:
             return False
 
-        return self.position in scene.Scene.current_scene.level.visible_tiles
+        return self.position in gamescene.GameScene.current_scene.level_scene.level.visible_tiles
 
     def remove(self):
-        if self in scene.Scene.current_scene.entities:
-            scene.Scene.current_scene.entities.remove(self)
+        if self in gamescene.GameScene.current_scene.level_scene.entities:
+            gamescene.GameScene.current_scene.level_scene.entities.remove(self)
             self.position = None

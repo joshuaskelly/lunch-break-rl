@@ -1,66 +1,59 @@
 import random
 
-import tdl
-
 import dungeongenerator
-import dungeonmaster
-import draw
-import palette
-import level
 import utils
 
+from entities import player, stairs
+from scenes.scene import Scene
 from ui import console
-from ui import entitieswindow
-from ui import playerwindow
-from ui import levelwindow
-
-from ai import action
-from entities import animation
-from entities import entity
-from entities import item
-from entities import kobold
-from entities import player
-from entities import stairs
-from twitchchatmanager import TwitchChatManager
 
 
-class Scene(object):
-    current_scene = None
-
+class LevelScene(Scene):
     def __init__(self):
-        self.entities = []
-        self.seconds_per_tick = 2
-        self.timer = 0
+        super().__init__()
+
+        self.level = None
         self.tick_count = 0
         self.change_level_requested = False
         self._change_level_on_tick = 0
 
-        self.init_scene()
+    def update(self, time):
+        super().update(time)
+        self.level.update_fov()
+
+    def tick(self, tick):
+        super().tick(tick)
+
+        self.tick_count = tick
+
+        if self.change_level_requested:
+            console.Console.current_console.print('{} turns left.'.format(self._change_level_on_tick - tick))
+
+            if self._change_level_on_tick - tick <= 0 or self.active_player_count() == 0:
+                console.Console.current_console.print('NEXT LEVEL!')
+                self.init_scene()
+
+    def draw(self, console):
+        # Draw items and creatures
+        for e in [n for n in self.entities if not isinstance(n, player.Player)]:
+            e.draw(console)
+
+        # Draw players
+        for e in [n for n in self.entities if isinstance(n, player.Player)]:
+            e.draw(console)
 
     def init_scene(self):
-        # Persist players in level
+        # Reset level change info
         self.change_level_requested = False
         self._change_level_on_tick = 0
 
+        # Persist players in level
         self.entities = [p for p in self.players if not p.idle]
-        self.entities.append(TwitchChatManager())
-        w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
-        w.seconds_per_tick = self.seconds_per_tick
-        self.entities.append(w)
 
-        self.level, new_entities = dungeongenerator.generate_level(29, 22) #level.Level(12, 1, 29, 22)
+        self.level, new_entities = dungeongenerator.generate_level(29, 22)
         self.level.x = 12
         self.level.y = 1
         self.entities.append(self.level)
-
-        w = playerwindow.PlayerWindow(29+13, 0, 11, 30, 'Players')
-        self.entities.append(w)
-
-        w = entitieswindow.EntitiesWindow(0, 0, 11, 30)
-        self.entities.append(w)
-
-        self.console = console.Console(11, 24, 31, 6, title=None)
-        self.entities.append(self.console)
 
         # Add generated entities to scene
         for en in new_entities:
@@ -85,29 +78,6 @@ class Scene(object):
             pos = self.get_location_near_stairs()
 
             p.position = pos
-
-        if not Scene.current_scene:
-            Scene.current_scene = self
-
-    def change_level(self):
-        if not self.change_level_requested:
-            self.change_level_requested = True
-            self._change_level_on_tick = self.tick_count + 30
-
-    def draw(self, console):
-        for e in [n for n in self.entities if not isinstance(n, player.Player)]:
-            e.draw(console)
-
-        for e in [n for n in self.entities if isinstance(n, player.Player)]:
-            e.draw(console)
-
-    def handle_events(self, event):
-        for e in self.entities:
-            e.handle_events(event)
-
-            if event.type == 'KEYDOWN':
-                if event.keychar.upper() == 'G':
-                    self.init_scene()
 
     def check_collision(self, x, y):
         """Returns True if player can move into the given world coords
@@ -145,19 +115,10 @@ class Scene(object):
     def active_player_count(self):
         return len([p for p in self.players if p.state != 'EXITED'])
 
-    def tick(self, tick_number):
-        if self.change_level_requested:
-            console.Console.current_console.print('{} turns left.'.format(self._change_level_on_tick - tick_number))
-
-            if self._change_level_on_tick - tick_number <= 0 or self.active_player_count() == 0:
-                console.Console.current_console.print('NEXT LEVEL!')
-                self.init_scene()
-
-    def update(self, time):
-        for entity in self.entities:
-            entity.update(time)
-
-        self.level.update_fov()
+    def change_level(self):
+        if not self.change_level_requested:
+            self.change_level_requested = True
+            self._change_level_on_tick = self.tick_count + 30
 
     def get_location_near_stairs(self):
         # Find stair location

@@ -1,12 +1,10 @@
 import random
 
 import palette
-import scene
-
-from ai import action
-from entities import creature
-from entities import kobold
 from entities import item
+from entities import kobold
+from scenes import gamescene
+
 
 class DungeonMaster(object):
     def __init__(self):
@@ -23,13 +21,13 @@ class DungeonMaster(object):
 
         if roll <= 0.15:
             roll = random.random()
-            current_scene = scene.Scene.current_scene
+            current_scene = gamescene.GameScene.current_scene.level_scene
             level = current_scene.level
 
             position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
             tries = 0
 
-            while not scene.Scene.current_scene.check_collision(*position) and tries < 10:
+            while not gamescene.GameScene.current_scene.level_scene.check_collision(*position) and tries < 10:
                 position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
                 tries += 1
 
@@ -56,7 +54,3 @@ class DungeonMaster(object):
             elif roll <= 1:
                 d = item.Glove(position=position)
                 current_scene.entities.append(d)
-
-    def handle_events(self, event):
-        if event.type == 'TICK':
-            self.tick(event.tick_number)

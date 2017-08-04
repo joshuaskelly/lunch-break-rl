@@ -1,10 +1,10 @@
 import palette
-import scene
-
 from entities import entity
 from entities import player
+from scenes import gamescene
 from ui import progressbar
 from ui import window
+
 
 class EntitiesWindow(window.Window):
     def __init__(self, x, y, width, height, title='Entities'):
@@ -14,7 +14,7 @@ class EntitiesWindow(window.Window):
         super().draw(console)
 
         row = 1
-        for e in scene.Scene.current_scene.entities:
+        for e in gamescene.GameScene.current_scene.level_scene.entities:
             if isinstance(e, player.Player):
                 continue
 

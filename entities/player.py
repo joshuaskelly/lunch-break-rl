@@ -1,10 +1,9 @@
-import events
 import palette
-import scene
-
 from ai import action
 from entities import creature
 from entities import entity
+from scenes import gamescene
+
 
 class Player(creature.Creature):
     def __init__(self, char='@', position=(0, 0), fg=palette.BRIGHT_RED, bg=palette.BLACK):
@@ -17,12 +16,13 @@ class Player(creature.Creature):
     def update(self, time):
         super().update(time)
 
-    def tick(self, tick_number):
-        super().tick(tick_number)
-        self._current_tick = tick_number
+    def tick(self, tick):
+        super().tick(tick)
+
+        self._current_tick = tick
 
         if self._has_taken_action or self.state == 'EXITED':
-            self._last_action_tick = tick_number
+            self._last_action_tick = tick
             self._has_taken_action = False
 
     def draw(self, console):
@@ -104,7 +104,7 @@ class Player(creature.Creature):
                     if direction.upper() == 'R':
                         dest = dest[0] + 1, dest[1]
 
-                    es = [e for e in scene.Scene.current_scene.entities if isinstance(e, entity.Entity) and e.position == dest]
+                    es = [e for e in gamescene.GameScene.current_scene.level_scene.entities if isinstance(e, entity.Entity) and e.position == dest]
 
                     if es:
                         target_entity = es[0]

@@ -2,14 +2,14 @@ import random
 
 import tdl
 
-import scene
 import utils
-
 from entities import animation
 from entities import creature
 from entities import item
 from entities import player
+from scenes import gamescene
 from ui import console
+
 
 class Action(object):
     def __init__(self):
@@ -137,7 +137,7 @@ class EquipItemAction(Action):
         self.item.remove()
 
         if old_item and not isinstance(old_item, item.Fist):
-            scene.Scene.current_scene.entities.append(old_item)
+            gamescene.GameScene.current_scene.level_scene.entities.append(old_item)
 
         if owner.visible:
             console.Console.current_console.print('{} is equiping {}'.format(owner.name, self.item.name))
@@ -189,7 +189,7 @@ class ThrowAction(Action):
         action_to_perform = None
         target_entity = None
 
-        current_scene = scene.Scene.current_scene
+        current_scene = gamescene.GameScene.current_scene.level_scene
         level = current_scene.level
         done = False
         for point in path[1:]:
