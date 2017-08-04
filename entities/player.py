@@ -1,8 +1,9 @@
+import instances
 import palette
+
 from ai import action
 from entities import creature
 from entities import entity
-from scenes import gamescene
 
 
 class Player(creature.Creature):
@@ -104,7 +105,7 @@ class Player(creature.Creature):
                     if direction.upper() == 'R':
                         dest = dest[0] + 1, dest[1]
 
-                    es = [e for e in gamescene.GameScene.current_scene.level_scene.entities if isinstance(e, entity.Entity) and e.position == dest]
+                    es = [e for e in instances.scene_root.entities if isinstance(e, entity.Entity) and e.position == dest]
 
                     if es:
                         target_entity = es[0]

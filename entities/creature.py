@@ -1,14 +1,14 @@
 import tdl
 
+import instances
 import palette
+
 from ai import action
 from ai import brain
 from entities import animation
 from entities import entity
 from entities import item
 from entities import player
-from scenes import gamescene
-from ui import console
 
 
 class Creature(entity.Entity):
@@ -29,7 +29,7 @@ class Creature(entity.Entity):
         target_entity = None
 
         # Determine bump action
-        for e in gamescene.GameScene.current_scene.level_scene.entities:
+        for e in instances.scene_root.entities:
             if not isinstance(e, entity.Entity):
                 continue
 
@@ -66,7 +66,7 @@ class Creature(entity.Entity):
 
     def can_move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
-        return gamescene.GameScene.current_scene.level_scene.check_collision(*dest)
+        return instances.scene_root.check_collision(*dest)
 
     def update(self, time):
         if self.current_health <= 0:
@@ -76,13 +76,13 @@ class Creature(entity.Entity):
 
     def update_fov(self):
         x, y = self.position
-        self.visible_tiles = tdl.map.quick_fov(x, y, gamescene.GameScene.current_scene.level_scene.check_collision)
+        self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision)
 
     def drop_held_item(self):
         if not isinstance(self.held_item, item.Fist):
             i = self.held_item
             i.position = self.position
-            gamescene.GameScene.current_scene.level_scene.entities.append(i)
+            instances.scene_root.entities.append(i)
             self.held_item = item.Fist('f')
 
     def hurt(self, damage, hurt_action):
@@ -96,7 +96,7 @@ class Creature(entity.Entity):
 
     def die(self):
         self.drop_held_item()
-        console.Console.current_console.print('{} perishes!'.format(self.name))
+        instances.console.print('{} perishes!'.format(self.name))
         self.remove()
 
     def tick(self, tick):
@@ -113,7 +113,7 @@ class Creature(entity.Entity):
 
     @property
     def visible_entities(self):
-        current_scene = gamescene.GameScene.current_scene
+        current_scene = instances.scene_root
         result = []
 
         for e in current_scene.entities:

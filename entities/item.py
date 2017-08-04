@@ -1,8 +1,8 @@
+import instances
 import palette
 
 from ai import action
 from entities import entity
-from ui import console
 
 
 class Item(entity.Entity):
@@ -26,7 +26,7 @@ class UsableItem(Item):
         return action.UseItemAction(self)
 
     def use(self, target):
-        console.Console.current_console.print('{} is being used on {}'.format(self.name, target.name))
+        instances.console.print('{} is being used on {}'.format(self.name, target.name))
 
 
 class Potion(UsableItem):
@@ -36,7 +36,7 @@ class Potion(UsableItem):
         self.heal_amount = 4
 
     def use(self, target):
-        console.Console.current_console.print('{} recovers {} health!'.format(target.name, self.heal_amount))
+        instances.console.print('{} recovers {} health!'.format(target.name, self.heal_amount))
         target.current_health = min(target.max_health, target.current_health + self.heal_amount)
 
 
@@ -76,7 +76,7 @@ class Dagger(HeldItem):
         counter.tags = ['counter']
 
         if counter.prerequiste(owner):
-            console.Console.current_console.print('{} counter attacks!'.format(owner.name))
+            instances.console.print('{} counter attacks!'.format(owner.name))
             counter.perform(owner)
 
 class Glove(HeldItem):

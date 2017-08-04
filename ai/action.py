@@ -2,13 +2,13 @@ import random
 
 import tdl
 
+import instances
 import utils
+
 from entities import animation
 from entities import creature
 from entities import item
 from entities import player
-from scenes import gamescene
-from ui import console
 
 
 class Action(object):
@@ -88,9 +88,10 @@ class AttackAction(Action):
             verb = self.weapon.verb
 
         if owner.visible:
-            console.Console.current_console.print('{} {} {}'.format(owner.name, verb, self.target.name))
+            instances.console.print('{} {} {}'.format(owner.name, verb, self.target.name))
 
         self.target.hurt(damage_dealt, self)
+
 
 class MoveAction(Action):
     def __init__(self, dest):
@@ -121,6 +122,7 @@ class IdleAction(Action):
         owner.brain.add_action(IdleAction())
         #console.Console.current_console.print('{} is thinking...'.format(owner.name))
 
+
 class EquipItemAction(Action):
     def __init__(self, item):
         super().__init__()
@@ -137,10 +139,10 @@ class EquipItemAction(Action):
         self.item.remove()
 
         if old_item and not isinstance(old_item, item.Fist):
-            gamescene.GameScene.current_scene.level_scene.entities.append(old_item)
+            instances.scene_root.entities.append(old_item)
 
         if owner.visible:
-            console.Console.current_console.print('{} is equiping {}'.format(owner.name, self.item.name))
+            instances.console.print('{} is equiping {}'.format(owner.name, self.item.name))
 
 class UseItemAction(Action):
     def __init__(self, item):
@@ -189,8 +191,7 @@ class ThrowAction(Action):
         action_to_perform = None
         target_entity = None
 
-        current_scene = gamescene.GameScene.current_scene.level_scene
-        level = current_scene.level
+        current_scene = instances.scene_root
         done = False
         for point in path[1:]:
             if current_scene.is_solid(*point):
@@ -245,7 +246,7 @@ class ThrowAction(Action):
                 action_to_perform(target_entity)
 
             if owner.visible:
-                console.Console.current_console.print('{} {} {}'.format(owner.name, 'throws', thrown_entity.name))
+                instances.console.print('{} {} {}'.format(owner.name, 'throws', thrown_entity.name))
 
         ani.on_done = action_callback
 

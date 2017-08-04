@@ -1,9 +1,9 @@
 import random
 
+import instances
 import palette
 from entities import item
 from entities import kobold
-from scenes import gamescene
 
 
 class DungeonMaster(object):
@@ -21,13 +21,13 @@ class DungeonMaster(object):
 
         if roll <= 0.15:
             roll = random.random()
-            current_scene = gamescene.GameScene.current_scene.level_scene
-            level = current_scene.level
+            current_scene = instances.scene_root
+            level = current_scene
 
             position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
             tries = 0
 
-            while not gamescene.GameScene.current_scene.level_scene.check_collision(*position) and tries < 10:
+            while not current_scene.check_collision(*position) and tries < 10:
                 position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
                 tries += 1
 

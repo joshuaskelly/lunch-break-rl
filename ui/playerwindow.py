@@ -1,6 +1,7 @@
+import instances
 import palette
+
 from entities import player
-from scenes import gamescene
 from ui import progressbar
 from ui import window
 
@@ -13,7 +14,7 @@ class PlayerWindow(window.Window):
         super().draw(console)
 
         row = 1
-        for entity in gamescene.GameScene.current_scene.level_scene.entities:
+        for entity in instances.scene_root.entities:
             if not isinstance(entity, player.Player):
                 continue
 
@@ -35,7 +36,3 @@ class PlayerWindow(window.Window):
 
         self.data.draw_str(2, self.height - 1, '(!join)', fg=palette.BRIGHT_YELLOW)
         console.blit(self.data, self.x, self.y)
-
-    def handle_events(self, event):
-        pass
-    

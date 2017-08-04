@@ -1,7 +1,8 @@
+import instances
 import palette
-from entities import player, entity
-from scenes import gamescene
-from ui import console
+
+from entities import entity
+from entities import player
 
 regular_viewers = [
     'daemianend',
@@ -22,17 +23,18 @@ regular_viewers = [
     '109thanos'
 ]
 
+
 class TwitchChatManager(entity.Entity):
     def __init__(self):
         super().__init__(' ')
 
     def handle_events(self, event):
-        s = gamescene.GameScene.current_scene.level_scene
+        current_scene = instances.scene_root
 
         if event.type == 'TWITCHCHATMESSAGE':
             if event.message:
                 if event.message.upper() == '!JOIN':
-                    player_names = [e.name for e in s.entities if hasattr(e, 'name')]
+                    player_names = [e.name for e in current_scene.entities if hasattr(e, 'name')]
 
                     if not event.nickname in player_names:
                         # Set player color
@@ -46,16 +48,16 @@ class TwitchChatManager(entity.Entity):
                             player_color = palette.get_nearest((255, 163, 0))
 
                         # Add player
-                        p = player.Player(event.nickname[0], gamescene.GameScene.current_scene.level_scene.get_location_near_stairs(), fg=player_color)
+                        p = player.Player(event.nickname[0], current_scene.get_location_near_stairs(), fg=player_color)
                         p.name = event.nickname
-                        s.entities.append(p)
-                        console.Console.current_console.print('{} has joined!'.format(event.nickname))
+                        current_scene.entities.append(p)
+                        instances.console.print('{} has joined!'.format(event.nickname))
 
                 elif event.message.upper() == '!LEAVE':
-                    for e in s.entities:
+                    for e in current_scene.entities:
                         if not isinstance(e, player.Player):
                             continue
 
                         if e.name == event.nickname:
                             e.die()
-                            console.Console.current_console.print('{} has left.'.format(event.nickname))
+                            instances.console.print('{} has left.'.format(event.nickname))

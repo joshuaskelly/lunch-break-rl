@@ -1,17 +1,19 @@
+import instances
+
 from ui import window
 
 
 class Console(window.Window):
-    current_console = None
+    instance = None
 
     def __init__(self, x, y, width, height, title='Players'):
         super().__init__(x, y, width, height, title)
 
         self.messages = []
 
-        #if not Console.current_console:
-        # TODO: Fix this? Or live with it?
-        Console.current_console = self
+        if not Console.instance:
+            Console.instance = self
+            instances.register('console', self)
 
     def print(self, message):
         self.messages.append(message[:self.width-2])

@@ -5,7 +5,7 @@ import time
 import tdl
 from twitchobserver import Observer
 
-from scenes.gamescene import GameScene
+from scenes import gamescene
 
 
 class TickEvent(object):
@@ -35,7 +35,7 @@ class Game(object):
         self._last_time = time.time()
 
         # Set static attributes
-        Game.scene_root = GameScene()
+        Game.scene_root = gamescene.GameScene()
 
         # Twitch Observer
         nickname = Game.config['TWITCH']['Nickname']

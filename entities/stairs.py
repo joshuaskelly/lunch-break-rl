@@ -1,8 +1,9 @@
+import instances
 import palette
+
 from ai import action
 from entities import entity
 from entities import player
-from scenes import gamescene
 
 
 class Stairs(entity.Entity):
@@ -12,7 +13,7 @@ class Stairs(entity.Entity):
         self.name = 'Up'
 
     def draw(self, console):
-        level = gamescene.GameScene.current_scene.level_scene.level
+        level = instances.scene_root.level
 
         if self.visible:
             console.draw_char(*self.position, self.char, self.fg, self.bg)
@@ -22,6 +23,7 @@ class Stairs(entity.Entity):
 
         for child in self.children:
             child.draw(console)
+
 
 class StairsDown(Stairs):
     def __init__(self, char='>', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
@@ -43,6 +45,6 @@ class StairsDown(Stairs):
                 owner.position = -1, -1
 
                 # Start a countdown timer
-                gamescene.GameScene.current_scene.level_scene.change_level()
+                instances.scene_root.change_level()
 
         return NextLevel()

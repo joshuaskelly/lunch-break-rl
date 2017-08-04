@@ -1,16 +1,17 @@
 import game
+import twitchchatmanager
+
 from ui import console
 from ui import entitieswindow
 from ui import playerwindow
 from ui import levelwindow
 
-from scenes.levelscene import LevelScene
-from scenes.scene import Scene
-from twitchchatmanager import TwitchChatManager
+from scenes import levelscene
+from scenes import scene
 
 
-class GameScene(Scene):
-    current_scene = None
+class GameScene(scene.Scene):
+    instance = None
 
     def __init__(self):
         super().__init__()
@@ -19,15 +20,19 @@ class GameScene(Scene):
         self.level_scene = None
         self.seconds_per_tick = int(game.Game.args.turn) if game.Game.args.turn else 2
 
+        # Singleton-ish
+        if not GameScene.instance:
+            GameScene.instance = self
+
         self.init_scene()
 
     def init_scene(self):
-        self.entities.append(TwitchChatManager())
+        self.entities.append(twitchchatmanager.TwitchChatManager())
         w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
         w.seconds_per_tick = self.seconds_per_tick
         self.entities.append(w)
 
-        self.level_scene = LevelScene()
+        self.level_scene = levelscene.LevelScene()
         self.level_scene.init_scene()
         self.entities.append(self.level_scene)
 
@@ -39,12 +44,3 @@ class GameScene(Scene):
 
         self.console = console.Console(11, 24, 31, 6, title=None)
         self.entities.append(self.console)
-
-        # Singleton-ish
-        if not GameScene.current_scene:
-            GameScene.current_scene = self
-
-    @property
-    def level(self):
-        return self.level_scene.level
-

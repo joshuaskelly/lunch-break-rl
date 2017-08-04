@@ -1,4 +1,4 @@
-from scenes import gamescene
+import instances
 
 
 class Entity(object):
@@ -72,9 +72,11 @@ class Entity(object):
         if not self.position:
             return False
 
-        return self.position in gamescene.GameScene.current_scene.level_scene.level.visible_tiles
+        return self.position in instances.scene_root.level.visible_tiles
 
     def remove(self):
-        if self in gamescene.GameScene.current_scene.level_scene.entities:
-            gamescene.GameScene.current_scene.level_scene.entities.remove(self)
+        current_scene = instances.scene_root
+
+        if self in current_scene.entities:
+            current_scene.entities.remove(self)
             self.position = None

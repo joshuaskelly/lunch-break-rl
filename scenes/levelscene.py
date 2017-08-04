@@ -1,14 +1,17 @@
 import random
 
 import dungeongenerator
+import instances
 import utils
 
-from entities import player, stairs
-from scenes.scene import Scene
-from ui import console
+from entities import player
+from entities import stairs
+from scenes import scene
 
 
-class LevelScene(Scene):
+class LevelScene(scene.Scene):
+    instance = None
+
     def __init__(self):
         super().__init__()
 
@@ -16,6 +19,10 @@ class LevelScene(Scene):
         self.tick_count = 0
         self.change_level_requested = False
         self._change_level_on_tick = 0
+
+        if not LevelScene.instance:
+            LevelScene.instance = self
+            instances.register('scene_root', self)
 
     def update(self, time):
         super().update(time)
@@ -27,10 +34,10 @@ class LevelScene(Scene):
         self.tick_count = tick
 
         if self.change_level_requested:
-            console.Console.current_console.print('{} turns left.'.format(self._change_level_on_tick - tick))
+            instances.console.print('{} turns left.'.format(self._change_level_on_tick - tick))
 
             if self._change_level_on_tick - tick <= 0 or self.active_player_count() == 0:
-                console.Console.current_console.print('NEXT LEVEL!')
+                instances.console.print('NEXT LEVEL!')
                 self.init_scene()
 
     def draw(self, console):

@@ -1,7 +1,7 @@
 import tdl
 
+import instances
 from entities import entity
-from scenes import gamescene
 
 
 class Animation(entity.Entity):
@@ -78,7 +78,7 @@ class ThrowMotion(Animation):
                 self.on_done()
 
     def draw(self, console):
-        if not gamescene.GameScene.current_scene.level_scene.check_visibility(*self.current_point):
+        if not instances.scene_root.check_visibility(*self.current_point):
             return
 
         p = self.parent
