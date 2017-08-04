@@ -2,6 +2,7 @@ def cp437(string):
     """Converts utf8 to codepage 437"""
     return ''.join([chr(ord(c.encode('cp437'))) for c in string])
 
+
 def rect(x, y, width, height):
     result = []
 
@@ -24,8 +25,7 @@ def is_next_to(e1, e2):
     if not e1 or not e2:
         return False
 
-    dx = abs(e1.position[0] - e2.position[0])
-    dy = abs(e1.position[1] - e2.position[1])
+    dx, dy = math.sub(e1.position, e2.position)
 
     if dx > 1:
         return False
@@ -37,3 +37,13 @@ def is_next_to(e1, e2):
         return False
 
     return True
+
+
+class math(object):
+    @staticmethod
+    def add(lhs, rhs):
+        return lhs[0] + rhs[0], lhs[1] + rhs[1]
+
+    @staticmethod
+    def sub(lhs, rhs):
+        return lhs[0] - rhs[0], lhs[1] - rhs[1]

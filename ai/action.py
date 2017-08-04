@@ -58,19 +58,7 @@ class AttackAction(Action):
         self.weapon = None
 
     def prerequiste(self, owner):
-        dx = owner.position[0] - self.target.position[0]
-        dy = owner.position[1] - self.target.position[1]
-
-        if abs(dx) > 1:
-            return False
-
-        if abs(dy) > 1:
-            return False
-
-        if abs(dx) == 1 and abs(dy) == 1:
-            return False
-
-        return True
+        return utils.is_next_to(owner, self.target)
 
     def perform(self, owner):
         self.owner = owner
@@ -144,6 +132,7 @@ class EquipItemAction(Action):
         if owner.visible:
             instances.console.print('{} is equiping {}'.format(owner.name, self.item.name))
 
+
 class UseItemAction(Action):
     def __init__(self, item):
         super().__init__()
@@ -155,6 +144,7 @@ class UseItemAction(Action):
     def perform(self, owner):
         self.item.use(owner)
         self.item.remove()
+
 
 class ThrowAction(Action):
     def __init__(self, target):
@@ -175,8 +165,7 @@ class ThrowAction(Action):
             weapon_range = weapon.range
 
         # Determine direction of throw
-        dx = thrown_entity.position[0] - owner.position[0]
-        dy = thrown_entity.position[1] - owner.position[1]
+        dx, dy = utils.math.sub(thrown_entity.position, owner.position)
         dest = thrown_entity.position
 
         # Determine destination of throw
