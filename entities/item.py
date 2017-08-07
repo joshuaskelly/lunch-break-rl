@@ -1,11 +1,14 @@
 import instances
 import palette
+import registry
 
 from ai import action
 from entities import entity
 
 
 class Item(entity.Entity):
+    registered_entities = []
+
     def get_action(self, other=None):
         pass
 
@@ -39,6 +42,8 @@ class Potion(UsableItem):
         instances.console.print('{} recovers {} health!'.format(target.name, self.heal_amount))
         target.current_health = min(target.max_health, target.current_health + self.heal_amount)
 
+registry.Registry.register(Potion, 'item', 'rare')
+
 
 class Fist(HeldItem):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
@@ -55,6 +60,9 @@ class Sword(HeldItem):
         self.damage = 3
         self.name = 'sword'
         self.verb = 'slashes'
+
+registry.Registry.register(Sword, 'weapon', 'common')
+
 
 class Dagger(HeldItem):
     def __init__(self, char='d', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
@@ -79,6 +87,9 @@ class Dagger(HeldItem):
             instances.console.print('{} counter attacks!'.format(owner.name))
             counter.perform(owner)
 
+registry.Registry.register(Dagger, 'weapon', 'common')
+
+
 class Glove(HeldItem):
     def __init__(self, char='g', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg)
@@ -92,3 +103,5 @@ class Glove(HeldItem):
 
     def get_special_action(self, target):
         return action.ThrowAction(target)
+
+registry.Registry.register(Glove, 'weapon', 'rare')

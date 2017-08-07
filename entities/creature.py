@@ -78,6 +78,9 @@ class Creature(entity.Entity):
         super().update(time)
 
     def update_fov(self):
+        if not self.position:
+            return
+
         x, y = self.position
         self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision)
 

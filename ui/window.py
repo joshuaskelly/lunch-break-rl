@@ -12,6 +12,7 @@ class Window(entity.Entity):
         self.height = height
         self.data = tdl.Console(width, height)
         self.title = title
+        self.always_show = True
 
     def update(self, time):
         for child in self.children:

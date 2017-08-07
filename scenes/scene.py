@@ -9,6 +9,7 @@ class Scene(entity.Entity):
         self.position = x, y
         self.width = width
         self.height = height
+        self.always_show = True
 
         self.console = tdl.Console(width, height)
 

@@ -11,7 +11,7 @@ class Player(creature.Creature):
         super().__init__(char, position, fg, bg)
         self.name = 'Player'
         self._last_action_tick = 0
-        self._current_tick = 0
+        self._current_tick = 999999
         self._has_taken_action = False
 
     def update(self, time):

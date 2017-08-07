@@ -19,6 +19,7 @@ class Level(entity.Entity):
         self.erasing = False
         self.visible_tiles = set()
         self.seen_tiles = set()
+        self.always_show = True
 
     def draw_char(self, x, y, fg=Ellipsis, bg=Ellipsis):
         self.data.draw_char(x, y, fg, bg)
@@ -44,10 +45,9 @@ class Level(entity.Entity):
             child.draw(console)
 
     def update_fov(self):
-        current_scene = instances.scene_root
         self.visible_tiles = set()
 
-        for e in current_scene.children:
+        for e in self.children:
             if not isinstance(e, player.Player):
                 continue
 

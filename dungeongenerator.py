@@ -3,14 +3,14 @@ import random
 import tdl
 
 import level
-import palette
+import registry
 import utils
 
 from data import room_templates
-from entities import entity
-from entities import kobold
 from entities import item
+from entities import kobold
 from entities import stairs
+
 
 def generate_level(width, height):
     new_entities = []
@@ -111,7 +111,6 @@ def generate_level(width, height):
             ent = stairs.Stairs(position=coord)
             new_entities.append(ent)
 
-
         if m & STAIRDOWN:
             rect = utils.rect(x, y, 9, 7)
             potential_coords = []
@@ -130,19 +129,39 @@ def generate_level(width, height):
         ch, fg, bg = new_level.data.get_char(x, y)
         if ch == ord('.'):
             if random.random() < 1 / 30:
-                k = kobold.Kobold(position=(x, y))
-                new_entities.append(k)
+                monster_classes = registry.Registry.get('monster', 'common')
+                MonsterClass = random.choice(monster_classes)
+                mon = MonsterClass(position=(x, y))
+                new_entities.append(mon)
 
-            elif random.random() < 1 / 60:
-                s = item.Sword(position=(x, y))
-                new_entities.append(s)
+            elif random.random() < 1 / 70:
+                rarity = 'common'
+                #if random.random() < 1 / 100:
+                #    rarity = 'rare'
 
-            elif random.random() < 1 / 60:
-                s = item.Dagger(position=(x, y))
-                new_entities.append(s)
+                #elif random.random() < 1 / 4:
+                #    rarity = 'uncommon'
 
-            elif random.random() < 1 / 100:
-                p = item.Potion(char='!', position=(x, y), fg=palette.BRIGHT_MAGENTA)
-                new_entities.append(p)
+                weapon_classes = registry.Registry.get('weapon', rarity)
+
+                if weapon_classes:
+                    WeaponClass = random.choice(weapon_classes)
+                    weapon = WeaponClass(position=(x, y))
+                    new_entities.append(weapon)
+
+            elif random.random() < 1 / 180:
+                rarity = 'common'
+                #if random.random() < 1 / 100:
+                #    rarity = 'rare'
+
+                #elif random.random() < 1 / 4:
+                #    rarity = 'uncommon'
+
+                item_classes = registry.Registry.get('item', rarity)
+
+                if item_classes:
+                    ItemClass = random.choice(item_classes)
+                    item = ItemClass(position=(x, y))
+                    new_entities.append(item)
 
     return new_level, new_entities

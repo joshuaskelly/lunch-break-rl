@@ -128,7 +128,7 @@ class EquipItemAction(Action):
         owner.append(self.item)
 
         if old_item and not isinstance(old_item, item.Fist):
-            instances.scene_root.append(old_item)
+            instances.scene_root.level.append(old_item)
 
         if owner.visible:
             instances.console.print('{} is equiping {}'.format(owner.name, self.item.name))

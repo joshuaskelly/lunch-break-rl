@@ -1,10 +1,12 @@
 import random
 
 import palette
+import registry
 
 from ai import action
 from entities import creature
 from entities import item
+
 
 class Kobold(creature.Creature):
     def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=(0, 0, 0)):
@@ -16,3 +18,5 @@ class Kobold(creature.Creature):
 
         if random.randint(0, 3) == 0:
             self.held_item = item.Sword()
+
+registry.Registry.register(Kobold, 'monster', 'common')

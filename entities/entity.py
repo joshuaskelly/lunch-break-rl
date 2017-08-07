@@ -11,6 +11,7 @@ class Entity(object):
         self.name = self.__class__.__name__
         self._children = []
         self.hidden = False
+        self.always_show = False
         self.parent = None
 
     @property
@@ -104,6 +105,9 @@ class Entity(object):
 
     @property
     def visible(self):
+        if self.always_show:
+            return True
+
         if self.hidden:
             return False
 

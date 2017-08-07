@@ -64,19 +64,11 @@ class LevelScene(scene.Scene):
         self._children = [p for p in self.players if not p.idle]
 
         self.level, new_entities = dungeongenerator.generate_level(29, 22)
-        #self.level.x = 12
-        #self.level.y = 1
         self.append(self.level)
 
         # Add generated entities to scene
         for en in new_entities:
-            #pos = en.position
-            #pos = pos[0] + self.level.x, pos[1] + self.level.y
-            #pos = pos[0], pos[1]
-            #en.position = pos
-
-            self.level.append(en)
-            #self.append(en)
+            self.append(en)
 
         health_bonus = len([p for p in self.players if p.state == 'EXITED'])
 
@@ -89,10 +81,7 @@ class LevelScene(scene.Scene):
             p.brain.actions = []
             p.visible_tiles = set()
             p.state = 'NORMAL'
-
-            pos = self.get_location_near_stairs()
-
-            p.position = pos
+            p.position = self.get_location_near_stairs()
 
         self.children.append(twitchchatmanager.TwitchChatManager())
 
@@ -138,11 +127,11 @@ class LevelScene(scene.Scene):
 
     def get_location_near_stairs(self):
         # Find stair location
-        stair_location = [e for e in self.level.children if isinstance(e, stairs.Stairs) and e.name == 'Up'][0].position
+        stair_location = [e for e in self.children if isinstance(e, stairs.Stairs) and e.name == 'Up'][0].position
 
         # Find open areas around stairs
         rect = utils.rect(stair_location[0] - 3, stair_location[1] - 3, 7, 7)
-        filled_location = [e.position for e in self.level.children if hasattr(e, 'position')]
+        filled_location = [e.position for e in self.children if hasattr(e, 'position')]
         possible_locations = []
         for point in rect:
             if point not in self.level.data:

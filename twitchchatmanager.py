@@ -21,7 +21,8 @@ regular_viewers = [
     'paspartout',
     'nixrod',
     'glasscaskettv',
-    '109thanos'
+    '109thanos',
+    'hawaii_beach'
 ]
 
 
@@ -51,10 +52,9 @@ class TwitchChatManager(entity.Entity):
 
                         # Add player
                         pos = current_scene.get_location_near_stairs()
-                        #pos = utils.math.sub(pos, current_scene.level.position)
                         p = player.Player(event.nickname[0], pos, fg=player_color)
                         p.name = event.nickname
-                        current_scene.level.append(p)
+                        current_scene.append(p)
                         instances.console.print('{} has joined!'.format(event.nickname))
 
                 elif event.message.upper() == '!LEAVE':
