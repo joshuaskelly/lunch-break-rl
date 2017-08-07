@@ -22,6 +22,9 @@ class Creature(entity.Entity):
         self.visible_tiles = set()
         self.state = 'NORMAL'
 
+        self.append(self.held_item)
+        self.held_item.hidden = True
+
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
 
@@ -29,7 +32,7 @@ class Creature(entity.Entity):
         target_entity = None
 
         # Determine bump action
-        for e in instances.scene_root.entities:
+        for e in instances.scene_root.children:
             if not isinstance(e, entity.Entity):
                 continue
 
@@ -82,14 +85,13 @@ class Creature(entity.Entity):
         if not isinstance(self.held_item, item.Fist):
             i = self.held_item
             i.position = self.position
-            instances.scene_root.entities.append(i)
+            instances.scene_root.children.append(i)
             self.held_item = item.Fist('f')
 
     def hurt(self, damage, hurt_action):
         self.current_health -= damage
         ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
-        ani.parent = self
-        self.children.append(ani)
+        self.append(ani)
 
         if self.current_health > 0 and hasattr(self.held_item, 'on_hurt'):
             self.held_item.on_hurt(damage, hurt_action)
@@ -116,7 +118,7 @@ class Creature(entity.Entity):
         current_scene = instances.scene_root
         result = []
 
-        for e in current_scene.entities:
+        for e in current_scene.children:
             if not isinstance(e, entity.Entity):
                 continue
 

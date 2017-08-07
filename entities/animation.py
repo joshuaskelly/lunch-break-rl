@@ -8,8 +8,6 @@ class Animation(entity.Entity):
     def __init__(self):
         super().__init__(' ')
 
-        self.parent = None
-
     def on_done(self):
         pass
 
@@ -52,11 +50,9 @@ class FlashBackground(Animation):
 
 
 class ThrowMotion(Animation):
-    def __init__(self, parent, source, dest, time):
+    def __init__(self, source, dest, time):
         super().__init__()
 
-        self.parent = parent
-        self.parent.hidden = True
         self.points = tdl.map.bresenham(*source, *dest)
         self.dest = dest
         self.time = time
@@ -65,6 +61,7 @@ class ThrowMotion(Animation):
         self.current_point = self.points.pop(0)
 
     def update(self, time):
+        self.parent.hidden = True
         self.time_to_next += time
         if self.time_to_next >= self.frame_time:
             self.time_to_next = 0
@@ -74,7 +71,7 @@ class ThrowMotion(Animation):
 
             else:
                 self.parent.hidden = False
-                self.parent.children.remove(self)
+                self.parent.remove(self)
                 self.on_done()
 
     def draw(self, console):

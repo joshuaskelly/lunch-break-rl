@@ -15,7 +15,7 @@ class EntitiesWindow(window.Window):
         super().draw(console)
 
         row = 1
-        for e in instances.scene_root.entities:
+        for e in instances.scene_root.level.children:
             if isinstance(e, player.Player):
                 continue
 

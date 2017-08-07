@@ -1,5 +1,6 @@
 import instances
 import palette
+import utils
 
 from ai import action
 from entities import entity
@@ -16,10 +17,10 @@ class Stairs(entity.Entity):
         level = instances.scene_root.level
 
         if self.visible:
-            console.draw_char(*self.position, self.char, self.fg, self.bg)
+            console.draw_char(*self.offset, self.char, self.fg, self.bg)
 
         elif self.position in level.seen_tiles:
-            console.draw_char(*self.position, self.char, self.dark_fg, self.bg)
+            console.draw_char(*self.offset, self.char, self.dark_fg, self.bg)
 
         for child in self.children:
             child.draw(console)

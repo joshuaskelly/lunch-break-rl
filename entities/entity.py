@@ -1,4 +1,5 @@
 import instances
+import utils
 
 
 class Entity(object):
@@ -8,8 +9,9 @@ class Entity(object):
         self.fg = fg
         self.bg = bg
         self.name = self.__class__.__name__
-        self.children = []
+        self._children = []
         self.hidden = False
+        self.parent = None
 
     @property
     def x(self):
@@ -27,9 +29,23 @@ class Entity(object):
     def y(self, value):
         self.position = self.position[0], value
 
+    @property
+    def offset(self):
+        """Offset is the 'Global' position of the Entity relative to it's
+        containing Scene. Primarily used for drawing."""
+        parent_offset = 0, 0
+        if self.parent:
+            parent_offset = self.parent.offset
+
+        return utils.math.add(self.position, parent_offset)
+
+    @property
+    def children(self):
+        return self._children
+
     def draw(self, console):
         if self.visible:
-            console.draw_char(*self.position, self.char, self.fg, self.bg)
+            console.draw_char(*self.offset, self.char, self.fg, self.bg)
 
         for child in self.children:
             child.draw(console)
@@ -54,6 +70,28 @@ class Entity(object):
         for child in self.children:
             child.handle_events(event)
 
+    def append(self, child):
+        if child.parent:
+            raise RuntimeError('Attempting to reparent <{}>'.format(child.__class__.__name__))
+
+        if child not in self.children:
+            self._children.append(child)
+            child.parent = self
+
+        else:
+            raise RuntimeError('Attempting to add child <{}> twice to <{}>'.format(child.__class__.__name__, self.__class__.__name__))
+
+    def remove(self, child=None):
+        parent = self
+        if not child:
+            child = self
+            parent = self.parent
+
+        if parent:
+            parent._children.remove(child)
+            child.parent = None
+            child.position = None
+
     def get_action(self, other=None):
         """Returns an action
 
@@ -73,10 +111,3 @@ class Entity(object):
             return False
 
         return self.position in instances.scene_root.level.visible_tiles
-
-    def remove(self):
-        current_scene = instances.scene_root
-
-        if self in current_scene.entities:
-            current_scene.entities.remove(self)
-            self.position = None

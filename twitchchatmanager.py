@@ -1,5 +1,6 @@
 import instances
 import palette
+import utils
 
 from entities import entity
 from entities import player
@@ -27,6 +28,7 @@ regular_viewers = [
 class TwitchChatManager(entity.Entity):
     def __init__(self):
         super().__init__(' ')
+        self.hidden = True
 
     def handle_events(self, event):
         current_scene = instances.scene_root
@@ -34,7 +36,7 @@ class TwitchChatManager(entity.Entity):
         if event.type == 'TWITCHCHATMESSAGE':
             if event.message:
                 if event.message.upper() == '!JOIN':
-                    player_names = [e.name for e in current_scene.entities if hasattr(e, 'name')]
+                    player_names = [e.name for e in current_scene.children if hasattr(e, 'name')]
 
                     if not event.nickname in player_names:
                         # Set player color
@@ -48,13 +50,15 @@ class TwitchChatManager(entity.Entity):
                             player_color = palette.get_nearest((255, 163, 0))
 
                         # Add player
-                        p = player.Player(event.nickname[0], current_scene.get_location_near_stairs(), fg=player_color)
+                        pos = current_scene.get_location_near_stairs()
+                        #pos = utils.math.sub(pos, current_scene.level.position)
+                        p = player.Player(event.nickname[0], pos, fg=player_color)
                         p.name = event.nickname
-                        current_scene.entities.append(p)
+                        current_scene.level.append(p)
                         instances.console.print('{} has joined!'.format(event.nickname))
 
                 elif event.message.upper() == '!LEAVE':
-                    for e in current_scene.entities:
+                    for e in current_scene.children:
                         if not isinstance(e, player.Player):
                             continue
 

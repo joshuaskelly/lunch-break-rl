@@ -1,11 +1,9 @@
-import os
-import pickle
-
 import tdl
 
 import game
 import instances
 import palette
+import utils
 
 from entities import entity
 from entities import player
@@ -31,8 +29,6 @@ class Level(entity.Entity):
     def draw(self, console):
         for x, y in self.data:
             ch, fg, bg = self.data.get_char(x, y)
-            x += self.x
-            y += self.y
 
             if (x, y) in self.seen_tiles or game.Game.args.no_fog_of_war == 'true':
                 if (x, y) in self.visible_tiles:
@@ -41,76 +37,17 @@ class Level(entity.Entity):
                 else:
                     fg = palette.BRIGHT_BLACK
 
-                console.draw_char(x, y, ch, fg, bg)
+                ox, oy = utils.math.add(self.position, (x, y))
+                console.draw_char(ox, oy, ch, fg, bg)
 
-    def handle_events(self, event):
-        if event.type == 'MOUSEDOWN':
-            if event.button == 'LEFT':
-                if not self.erasing:
-                    self.painting = True
-
-            if event.button == 'RIGHT':
-                if not self.painting:
-                    self.erasing = True
-
-        if event.type == 'MOUSEUP':
-            if event.button == 'LEFT':
-                if not self.erasing:
-                    self.painting = False
-
-            if event.button == 'RIGHT':
-                if not self.painting:
-                    self.erasing = False
-
-        if event.type == 'MOUSEMOTION':
-            pos = event.cell
-            pos = pos[0] - self.x, pos[1] - self.y
-
-            if pos in self.data:
-                if self.painting:
-                    self.draw_char(*pos, '#')
-
-                elif self.erasing:
-                    self.draw_char(*pos, ' ')
-
-
-            if event.type == 'KEYDOWN':
-                if event.keychar.upper() == 'S':
-                    self.save()
-
-                elif event.keychar.upper() == 'L':
-                    self.load()
-
-    def save(self):
-        print('Saving Level Data')
-        data = [self.data.get_char(*i) for i in self.data]
-        binary_data = pickle.dumps(data)
-        with open('map.dat', 'wb') as file:
-            file.write(binary_data)
-
-    def load(self):
-        if not os.path.exists('map.dat'):
-            print('No Level Data Found to Load')
-            return
-
-        print('Loading Level Data')
-        with open('map.dat', 'rb') as file:
-            binary_data = file.read()
-
-        data = pickle.loads(binary_data)
-
-        for i, t in enumerate(self.data):
-            char, fg, bg = data[i]
-            self.data.draw_char(*t, chr(char), fg, bg)
-
-    def update(self, time):
-        pass
+        for child in self.children:
+            child.draw(console)
 
     def update_fov(self):
         current_scene = instances.scene_root
         self.visible_tiles = set()
 
-        for e in current_scene.entities:
+        for e in current_scene.children:
             if not isinstance(e, player.Player):
                 continue
 
@@ -118,5 +55,5 @@ class Level(entity.Entity):
             self.seen_tiles = self.seen_tiles.union(e.visible_tiles)
 
         if game.Game.args.no_fog_of_war:
-            self.visible_tiles = self.visible_tiles.union([(v[0] + self.x, v[1] + self.y) for v in self.data])
-            self.seen_tiles = self.seen_tiles.union([(s[0] + self.x, s[1] + self.y) for s in self.data])
+            self.visible_tiles = self.visible_tiles.union([(v[0], v[1]) for v in self.data])
+            self.seen_tiles = self.seen_tiles.union([(s[0], s[1]) for s in self.data])

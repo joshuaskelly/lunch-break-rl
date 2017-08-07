@@ -24,11 +24,11 @@ class DungeonMaster(object):
             current_scene = instances.scene_root
             level = current_scene
 
-            position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
+            position = random.randint(1, level.width - 1), random.randint(1, level.height)
             tries = 0
 
             while not current_scene.check_collision(*position) and tries < 10:
-                position = random.randint(1, level.width - 1) + level.x, random.randint(1, level.height + level.y - 1)
+                position = random.randint(1, level.width - 1), random.randint(1, level.height)
                 tries += 1
 
             if tries == 10:
@@ -36,21 +36,21 @@ class DungeonMaster(object):
 
             if roll <= 0.6:
                 k = kobold.Kobold(position=position)
-                current_scene.entities.append(k)
+                current_scene.append(k)
 
             elif roll <= 0.7:
                 s = item.Sword(position=position)
-                current_scene.entities.append(s)
+                current_scene.append(s)
 
             elif roll <= 0.8:
                 p = item.Potion(char='!', position=position, fg=palette.BRIGHT_MAGENTA)
                 p.name = 'potion'
-                current_scene.entities.append(p)
+                current_scene.append(p)
 
             elif roll <= 0.9:
                 d = item.Dagger(position=position)
-                current_scene.entities.append(d)
+                current_scene.append(d)
 
             elif roll <= 1:
                 d = item.Glove(position=position)
-                current_scene.entities.append(d)
+                current_scene.append(d)

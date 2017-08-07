@@ -1,26 +1,26 @@
+import tdl
+
 from entities import entity
 
 
 class Scene(entity.Entity):
-    def __init__(self):
+    def __init__(self, x=0, y=0, width=54, height=30):
         super().__init__(' ')
+        self.position = x, y
+        self.width = width
+        self.height = height
 
-    def draw(self, console):
-        for e in self.entities:
-            e.draw(console)
-
-    def handle_events(self, event):
-        for e in self.entities:
-            e.handle_events(event)
-
-    def update(self, time):
-        for entity in self.entities:
-            entity.update(time)
+        self.console = tdl.Console(width, height)
 
     @property
-    def entities(self):
-        return self.children
+    def offset(self):
+        return 0, 0
 
-    @entities.setter
-    def entities(self, entities):
-        self.children = entities
+    def draw(self, console):
+        if not self.visible:
+            return
+
+        for child in self.children:
+            child.draw(self.console)
+
+        console.blit(self.console, self.x, self.y, self.width, self.height)

@@ -19,7 +19,6 @@ class Action(object):
         return True
 
     def perform(self, owner):
-        #DO SOMETHING
         pass
 
     def fail(self, owner):
@@ -91,7 +90,6 @@ class MoveAction(Action):
 
     def perform(self, owner):
         owner.move(*self.dest)
-        #console.Console.current_console.print('{} is moving'.format(owner.name))
 
 
 class IdleAction(Action):
@@ -108,7 +106,6 @@ class IdleAction(Action):
             owner.brain.add_action(move)
 
         owner.brain.add_action(IdleAction())
-        #console.Console.current_console.print('{} is thinking...'.format(owner.name))
 
 
 class EquipItemAction(Action):
@@ -122,12 +119,16 @@ class EquipItemAction(Action):
     def perform(self, owner):
         old_item = owner.held_item
         old_item.position = self.item.position
+        old_item.remove()
+        old_item.hidden = False
 
         owner.held_item = self.item
         self.item.remove()
+        self.item.hidden = True
+        owner.append(self.item)
 
         if old_item and not isinstance(old_item, item.Fist):
-            instances.scene_root.entities.append(old_item)
+            instances.scene_root.append(old_item)
 
         if owner.visible:
             instances.console.print('{} is equiping {}'.format(owner.name, self.item.name))
@@ -226,8 +227,8 @@ class ThrowAction(Action):
             # Do something?
             pass
 
-        ani = animation.ThrowMotion(thrown_entity, thrown_entity.position, dest, 1.0)
-        thrown_entity.children.append(ani)
+        ani = animation.ThrowMotion(thrown_entity.position, dest, 1.0)
+        thrown_entity.append(ani)
         thrown_entity.position = dest
 
         def action_callback():

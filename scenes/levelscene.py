@@ -1,4 +1,5 @@
 import random
+import twitchchatmanager
 
 import dungeongenerator
 import instances
@@ -12,8 +13,8 @@ from scenes import scene
 class LevelScene(scene.Scene):
     instance = None
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, x=0, y=0, width=54, height=30):
+        super().__init__(x, y, width, height)
 
         self.level = None
         self.tick_count = 0
@@ -40,14 +41,19 @@ class LevelScene(scene.Scene):
                 instances.console.print('NEXT LEVEL!')
                 self.init_scene()
 
+    def handle_events(self, event):
+        super().handle_events(event)
+
     def draw(self, console):
         # Draw items and creatures
-        for e in [n for n in self.entities if not isinstance(n, player.Player)]:
-            e.draw(console)
+        for e in [n for n in self.children if not isinstance(n, player.Player)]:
+            e.draw(self.console)
 
         # Draw players
-        for e in [n for n in self.entities if isinstance(n, player.Player)]:
-            e.draw(console)
+        for e in [n for n in self.children if isinstance(n, player.Player)]:
+            e.draw(self.console)
+
+        console.blit(self.console, self.x, self.y, self.width, self.height)
 
     def init_scene(self):
         # Reset level change info
@@ -55,20 +61,22 @@ class LevelScene(scene.Scene):
         self._change_level_on_tick = 0
 
         # Persist players in level
-        self.entities = [p for p in self.players if not p.idle]
+        self._children = [p for p in self.players if not p.idle]
 
         self.level, new_entities = dungeongenerator.generate_level(29, 22)
-        self.level.x = 12
-        self.level.y = 1
-        self.entities.append(self.level)
+        #self.level.x = 12
+        #self.level.y = 1
+        self.append(self.level)
 
         # Add generated entities to scene
         for en in new_entities:
-            pos = en.position
-            pos = pos[0] + self.level.x, pos[1] + self.level.y
-            en.position = pos
+            #pos = en.position
+            #pos = pos[0] + self.level.x, pos[1] + self.level.y
+            #pos = pos[0], pos[1]
+            #en.position = pos
 
-            self.entities.append(en)
+            self.level.append(en)
+            #self.append(en)
 
         health_bonus = len([p for p in self.players if p.state == 'EXITED'])
 
@@ -86,6 +94,8 @@ class LevelScene(scene.Scene):
 
             p.position = pos
 
+        self.children.append(twitchchatmanager.TwitchChatManager())
+
     def check_collision(self, x, y):
         """Returns True if player can move into the given world coords
 
@@ -93,11 +103,10 @@ class LevelScene(scene.Scene):
         y: The y-coordinate in world space
         """
 
-        # Convert from world to local space
-        if (x - self.level.x, y - self.level.y) not in self.level.data:
+        if (x, y) not in self.level.data:
             return False
 
-        char, fg, bg = self.level.get_char(x - self.level.x, y - self.level.y)
+        char, fg, bg = self.level.get_char(x, y)
 
         return char == ord(' ') or char == ord('.')
 
@@ -106,7 +115,7 @@ class LevelScene(scene.Scene):
 
     def get_entity_at(self, x, y):
         result = []
-        for e in self.entities:
+        for e in self.children:
             if hasattr(e, 'position') and e.position == (x, y):
                 result.append(e)
 
@@ -117,7 +126,7 @@ class LevelScene(scene.Scene):
 
     @property
     def players(self):
-        return [p for p in self.entities if isinstance(p, player.Player)]
+        return [p for p in self.children if isinstance(p, player.Player)]
 
     def active_player_count(self):
         return len([p for p in self.players if p.state != 'EXITED'])
@@ -129,12 +138,11 @@ class LevelScene(scene.Scene):
 
     def get_location_near_stairs(self):
         # Find stair location
-        stair_location = [e for e in self.entities if isinstance(e, stairs.Stairs) and e.name == 'Up'][0].position
-        stair_location = stair_location[0] - self.level.x, stair_location[1] - self.level.y
+        stair_location = [e for e in self.level.children if isinstance(e, stairs.Stairs) and e.name == 'Up'][0].position
 
         # Find open areas around stairs
         rect = utils.rect(stair_location[0] - 3, stair_location[1] - 3, 7, 7)
-        filled_location = [e.position for e in self.entities if hasattr(e, 'position')]
+        filled_location = [e.position for e in self.level.children if hasattr(e, 'position')]
         possible_locations = []
         for point in rect:
             if point not in self.level.data:
@@ -150,6 +158,5 @@ class LevelScene(scene.Scene):
             raise RuntimeError('Unable to find empty space around stairs up')
 
         pos = possible_locations[random.randint(0, len(possible_locations) - 1)]
-        pos = pos[0] + self.level.x, pos[1] + self.level.y
 
         return pos
