@@ -2,6 +2,7 @@ import random
 import twitchchatmanager
 
 import dungeongenerator
+import game
 import instances
 import utils
 
@@ -27,7 +28,7 @@ class LevelScene(scene.Scene):
 
     def update(self, time):
         super().update(time)
-        self.level.update_fov()
+        self.update_fov()
 
     def tick(self, tick):
         super().tick(tick)
@@ -149,3 +150,14 @@ class LevelScene(scene.Scene):
         pos = possible_locations[random.randint(0, len(possible_locations) - 1)]
 
         return pos
+
+    def update_fov(self):
+        self.level.visible_tiles = set()
+
+        for p in self.players:
+            self.level.visible_tiles = self.level.visible_tiles.union(p.visible_tiles)
+            self.level.seen_tiles = self.level.seen_tiles.union(p.visible_tiles)
+
+        if game.Game.args.no_fog_of_war:
+            self.level.visible_tiles = self.level.visible_tiles.union([(v[0], v[1]) for v in self.level.data])
+            self.level.seen_tiles = self.level.seen_tiles.union([(s[0], s[1]) for s in self.level.data])

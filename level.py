@@ -1,12 +1,10 @@
 import tdl
 
 import game
-import instances
 import palette
 import utils
 
 from entities import entity
-from entities import player
 
 
 class Level(entity.Entity):
@@ -44,16 +42,4 @@ class Level(entity.Entity):
         for child in self.children:
             child.draw(console)
 
-    def update_fov(self):
-        self.visible_tiles = set()
 
-        for e in self.children:
-            if not isinstance(e, player.Player):
-                continue
-
-            self.visible_tiles = self.visible_tiles.union(e.visible_tiles)
-            self.seen_tiles = self.seen_tiles.union(e.visible_tiles)
-
-        if game.Game.args.no_fog_of_war:
-            self.visible_tiles = self.visible_tiles.union([(v[0], v[1]) for v in self.data])
-            self.seen_tiles = self.seen_tiles.union([(s[0], s[1]) for s in self.data])
