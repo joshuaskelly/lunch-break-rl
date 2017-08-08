@@ -18,6 +18,17 @@ class Level(entity.Entity):
         self.visible_tiles = set()
         self.seen_tiles = set()
         self.always_show = True
+        self.pathfinder = tdl.map.AStar(width, height, callback=self.move_cost, diagnalCost=0)
+
+    def move_cost(self, x, y):
+        if (x, y) not in self.data:
+            return 0
+
+        ch, fg, bg = self.data.get_char(x, y)
+        if ch == ord('.'):
+            return 1
+
+        return 0
 
     def draw_char(self, x, y, fg=Ellipsis, bg=Ellipsis):
         self.data.draw_char(x, y, fg, bg)

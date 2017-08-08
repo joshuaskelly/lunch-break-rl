@@ -1,5 +1,6 @@
 import instances
 import palette
+import utils
 
 from ai import action
 from entities import creature
@@ -114,3 +115,39 @@ class Player(creature.Creature):
                         act = action.ThrowAction(target_entity)
                         self.brain.actions.append(act)
                         self._has_taken_action = True
+
+                elif commands[0].upper() == '!STAIRS':
+                    stair = instances.scene_root.downward_stair
+                    path = instances.scene_root.level.pathfinder.get_path(self.x, self.y, stair.x, stair.y)
+
+                    a = path[:]
+                    b = path[:-1]
+                    b.insert(0, self.position)
+                    z = list(zip(a, b))
+
+                    def func(item):
+                        lhs = item[0]
+                        rhs = item[1]
+
+                        return utils.math.sub(lhs, rhs)
+
+                    moves = list(map(func, z))
+
+                    t = {
+                        (1, 0): 'R',
+                        (0, 1): 'D',
+                        (-1, 0): 'L',
+                        (0, -1): 'U'
+                    }
+
+                    moves = [t[i] for i in moves]
+
+                    # TODO: Refactor this UGLY!
+                    class FakeTwitchEvent(object):
+                        def __init__(self, nick, message):
+                            self.type = 'TWITCHCHATMESSAGE'
+                            self.nickname = nick
+                            self.message = message
+
+                    ev = FakeTwitchEvent(self.name, '!MV {}'.format(''.join(moves)))
+                    self.handle_events(ev)

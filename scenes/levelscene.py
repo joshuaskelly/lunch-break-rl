@@ -121,6 +121,10 @@ class LevelScene(scene.Scene):
     def active_player_count(self):
         return len([p for p in self.players if p.state != 'EXITED'])
 
+    @property
+    def downward_stair(self):
+        return [e for e in self.children if isinstance(e, stairs.Stairs) and e.name == 'Down'][0]
+
     def change_level(self):
         if not self.change_level_requested:
             self.change_level_requested = True
