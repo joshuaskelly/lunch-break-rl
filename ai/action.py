@@ -47,7 +47,7 @@ class PerformHeldItemAction(Action):
         return True
 
     def perform(self, owner):
-        held_action = owner.held_item.get_action(owner)
+        held_action = owner.held_item.move_to_action(owner)
 
 
 class AttackAction(Action):
@@ -128,6 +128,9 @@ class EquipItemAction(Action):
         owner.append(self.item)
 
         if old_item and not isinstance(old_item, item.Fist):
+            if old_item.parent:
+                old_item.parent.remove(old_item)
+
             instances.scene_root.level.append(old_item)
 
         if owner.visible:

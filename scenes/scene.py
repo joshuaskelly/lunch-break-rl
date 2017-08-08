@@ -18,6 +18,8 @@ class Scene(entity.Entity):
         return 0, 0
 
     def draw(self, console):
+        self.console.clear()
+
         if not self.visible:
             return
 

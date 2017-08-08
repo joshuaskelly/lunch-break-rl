@@ -46,6 +46,8 @@ class LevelScene(scene.Scene):
         super().handle_events(event)
 
     def draw(self, console):
+        self.console.clear()
+
         # Draw items and creatures
         for e in [n for n in self.children if not isinstance(n, player.Player)]:
             e.draw(self.console)

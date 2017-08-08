@@ -1,10 +1,55 @@
 import instances
+import game
 import palette
 import utils
 
 from ai import action
 from entities import creature
 from entities import entity
+
+
+class DirectionHelper(object):
+    dir_map = {
+        (1, 0): 'R',
+        (0, 1): 'D',
+        (-1, 0): 'L',
+        (0, -1): 'U',
+        'R': (1, 0),
+        'D': (0, 1),
+        'L': (-1, 0),
+        'U': (0, -1)
+    }
+
+    @staticmethod
+    def get_direction(direction):
+        return DirectionHelper.dir_map.get(direction.upper())
+
+
+class MoveHelper(object):
+    @staticmethod
+    def path_to_moves(start, path):
+        # Calculate relative deltas
+        a = path[:]
+        b = path[:-1]
+        b.insert(0, start)
+        z = list(zip(a, b))
+
+        def func(item):
+            lhs = item[0]
+            rhs = item[1]
+
+            return utils.math.sub(lhs, rhs)
+
+        deltas = list(map(func, z))
+
+        # Convert deltas to moves
+        moves = [DirectionHelper.get_direction(i) for i in deltas]
+
+        return moves
+
+    @staticmethod
+    def move_to_action(move):
+        return action.MoveAction(DirectionHelper.get_direction(move.upper()))
 
 
 class Player(creature.Creature):
@@ -38,6 +83,17 @@ class Player(creature.Creature):
     def move(self, x, y):
         super().move(x, y)
 
+    def queue_batched_move(self, moves):
+        batched_move = action.BatchedMoveAction()
+
+        for command in moves:
+            move_action = MoveHelper.move_to_action(command)
+            move_action.parent = batched_move
+            self.brain.add_action(move_action)
+            self._has_taken_action = True
+
+        self.brain.add_action(batched_move)
+
     def handle_events(self, event):
         super().handle_events(event)
 
@@ -49,62 +105,31 @@ class Player(creature.Creature):
                 commands = event.message.split(' ')
 
                 if commands[0].upper() == '!MOVE' or commands[0].upper() == '!MV':
-                    batched_move = action.BatchedMoveAction()
                     moves = ''.join(commands[1:])
 
-                    for command in moves:
-                        if command.upper() == 'U':
-                            move = action.MoveAction((0, -1))
-                            move.parent = batched_move
-                            self.brain.add_action(move)
-                            self._has_taken_action = True
+                    players = instances.scene_root.players
+                    target = [p for p in players if p.name == moves.lower()]
+                    target = target[0] if target else None
 
-                        elif command.upper() == 'D':
-                            move = action.MoveAction((0, 1))
-                            move.parent = batched_move
-                            self.brain.add_action(move)
-                            self._has_taken_action = True
+                    if target and target is not self:
+                        path = instances.scene_root.level.pathfinder.get_path(*self.position, *target.position)[:-1]
+                        moves = MoveHelper.path_to_moves(self.position, path)
 
-                        elif command.upper() == 'L':
-                            move = action.MoveAction((-1, 0))
-                            move.parent = batched_move
-                            self.brain.add_action(move)
-                            self._has_taken_action = True
-
-                        elif command.upper() == 'R':
-                            move = action.MoveAction((1, 0))
-                            move.parent = batched_move
-                            self.brain.add_action(move)
-                            self._has_taken_action = True
-
-                    self.brain.add_action(batched_move)
+                    self.queue_batched_move(moves)
 
                 elif commands[0].upper() == '!DROP':
                     self.drop_held_item()
                     self._has_taken_action = True
 
                 elif commands[0].upper() == '!THROW':
-                    direction = commands[1:]
+                    direction = commands[1] if len(commands) > 1 else None
+                    direction = DirectionHelper.get_direction(direction[0])
 
                     if not direction:
                         return
 
-                    direction = direction[0]
-
                     target_entity = None
-                    dest = self.position
-
-                    if direction.upper() == 'U':
-                        dest = dest[0], dest[1] - 1
-
-                    elif direction.upper() == 'D':
-                        dest = dest[0], dest[1] + 1
-
-                    if direction.upper() == 'L':
-                        dest = dest[0] - 1, dest[1]
-
-                    if direction.upper() == 'R':
-                        dest = dest[0] + 1, dest[1]
+                    dest = utils.math.add(self.position, direction)
 
                     es = [e for e in instances.scene_root.children if isinstance(e, entity.Entity) and e.position == dest]
 
@@ -116,38 +141,8 @@ class Player(creature.Creature):
                         self.brain.actions.append(act)
                         self._has_taken_action = True
 
-                elif commands[0].upper() == '!STAIRS':
+                elif commands[0].upper() == '!STAIRS' and game.Game.args.debug:
                     stair = instances.scene_root.downward_stair
                     path = instances.scene_root.level.pathfinder.get_path(self.x, self.y, stair.x, stair.y)
-
-                    a = path[:]
-                    b = path[:-1]
-                    b.insert(0, self.position)
-                    z = list(zip(a, b))
-
-                    def func(item):
-                        lhs = item[0]
-                        rhs = item[1]
-
-                        return utils.math.sub(lhs, rhs)
-
-                    moves = list(map(func, z))
-
-                    t = {
-                        (1, 0): 'R',
-                        (0, 1): 'D',
-                        (-1, 0): 'L',
-                        (0, -1): 'U'
-                    }
-
-                    moves = [t[i] for i in moves]
-
-                    # TODO: Refactor this UGLY!
-                    class FakeTwitchEvent(object):
-                        def __init__(self, nick, message):
-                            self.type = 'TWITCHCHATMESSAGE'
-                            self.nickname = nick
-                            self.message = message
-
-                    ev = FakeTwitchEvent(self.name, '!MV {}'.format(''.join(moves)))
-                    self.handle_events(ev)
+                    moves = MoveHelper.path_to_moves(self.position, path)
+                    self.queue_batched_move(moves)
