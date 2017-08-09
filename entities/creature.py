@@ -31,22 +31,18 @@ class Creature(entity.Entity):
         action_to_perform = None
         target_entity = None
 
+        es = instances.scene_root.get_entity_at(*dest)
+
         # Determine bump action
-        for e in instances.scene_root.children:
-            if not isinstance(e, entity.Entity):
-                continue
+        if es:
+            target_entity = es[0]
 
-            if dest == e.position:
-                target_entity = e
+            # Let special item actions override bumped entity's default action
+            action_to_perform = self.held_item.get_special_action(target_entity)
 
-                # Let special item actions override bumped entity's default action
-                action_to_perform = self.held_item.get_special_action(e)
-
-                # Get bumped entity's default action
-                if not action_to_perform:
-                    action_to_perform = e.get_action(self)
-
-                break
+            # Get bumped entity's default action
+            if not action_to_perform:
+                action_to_perform = target_entity.get_action(self)
 
         # Perform the action if possible
         if action_to_perform and action_to_perform.prerequiste(self):
@@ -61,7 +57,7 @@ class Creature(entity.Entity):
 
                 next_action.fail(self)
 
-        if target_entity and target_entity.position == dest:
+        if target_entity and target_entity.position == dest and action_to_perform:
             return
 
         if self.can_move(x, y):

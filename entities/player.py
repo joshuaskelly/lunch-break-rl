@@ -9,6 +9,7 @@ from entities import entity
 
 
 class DirectionHelper(object):
+    valid_moves = 'u', 'd', 'l', 'r', 'U', 'D', 'L', 'R'
     dir_map = {
         (1, 0): 'R',
         (0, 1): 'D',
@@ -53,7 +54,10 @@ class MoveHelper(object):
 
     @staticmethod
     def move_to_action(move):
-        return action.MoveAction(DirectionHelper.get_direction(move.upper()))
+        if move in DirectionHelper.dir_map:
+            return action.MoveAction(DirectionHelper.get_direction(move.upper()))
+
+        return None
 
 
 class Player(creature.Creature):
@@ -88,13 +92,19 @@ class Player(creature.Creature):
         super().move(x, y)
 
     def queue_batched_move(self, moves):
+        moves = [m for m in moves if m in DirectionHelper.valid_moves]
+        if not moves:
+            return
+
         batched_move = action.BatchedMoveAction()
 
         for command in moves:
             move_action = MoveHelper.move_to_action(command)
-            move_action.parent = batched_move
-            self.brain.add_action(move_action)
-            self._has_taken_action = True
+
+            if move_action:
+                move_action.parent = batched_move
+                self.brain.add_action(move_action)
+                self._has_taken_action = True
 
         self.brain.add_action(batched_move)
 
@@ -150,3 +160,9 @@ class Player(creature.Creature):
                     path = instances.scene_root.level.pathfinder.get_path(self.x, self.y, stair.x, stair.y)
                     moves = MoveHelper.path_to_moves(self.position, path)
                     self.queue_batched_move(moves)
+
+                elif commands[0].upper() == '!STOP':
+                    next_action = self.brain.actions[0] if self.brain.actions else None
+
+                    if isinstance(next_action, action.MoveAction):
+                        next_action.fail(self)

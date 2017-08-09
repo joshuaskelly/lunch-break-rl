@@ -18,7 +18,10 @@ class Item(entity.Entity):
 
 class HeldItem(Item):
     def get_action(self, other=None):
-        return action.EquipItemAction(self)
+        if isinstance(other.held_item, Fist):
+            return action.EquipItemAction(self)
+
+        return None
 
     def get_perform_action(self, target):
         return action.AttackAction(target)
