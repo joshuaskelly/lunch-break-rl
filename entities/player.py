@@ -17,12 +17,16 @@ class DirectionHelper(object):
         'R': (1, 0),
         'D': (0, 1),
         'L': (-1, 0),
-        'U': (0, -1)
+        'U': (0, -1),
+        'r': (1, 0),
+        'd': (0, 1),
+        'l': (-1, 0),
+        'u': (0, -1)
     }
 
     @staticmethod
     def get_direction(direction):
-        return DirectionHelper.dir_map.get(direction.upper())
+        return DirectionHelper.dir_map.get(direction)
 
 
 class MoveHelper(object):
