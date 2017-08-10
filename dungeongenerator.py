@@ -149,13 +149,13 @@ def generate_level(width, height):
                     weapon = WeaponClass(position=(x, y))
                     new_entities.append(weapon)
 
-            elif random.random() < 1 / 180:
+            elif random.random() < 1 / 70:
                 rarity = 'common'
-                #if random.random() < 1 / 100:
-                #    rarity = 'rare'
+                if random.random() < 1 / 100 and registry.Registry.get('item', 'rare'):
+                    rarity = 'rare'
 
-                #elif random.random() < 1 / 4:
-                #    rarity = 'uncommon'
+                elif random.random() < 1 / 3 and registry.Registry.get('item', 'uncommon'):
+                    rarity = 'uncommon'
 
                 item_classes = registry.Registry.get('item', rarity)
 

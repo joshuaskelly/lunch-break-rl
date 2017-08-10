@@ -36,7 +36,7 @@ class UsableItem(Item):
 
 
 class Potion(UsableItem):
-    def __init__(self, char='s', position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
+    def __init__(self, char='!', position=(0, 0), fg=palette.BRIGHT_MAGENTA, bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg)
 
         self.heal_amount = 4
@@ -45,7 +45,7 @@ class Potion(UsableItem):
         instances.console.print('{} recovers {} health!'.format(target.name, self.heal_amount))
         target.current_health = min(target.max_health, target.current_health + self.heal_amount)
 
-registry.Registry.register(Potion, 'item', 'rare')
+registry.Registry.register(Potion, 'item', 'uncommon')
 
 
 class Fist(HeldItem):
