@@ -79,8 +79,7 @@ class Flash(Animation):
         if not self.visible or not self.parent.visible:
             return
 
-        pos = self.parent.position
-        console.draw_char(*pos, self.char, self.fg, self.bg)
+        console.draw_char(*self.offset, self.char, self.fg, self.bg)
 
 
 class ThrowMotion(Animation):
