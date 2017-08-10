@@ -12,7 +12,7 @@ class Brain(object):
     def perform_action(self):
         if self.actions:
             current_action = self.actions.pop(0)
-            if current_action.prerequiste(self.owner):
+            if current_action.prerequisite(self.owner):
                 current_action.perform(self.owner)
 
             else:

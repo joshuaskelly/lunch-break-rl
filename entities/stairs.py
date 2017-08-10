@@ -37,7 +37,7 @@ class StairsDown(Stairs):
             return None
 
         class NextLevel(action.Action):
-            def prerequiste(self, owner):
+            def prerequisite(self, owner):
                 return isinstance(owner, player.Player)
 
             def perform(self, owner):

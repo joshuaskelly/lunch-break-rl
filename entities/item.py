@@ -86,7 +86,7 @@ class Dagger(HeldItem):
         counter = action.AttackAction(attacker)
         counter.tags = ['counter']
 
-        if counter.prerequiste(owner):
+        if counter.prerequisite(owner):
             instances.console.print('{} counter attacks!'.format(owner.name))
             counter.perform(owner)
 

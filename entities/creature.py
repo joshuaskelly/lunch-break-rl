@@ -46,7 +46,7 @@ class Creature(entity.Entity):
                 action_to_perform = target_entity.get_action(self)
 
         # Perform the action if possible
-        if action_to_perform and action_to_perform.prerequiste(self):
+        if action_to_perform and action_to_perform.prerequisite(self):
             action_to_perform.perform(self)
 
             # Because we have bumped, cancel our move action

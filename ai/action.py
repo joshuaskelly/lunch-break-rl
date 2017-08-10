@@ -16,7 +16,7 @@ class Action(object):
     def __init__(self):
         self.parent = None
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return True
 
     def perform(self, owner):
@@ -46,7 +46,7 @@ class PerformHeldItemAction(Action):
         super().__init__()
         self.target = target
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return True
 
     def perform(self, owner):
@@ -59,7 +59,7 @@ class AttackAction(Action):
         self.target = target
         self.weapon = None
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return utils.is_next_to(owner, self.target)
 
     def perform(self, owner):
@@ -88,7 +88,7 @@ class MoveAction(Action):
         super().__init__()
         self.direction = direction
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return owner.can_move(*self.direction)
 
     def perform(self, owner):
@@ -101,7 +101,7 @@ class MoveToAction(Action):
         self.destination = destination
         self.max_moves = int(max_moves)
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         scene_root = instances.scene_root
         level = scene_root.level
 
@@ -138,7 +138,7 @@ class MoveToAction(Action):
 
 
 class WanderAction(Action):
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return True
 
     def perform(self, owner):
@@ -156,7 +156,7 @@ class WanderAction(Action):
 
 
 class IdleAction(Action):
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return True
 
     def perform(self, owner):
@@ -168,7 +168,7 @@ class EquipItemAction(Action):
         super().__init__()
         self.item = item
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return True
 
     def perform(self, owner):
@@ -197,7 +197,7 @@ class UseItemAction(Action):
         super().__init__()
         self.item = item
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return True
 
     def perform(self, owner):
@@ -210,7 +210,7 @@ class ThrowAction(Action):
         super().__init__()
         self.target = target
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return utils.is_next_to(owner, self.target)
 
     def perform(self, owner):
@@ -303,7 +303,7 @@ class SwapPosition(Action):
     def __init__(self, target):
         self.target = target
 
-    def prerequiste(self, owner):
+    def prerequisite(self, owner):
         return utils.is_next_to(owner, self.target)
 
     def perform(self, owner):
