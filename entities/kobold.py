@@ -12,7 +12,7 @@ from entities import item
 
 class Kobold(creature.Creature):
     def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=(0, 0, 0)):
-        super().__init__(char, position, fg, bg=(0, 0, 0))
+        super().__init__(char, position, fg, bg)
         self.name = 'kobold'
         self.brain = KoboldBrain(self)
         self.max_health = 4
@@ -35,10 +35,8 @@ class KoboldBrain(brain.Brain):
     def tick(self, tick):
         self.state.tick(tick)
 
-    def can_see_threat(self):
-        return len([e for e in self.owner.visible_entities if self.is_threat(e)])
-
     def get_nearest_threat(self):
+        """Returns the closes visible entity that is a threat"""
         threats = [e for e in self.owner.visible_entities if self.is_threat(e)]
         if threats:
             return threats[0]

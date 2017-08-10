@@ -24,12 +24,15 @@ class Action(object):
 
     def fail(self, owner):
         if self.parent:
-            while owner.brain.actions[0].parent == self.parent:
+            while owner.brain.actions and owner.brain.actions[0] != self.parent:
                 owner.brain.actions.pop(0)
 
             if self.parent == owner.brain.actions[0]:
                 parent_action = owner.brain.actions.pop(0)
                 parent_action.fail(owner)
+
+            else:
+                raise RuntimeError('Failed to find action parent')
 
 
 class BatchedMoveAction(Action):
