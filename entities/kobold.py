@@ -1,6 +1,5 @@
 import random
 
-import instances
 import palette
 import registry
 
@@ -29,51 +28,151 @@ registry.Registry.register(Kobold, 'monster', 'common')
 class KoboldBrain(brain.Brain):
     def __init__(self, owner):
         super().__init__(owner)
-        self.player_aggro = 0
-        self.is_aggro = False
+        self.state = None
+        self.context = {}
+        self.set_state(KoboldIdleState)
 
-    def can_see_player(self):
-        return len([e for e in self.owner.visible_entities if e.__class__.__name__ == 'Player'])
+    def tick(self, tick):
+        self.state.tick(tick)
 
-    def perform_action(self):
-        if self.can_see_player() and self.player_aggro <= 0:
-            self.player_aggro = 5
-            self.fail_next_action()
-            # instances.console.print('Can see player!')
+    def can_see_threat(self):
+        return len([e for e in self.owner.visible_entities if self.is_threat(e)])
 
-            if not self.is_aggro:
-                ani = animation.Flash('!', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
-                self.owner.append(ani)
-                self.is_aggro = True
+    def get_nearest_threat(self):
+        threats = [e for e in self.owner.visible_entities if self.is_threat(e)]
+        if threats:
+            return threats[0]
 
-            player = [e for e in self.owner.visible_entities if e.__class__.__name__ == 'Player'][0]
-            self.add_action(action.IdleAction())
-            self.add_action(action.MoveToAction(player.position, self.owner.sight_radius))
+        return None
+
+    def is_threat(self, entity):
+        return entity.__class__.__name__ == 'Player'
+
+    def set_state(self, state_class):
+        old_state = self.state
+        new_state = state_class(self)
+
+        if old_state:
+            old_state.on_state_exit(new_state)
+            old_state.brain = None
+
+        self.state = new_state
+        self.state.on_state_enter(old_state)
+
+
+class KoboldState(object):
+    """State base class"""
+    def __init__(self, brain):
+        self.brain = brain
+
+    @property
+    def name(self):
+        return self.__class__.__name__
+
+    @property
+    def context(self):
+        if self.brain:
+            return self.brain.context
+
+        return None
+
+    @property
+    def owner(self):
+        if self.brain:
+            return self.brain.owner
+
+        return None
+
+    def tick(self, tick):
+        """Performs per tick logic"""
+        pass
+
+    def on_threat_spotted(self, player):
+        """Called when a threatening entity is in sight"""
+        pass
+
+    def on_threat_lost(self, player):
+        """Called when a threatening entity is no longer in sight"""
+        pass
+
+    def on_state_enter(self, prev_state):
+        """Called when transitioning to this state
+        
+        prev_state: The state object transitioning from
+        """
+        pass
+
+    def on_state_exit(self, next_state):
+        """Called when transitioning from this state
+        
+        next_state: The state object transitioning to
+        """
+        pass
+
+
+class KoboldIdleState(KoboldState):
+    """State class that encapsulates idle behavior"""
+    def __init__(self, brain):
+        super().__init__(brain)
+
+    def tick(self, tick):
+        threat = self.brain.get_nearest_threat()
+        if threat:
+            # Forget whatever we were doing.
+            self.brain.fail_next_action()
+            self.brain.actions = []
+            self.context['threat'] = threat
+            self.brain.set_state(KoboldAggroState)
 
         else:
-            self.player_aggro -= 1
-
-            if self.is_aggro:
-                ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
-                self.owner.append(ani)
-                self.add_action(action.IdleAction())
-                self.is_aggro = False
-
             # Idle behavior. Wait and wander.
-            if not self.actions:
+            if not self.brain.actions:
                 batched_action = action.BatchedMoveAction()
 
                 for _ in range(random.randint(1, 3)):
                     idle_action = action.IdleAction()
                     idle_action.parent = batched_action
-                    self.add_action(idle_action)
+                    self.brain.add_action(idle_action)
 
                 wander_action = action.WanderAction()
                 wander_action.parent = batched_action
-                self.add_action(wander_action)
+                self.brain.add_action(wander_action)
 
-                self.add_action(batched_action)
+                self.brain.add_action(batched_action)
 
-        super().perform_action()
+    def on_threat_spotted(self, player):
+        self.brain.set_state(KoboldAggroState)
 
 
+class KoboldAggroState(KoboldState):
+    """State class the encapsulates aggressive behavior"""
+    def __init__(self, brain):
+        super().__init__(brain)
+        self.aggro_counter = 0
+        self.aggro_cooldown = 5
+
+    @property
+    def threat(self):
+        return self.context.get('threat')
+
+    def on_state_enter(self, prev_state):
+        ani = animation.Flash('!', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
+        self.owner.append(ani)
+        self.brain.add_action(action.IdleAction())
+
+    def on_state_exit(self, next_state):
+        ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
+        self.owner.append(ani)
+        self.brain.add_action(action.IdleAction())
+        self.context['threat'] = None
+
+    def tick(self, tick):
+        if self.owner.can_see(self.threat):
+            if self.aggro_counter <= 0:
+                self.brain.add_action(action.MoveToAction(self.threat.position, self.brain.owner.sight_radius))
+                self.aggro_counter = self.aggro_cooldown
+
+        else:
+            self.brain.set_state(KoboldIdleState)
+
+        self.aggro_counter -= 1

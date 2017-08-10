@@ -6,6 +6,9 @@ class Brain(object):
         self.owner = owner
         self.actions = []
 
+    def tick(self, tick):
+        pass
+
     def perform_action(self):
         if self.actions:
             current_action = self.actions.pop(0)

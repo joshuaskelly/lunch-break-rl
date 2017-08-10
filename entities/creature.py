@@ -68,6 +68,13 @@ class Creature(entity.Entity):
         dest = self.position[0] + x, self.position[1] + y
         return instances.scene_root.check_collision(*dest)
 
+    def can_see(self, target):
+        """Returns true if target entity is in sight"""
+        if not target or not target.position:
+            return False
+
+        return target.position in self.visible_tiles
+
     def update(self, time):
         if self.current_health <= 0:
             self.die()
@@ -104,6 +111,7 @@ class Creature(entity.Entity):
     def tick(self, tick):
         super().tick(tick)
 
+        self.brain.tick(tick)
         self.brain.perform_action()
         self.update_fov()
 

@@ -33,7 +33,9 @@ class Action(object):
 
 
 class BatchedMoveAction(Action):
-    pass
+    def perform(self, owner):
+        # Perform the next action
+        owner.brain.perform_action()
 
 
 class PerformHeldItemAction(Action):
