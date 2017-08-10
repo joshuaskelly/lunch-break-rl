@@ -68,14 +68,18 @@ class Player(creature.Creature):
                 commands = event.message.split(' ')
 
                 if commands[0].upper() == '!MOVE' or commands[0].upper() == '!MV':
+                    # Moves can be either a series of moves (eg. ULDR) or a
+                    # players name
                     moves = ''.join(commands[1:])
+                    if moves and moves[0] == '@':
+                        moves = moves[1:]
 
                     players = instances.scene_root.players
                     target = [p for p in players if p.name == moves.lower()]
                     target = target[0] if target else None
 
                     if target and target is not self:
-                        path = instances.scene_root.level.pathfinder.get_path(*self.position, *target.position)[:-1]
+                        path = instances.scene_root.level.player_pathfinder.get_path(*self.position, *target.position)[:-1]
                         moves = helpers.MoveHelper.path_to_moves(self.position, path)
 
                     self.queue_batched_move(moves)
@@ -106,7 +110,7 @@ class Player(creature.Creature):
 
                 elif commands[0].upper() == '!STAIRS' and game.Game.args.debug:
                     stair = instances.scene_root.downward_stair
-                    path = instances.scene_root.level.pathfinder.get_path(self.x, self.y, stair.x, stair.y)
+                    path = instances.scene_root.level.player_pathfinder.get_path(self.x, self.y, stair.x, stair.y)
                     moves = helpers.MoveHelper.path_to_moves(self.position, path)
                     self.queue_batched_move(moves)
 

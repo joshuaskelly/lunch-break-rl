@@ -19,9 +19,23 @@ class Level(entity.Entity):
         self.seen_tiles = set()
         self.always_show = True
         self.pathfinder = tdl.map.AStar(width, height, callback=self.move_cost, diagnalCost=0)
+        self.player_pathfinder = tdl.map.AStar(width, height, callback=self.player_move_cost, diagnalCost=0)
 
     def move_cost(self, x, y):
         if (x, y) not in self.data:
+            return 0
+
+        ch, fg, bg = self.data.get_char(x, y)
+        if ch == ord('.'):
+            return 1
+
+        return 0
+
+    def player_move_cost(self, x, y):
+        if (x, y) not in self.data:
+            return 0
+
+        if (x, y) not in self.seen_tiles:
             return 0
 
         ch, fg, bg = self.data.get_char(x, y)
