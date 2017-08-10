@@ -66,5 +66,3 @@ class Level(entity.Entity):
 
         for child in self.children:
             child.draw(console)
-
-
