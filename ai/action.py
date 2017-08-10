@@ -2,6 +2,7 @@ import random
 
 import tdl
 
+import helpers
 import instances
 import utils
 
@@ -28,10 +29,7 @@ class Action(object):
 
             if self.parent == owner.brain.actions[0]:
                 parent_action = owner.brain.actions.pop(0)
-                parent_action.on_fail(owner)
-
-    def on_fail(self, owner):
-        pass
+                parent_action.fail(owner)
 
 
 class BatchedMoveAction(Action):
@@ -81,18 +79,60 @@ class AttackAction(Action):
 
 
 class MoveAction(Action):
-    def __init__(self, dest):
+    def __init__(self, direction):
         super().__init__()
-        self.dest = dest
+        self.direction = direction
 
     def prerequiste(self, owner):
-        return owner.can_move(*self.dest)
+        return owner.can_move(*self.direction)
 
     def perform(self, owner):
-        owner.move(*self.dest)
+        owner.move(*self.direction)
 
 
-class IdleAction(Action):
+class MoveToAction(Action):
+    def __init__(self, destination, max_moves=None):
+        super().__init__()
+        self.destination = destination
+        self.max_moves = int(max_moves)
+
+    def prerequiste(self, owner):
+        scene_root = instances.scene_root
+        level = scene_root.level
+
+        return self.destination in level.data and scene_root.check_collision(*self.destination)
+
+    def perform(self, owner):
+        path = instances.scene_root.level.pathfinder.get_path(*owner.position, *self.destination)
+
+        if self.max_moves:
+            path = path[:self.max_moves]
+
+        moves = helpers.MoveHelper.path_to_moves(owner.position, path)
+
+        if not moves:
+            return
+
+        batched_move = BatchedMoveAction()
+        first_move = None
+
+        for command in moves:
+            move_action = helpers.MoveHelper.move_to_action(command)
+
+            if move_action:
+                move_action.parent = batched_move
+                owner.brain.add_action(move_action)
+
+                if not first_move:
+                    first_move = move_action
+
+        owner.brain.add_action(batched_move)
+
+        if owner.brain.actions[0] is first_move:
+            owner.brain.perform_action()
+
+
+class WanderAction(Action):
     def prerequiste(self, owner):
         return True
 
@@ -100,12 +140,22 @@ class IdleAction(Action):
         moves = (1, 0), (-1, 0), (0, 1), (0, -1)
 
         number_of_moves = random.randint(1, 3)
+        batched_move = BatchedMoveAction()
 
         for _ in range(number_of_moves):
-            move = MoveAction(moves[random.randint(0, 3)])
-            owner.brain.add_action(move)
+            move_action = MoveAction(moves[random.randint(0, 3)])
+            move_action.parent = batched_move
+            owner.brain.add_action(move_action)
 
-        owner.brain.add_action(IdleAction())
+        owner.brain.add_action(batched_move)
+
+
+class IdleAction(Action):
+    def prerequiste(self, owner):
+        return True
+
+    def perform(self, owner):
+        pass
 
 
 class EquipItemAction(Action):

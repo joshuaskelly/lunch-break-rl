@@ -49,6 +49,40 @@ class FlashBackground(Animation):
         console.draw_char(*pos, char, fg, self.current_bg)
 
 
+class Flash(Animation):
+    def __init__(self, char, fg=(255, 255, 255), bg=(0, 0, 0), interval=0.25, repeat=2):
+        super().__init__()
+
+        self.time = 0
+        self.interval = interval
+        self.times_flashed = 0
+        self.times_to_flash = repeat * 2
+        self.char = char
+        self.fg = fg
+        self.bg = bg
+        self.current_bg = bg
+        self.hidden = False
+
+    def update(self, time):
+        self.time += time
+        if self.time > self.interval:
+            self.time = 0
+            self.times_flashed += 1
+
+            self.hidden = not self.hidden
+
+        if self.times_flashed > self.times_to_flash:
+            self.parent.children.remove(self)
+            self.on_done()
+
+    def draw(self, console):
+        if not self.visible or not self.parent.visible:
+            return
+
+        pos = self.parent.position
+        console.draw_char(*pos, self.char, self.fg, self.bg)
+
+
 class ThrowMotion(Animation):
     def __init__(self, source, dest, time):
         super().__init__()

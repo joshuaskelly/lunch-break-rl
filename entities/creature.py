@@ -21,6 +21,7 @@ class Creature(entity.Entity):
         self.held_item = item.Fist('f')
         self.visible_tiles = set()
         self.state = 'NORMAL'
+        self.sight_radius = 7.5
 
         self.append(self.held_item)
         self.held_item.hidden = True
@@ -78,7 +79,7 @@ class Creature(entity.Entity):
             return
 
         x, y = self.position
-        self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision)
+        self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision, radius=self.sight_radius)
 
     def drop_held_item(self):
         if not isinstance(self.held_item, item.Fist):

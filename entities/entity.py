@@ -114,4 +114,4 @@ class Entity(object):
         if not self.position:
             return False
 
-        return self.position in instances.scene_root.level.visible_tiles
+        return self.offset in instances.scene_root.level.visible_tiles
