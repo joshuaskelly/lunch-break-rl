@@ -8,4 +8,5 @@
 __pycache__
 
 # Ignore Twitch Bot Config
+config.cfg
 chat.cfg
