@@ -110,3 +110,14 @@ class Glove(HeldItem):
         return action.ThrowAction(target)
 
 registry.Registry.register(Glove, 'weapon', 'rare')
+
+
+class PickAxe(HeldItem):
+    def __init__(self, char='p', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+        super().__init__(char, position, fg, bg)
+
+        self.damage = 2
+        self.name = 'pick axe'
+        self.verb = 'strikes'
+
+registry.Registry.register(PickAxe, 'weapon', 'uncommon')

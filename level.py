@@ -7,6 +7,20 @@ import utils
 from entities import entity
 
 
+class LevelEntity(entity.Entity):
+    def __init__(self, position, level):
+        char, fg, bg = level.get_char(*position)
+        super().__init__(char, position, fg, bg)
+        self.name = 'wall'
+        self.level = level
+
+    def on_hit(self, action, action_context={}):
+        owner = action_context.get('owner')
+
+        if owner and owner.held_item.name == 'pick axe':
+            self.level.draw_char(self.position[0], self.position[1], '.')
+
+
 class Level(entity.Entity):
     def __init__(self, x, y, width, height):
         super().__init__(' ', position=(x, y))
@@ -44,8 +58,8 @@ class Level(entity.Entity):
 
         return 0
 
-    def draw_char(self, x, y, fg=Ellipsis, bg=Ellipsis):
-        self.data.draw_char(x, y, fg, bg)
+    def draw_char(self, x, y, char, fg=(255, 255, 255), bg=(0, 0, 0)):
+        self.data.draw_char(x, y, char, fg, bg)
 
     def get_char(self, x, y):
         return self.data.get_char(x, y)

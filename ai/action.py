@@ -88,7 +88,10 @@ class AttackAction(Action):
         if owner.visible:
             instances.console.print('{} {} {}'.format(owner.name, verb, self.target.name))
 
-        action_context = {'damage': damage_dealt}
+        action_context = {
+            'damage': damage_dealt,
+            'owner': owner
+        }
 
         self.target.on_hit(self, action_context)
 

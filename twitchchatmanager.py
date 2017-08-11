@@ -3,6 +3,7 @@ import palette
 import utils
 
 from entities import entity
+from entities import item
 from entities import player
 
 regular_viewers = [
@@ -42,10 +43,13 @@ class TwitchChatManager(entity.Entity):
                 if event.message.upper() == '!JOIN':
                     player_names = [e.name for e in current_scene.children if hasattr(e, 'name')]
 
+                    bonus = None
+
                     if not event.nickname in player_names:
                         # Set player color
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
                             player_color = palette.BRIGHT_BLUE
+                            bonus = item.PickAxe()
 
                         elif event.nickname.lower() in regular_viewers:
                             player_color = palette.BRIGHT_RED
@@ -57,6 +61,10 @@ class TwitchChatManager(entity.Entity):
                         pos = current_scene.get_location_near_stairs()
                         p = player.Player(event.nickname[0], pos, fg=player_color)
                         p.name = event.nickname
+
+                        if bonus:
+                            p.held_item = bonus
+
                         current_scene.append(p)
                         instances.console.print('{} has joined!'.format(event.nickname))
 

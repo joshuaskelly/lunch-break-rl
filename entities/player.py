@@ -7,6 +7,7 @@ import utils
 from ai import action
 from entities import creature
 from entities import entity
+from entities import item
 
 
 class Player(creature.Creature):

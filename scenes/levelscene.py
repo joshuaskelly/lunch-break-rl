@@ -4,6 +4,7 @@ import twitchchatmanager
 import dungeongenerator
 import game
 import instances
+import level
 import utils
 
 from entities import player
@@ -110,6 +111,10 @@ class LevelScene(scene.Scene):
         for e in self.children:
             if hasattr(e, 'position') and e.position == (x, y):
                 result.append(e)
+
+        if not result:
+            if self.is_solid(x, y):
+                result.append(level.LevelEntity((x, y), self.level))
 
         return result
 
