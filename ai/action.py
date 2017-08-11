@@ -35,7 +35,7 @@ class Action(object):
                 raise RuntimeError('Failed to find action parent')
 
 
-class BatchedMoveAction(Action):
+class BatchedAction(Action):
     def perform(self, owner):
         # Perform the next action
         owner.brain.perform_action()
@@ -54,12 +54,20 @@ class PerformHeldItemAction(Action):
 
 
 class AttackAction(Action):
-    def __init__(self, target):
+    def __init__(self, direction):
         super().__init__()
-        self.target = target
+        self.target = None
         self.weapon = None
+        self.direction = direction
 
     def prerequisite(self, owner):
+        target_pos = utils.math.add(owner.position, self.direction)
+        entities = instances.scene_root.get_entity_at(*target_pos)
+        self.target = entities[0] if entities else None
+
+        if not self.target or not owner:
+            return False
+
         return utils.is_next_to(owner, self.target)
 
     def perform(self, owner):
@@ -80,7 +88,9 @@ class AttackAction(Action):
         if owner.visible:
             instances.console.print('{} {} {}'.format(owner.name, verb, self.target.name))
 
-        self.target.hurt(damage_dealt, self)
+        action_context = {'damage': damage_dealt}
+
+        self.target.on_hit(self, action_context)
 
 
 class MoveAction(Action):
@@ -118,7 +128,7 @@ class MoveToAction(Action):
         if not moves:
             return
 
-        batched_move = BatchedMoveAction()
+        batched_move = BatchedAction()
         first_move = None
 
         for command in moves:
@@ -145,7 +155,7 @@ class WanderAction(Action):
         moves = (1, 0), (-1, 0), (0, 1), (0, -1)
 
         number_of_moves = random.randint(1, 3)
-        batched_move = BatchedMoveAction()
+        batched_move = BatchedAction()
 
         for _ in range(number_of_moves):
             move_action = MoveAction(moves[random.randint(0, 3)])

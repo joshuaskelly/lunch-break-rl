@@ -45,7 +45,7 @@ class Player(creature.Creature):
         if not moves:
             return
 
-        batched_move = action.BatchedMoveAction()
+        batched_move = action.BatchedAction()
 
         for command in moves:
             move_action = helpers.MoveHelper.move_to_action(command)
@@ -83,6 +83,20 @@ class Player(creature.Creature):
                         moves = helpers.MoveHelper.path_to_moves(self.position, path)
 
                     self.queue_batched_move(moves)
+
+                elif commands[0].upper() == '!ATTACK' or commands[0].upper() == '!AT':
+                    moves = ''.join(commands[1:])
+                    moves = [helpers.DirectionHelper.get_direction(m) for m in moves if m in helpers.DirectionHelper.valid_moves]
+
+                    if moves:
+                        batched_attack = action.BatchedAction()
+
+                        for attack_dir in moves:
+                            act = action.AttackAction(attack_dir)
+                            act.parent = batched_attack
+                            self.brain.add_action(act)
+
+                        self.brain.add_action(batched_attack)
 
                 elif commands[0].upper() == '!DROP':
                     self.drop_held_item()

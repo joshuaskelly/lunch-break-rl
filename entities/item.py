@@ -1,6 +1,7 @@
 import instances
 import palette
 import registry
+import utils
 
 from ai import action
 from entities import entity
@@ -24,7 +25,8 @@ class HeldItem(Item):
         return None
 
     def get_perform_action(self, target):
-        return action.AttackAction(target)
+        direction = utils.math.sub(target.position, self.position)
+        return action.AttackAction(direction)
 
 
 class UsableItem(Item):
@@ -82,8 +84,8 @@ class Dagger(HeldItem):
 
         owner = hurt_action.target
         attacker = hurt_action.owner
-
-        counter = action.AttackAction(attacker)
+        direction = utils.math.sub(attacker.position, owner.position)
+        counter = action.AttackAction(direction)
         counter.tags = ['counter']
 
         if counter.prerequisite(owner):

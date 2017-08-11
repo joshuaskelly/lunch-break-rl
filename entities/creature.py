@@ -2,6 +2,7 @@ import tdl
 
 import instances
 import palette
+import utils
 
 from ai import action
 from ai import brain
@@ -91,17 +92,20 @@ class Creature(entity.Entity):
     def drop_held_item(self):
         if not isinstance(self.held_item, item.Fist):
             i = self.held_item
+            i.remove()
+            i.hidden = False
             i.position = self.position
-            instances.scene_root.children.append(i)
+            instances.scene_root.append(i)
             self.held_item = item.Fist('f')
 
-    def hurt(self, damage, hurt_action):
-        self.current_health -= damage
+    def on_hit(self, action, action_context={}):
+        damage_dealt = action_context.get('damage') if 'damage' in action_context else 0
+        self.current_health -= damage_dealt
         ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
         self.append(ani)
 
         if self.current_health > 0 and hasattr(self.held_item, 'on_hurt'):
-            self.held_item.on_hurt(damage, hurt_action)
+            self.held_item.on_hurt(damage_dealt, action)
 
     def die(self):
         self.drop_held_item()
@@ -119,7 +123,8 @@ class Creature(entity.Entity):
         if isinstance(self, player.Player) and isinstance(other, player.Player):
             return action.SwapPosition(self)
 
-        return action.AttackAction(self)
+        direction = utils.math.sub(self.position, other.position)
+        return action.AttackAction(direction)
 
     @property
     def visible_entities(self):

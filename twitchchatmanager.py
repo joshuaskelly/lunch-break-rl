@@ -23,7 +23,9 @@ regular_viewers = [
     'glasscaskettv',
     '109thanos',
     'hawaii_beach',
-    'robojester'
+    'robojester',
+    'gusanolocovg',
+    'newobj'
 ]
 
 

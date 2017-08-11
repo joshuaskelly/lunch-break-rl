@@ -125,7 +125,7 @@ class KoboldIdleState(KoboldState):
         else:
             # Idle behavior. Wait and wander.
             if not self.brain.actions:
-                batched_action = action.BatchedMoveAction()
+                batched_action = action.BatchedAction()
 
                 for _ in range(random.randint(1, 3)):
                     idle_action = action.IdleAction()

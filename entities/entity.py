@@ -115,3 +115,6 @@ class Entity(object):
             return False
 
         return self.offset in instances.scene_root.level.visible_tiles
+
+    def on_hit(self, action, action_context={}):
+        pass
