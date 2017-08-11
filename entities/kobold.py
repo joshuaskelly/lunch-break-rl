@@ -19,8 +19,7 @@ class Kobold(creature.Creature):
         self.current_health = self.max_health
         self.sight_radius = 3.5
 
-        if random.randint(0, 3) == 0:
-            self.held_item = item.Sword()
+        self.equip_held_item(item.Sword())
 
 registry.Registry.register(Kobold, 'monster', 'common')
 

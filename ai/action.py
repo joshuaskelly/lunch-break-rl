@@ -76,6 +76,8 @@ class AttackAction(Action):
         if not self.weapon:
             self.weapon = owner.held_item
 
+        self.weapon.on_use()
+
         damage_dealt = 1
         verb = 'attacks'
 
@@ -192,8 +194,9 @@ class EquipItemAction(Action):
 
         owner.held_item = self.item
         self.item.remove()
-        self.item.hidden = True
-        owner.append(self.item)
+        #self.item.hidden = True
+        #owner.append(self.item)
+        owner.equip_held_item(self.item)
 
         if old_item and not isinstance(old_item, item.Fist):
             if old_item.parent:

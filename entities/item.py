@@ -1,3 +1,5 @@
+import random
+
 import instances
 import palette
 import registry
@@ -5,19 +7,25 @@ import utils
 
 from ai import action
 from entities import entity
+from entities import creature
 
 
 class Item(entity.Entity):
-    registered_entities = []
-
     def get_action(self, other=None):
         pass
 
     def get_special_action(self, target):
         return None
 
+    def on_use(self):
+        pass
+
 
 class HeldItem(Item):
+    def __init__(self, char, position=(0, 0), fg=(255, 255, 255),  bg=(0, 0, 0)):
+        super().__init__(char, position, fg, bg)
+        self.chance_to_break = 1 / 4
+
     def get_action(self, other=None):
         if isinstance(other.held_item, Fist):
             return action.EquipItemAction(self)
@@ -27,6 +35,15 @@ class HeldItem(Item):
     def get_perform_action(self, target):
         direction = utils.math.sub(target.position, self.position)
         return action.AttackAction(direction)
+
+    def on_use(self):
+        if random.random() < self.chance_to_break:
+            instances.console.print('{} {} breaks!'.format(self.parent.name, self.name))
+
+            if isinstance(self.parent, creature.Creature):
+                self.parent.drop_held_item()
+
+            self.remove()
 
 
 class UsableItem(Item):
@@ -56,6 +73,9 @@ class Fist(HeldItem):
 
         self.damage = 1
         self.verb = 'punches'
+
+    def on_use(self):
+        pass
 
 
 class Sword(HeldItem):

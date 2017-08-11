@@ -19,13 +19,12 @@ class Creature(entity.Entity):
         self.name = 'Creature'
         self.current_health = 10
         self.max_health = 10
-        self.held_item = item.Fist('f')
+        self.held_item = None
         self.visible_tiles = set()
         self.state = 'NORMAL'
         self.sight_radius = 7.5
 
-        self.append(self.held_item)
-        self.held_item.hidden = True
+        self.equip_held_item(item.Fist('f'))
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
@@ -88,6 +87,11 @@ class Creature(entity.Entity):
 
         x, y = self.position
         self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision, radius=self.sight_radius)
+
+    def equip_held_item(self, new_item):
+        self.held_item = new_item
+        self.held_item.hidden = True
+        self.append(new_item)
 
     def drop_held_item(self):
         if not isinstance(self.held_item, item.Fist):

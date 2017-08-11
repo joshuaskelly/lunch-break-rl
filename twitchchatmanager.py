@@ -63,7 +63,7 @@ class TwitchChatManager(entity.Entity):
                         p.name = event.nickname
 
                         if bonus:
-                            p.held_item = bonus
+                            p.equip_held_item(bonus)
 
                         current_scene.append(p)
                         instances.console.print('{} has joined!'.format(event.nickname))
