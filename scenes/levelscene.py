@@ -1,14 +1,13 @@
 import random
-import twitchchatmanager
 
 import dungeongenerator
 import game
 import instances
 import level
+import twitchchatmanager
 import utils
-
-from entities import player
 from entities import stairs
+from entities.creatures import player
 from scenes import scene
 
 

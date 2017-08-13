@@ -6,6 +6,7 @@
 *.pyc
 .pylintrc
 __pycache__
+.python-version
 
 # Ignore Twitch Bot Config
 config.cfg

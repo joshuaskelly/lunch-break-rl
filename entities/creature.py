@@ -3,18 +3,20 @@ import tdl
 import instances
 import palette
 import utils
-
-from ai import action
 from ai import brain
+from ai.actions import attackaction
+from ai.actions import moveaction
+from ai.actions import swappositionaction
 from entities import animation
 from entities import entity
 from entities import item
-from entities import player
+from entities.creatures import player
+from entities.items.weapons import fist
 
 
 class Creature(entity.Entity):
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
-        super().__init__(char, position, fg, bg=(0, 0, 0))
+        super().__init__(char, position, fg, bg)
         self.brain = brain.Brain(self)
         self.name = 'Creature'
         self.current_health = 10
@@ -24,7 +26,7 @@ class Creature(entity.Entity):
         self.state = 'NORMAL'
         self.sight_radius = 7.5
 
-        self.equip_held_item(item.Fist('f'))
+        self.equip_held_item(fist.Fist())
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
@@ -52,8 +54,8 @@ class Creature(entity.Entity):
             # Because we have bumped, cancel our move action
             next_action = self.brain.actions[0] if self.brain.actions else None
             if next_action and \
-                not isinstance(action_to_perform, action.SwapPosition) and \
-                isinstance(next_action, action.MoveAction) and \
+                not isinstance(action_to_perform, swappositionaction.SwapPositionAction) and \
+                isinstance(next_action, moveaction.MoveAction) and \
                 next_action.parent:
 
                 next_action.fail(self)
@@ -94,13 +96,13 @@ class Creature(entity.Entity):
         self.append(new_item)
 
     def drop_held_item(self):
-        if not isinstance(self.held_item, item.Fist):
+        if self.held_item.__class__.__name__ != 'Fist':
             i = self.held_item
             i.remove()
             i.hidden = False
             i.position = self.position
             instances.scene_root.append(i)
-            self.held_item = item.Fist('f')
+            self.held_item = item.Fist()
 
     def on_hit(self, action, action_context={}):
         damage_dealt = action_context.get('damage') if 'damage' in action_context else 0
@@ -125,10 +127,10 @@ class Creature(entity.Entity):
 
     def get_action(self, other=None):
         if isinstance(self, player.Player) and isinstance(other, player.Player):
-            return action.SwapPosition(self)
+            return swappositionaction.SwapPositionAction(self)
 
         direction = utils.math.sub(self.position, other.position)
-        return action.AttackAction(direction)
+        return attackaction.AttackAction(direction)
 
     @property
     def visible_entities(self):

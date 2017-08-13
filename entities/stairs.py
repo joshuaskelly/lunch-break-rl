@@ -1,10 +1,9 @@
 import instances
 import palette
-import utils
 
 from ai import action
 from entities import entity
-from entities import player
+from entities.creatures import player
 
 
 class Stairs(entity.Entity):

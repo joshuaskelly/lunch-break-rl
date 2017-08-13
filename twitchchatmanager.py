@@ -1,10 +1,9 @@
 import instances
 import palette
-import utils
 
 from entities import entity
 from entities import item
-from entities import player
+from entities.creatures import player
 
 regular_viewers = [
     'daemianend',

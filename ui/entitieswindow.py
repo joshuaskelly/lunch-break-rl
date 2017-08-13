@@ -2,7 +2,7 @@ import instances
 import palette
 
 from entities import entity
-from entities import player
+from entities.creatures import player
 from ui import progressbar
 from ui import window
 

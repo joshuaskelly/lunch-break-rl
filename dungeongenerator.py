@@ -5,11 +5,13 @@ import tdl
 import level
 import registry
 import utils
-
 from data import room_templates
-from entities import item
-from entities import kobold
+from entities import creatures
+from entities import items
 from entities import stairs
+
+creatures.register()
+items.register()
 
 
 def generate_level(width, height):

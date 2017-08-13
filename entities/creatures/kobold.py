@@ -5,9 +5,14 @@ import registry
 
 from ai import action
 from ai import brain
+
+from ai.actions import wanderaction
+from ai.actions import movetoaction
+
 from entities import animation
 from entities import creature
-from entities import item
+
+from entities.items.weapons import sword
 
 
 class Kobold(creature.Creature):
@@ -19,7 +24,8 @@ class Kobold(creature.Creature):
         self.current_health = self.max_health
         self.sight_radius = 3.5
 
-        self.equip_held_item(item.Sword())
+        if random.random() <= 0.25:
+            self.equip_held_item(sword.Sword())
 
 registry.Registry.register(Kobold, 'monster', 'common')
 
@@ -131,7 +137,7 @@ class KoboldIdleState(KoboldState):
                     idle_action.parent = batched_action
                     self.brain.add_action(idle_action)
 
-                wander_action = action.WanderAction()
+                wander_action = wanderaction.WanderAction()
                 wander_action.parent = batched_action
                 self.brain.add_action(wander_action)
 
@@ -166,7 +172,7 @@ class KoboldAggroState(KoboldState):
     def tick(self, tick):
         if self.owner.can_see(self.threat):
             if self.aggro_counter <= 0:
-                self.brain.add_action(action.MoveToAction(self.threat.position, self.brain.owner.sight_radius))
+                self.brain.add_action(movetoaction.MoveToAction(self.threat.position, self.brain.owner.sight_radius))
                 self.aggro_counter = self.aggro_cooldown
 
         else:
