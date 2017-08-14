@@ -82,7 +82,7 @@ def generate_level(width, height):
 
     moves = random.randint(8, 20)
     while moves > 0:
-        current_cursor = possible_moves[random.randint(0, len(possible_moves) - 1)]()
+        current_cursor = random.choice(possible_moves)()
         if current_cursor:
             moves -= 1
 
