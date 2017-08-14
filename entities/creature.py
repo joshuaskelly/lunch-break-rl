@@ -5,12 +5,10 @@ import palette
 import utils
 from ai import brain
 from ai.actions import attackaction
-from ai.actions import moveaction
 from ai.actions import swappositionaction
 from entities import animation
 from entities import entity
 from entities import item
-from entities.creatures import player
 from entities.items.weapons import fist
 
 
@@ -54,8 +52,8 @@ class Creature(entity.Entity):
             # Because we have bumped, cancel our move action
             next_action = self.brain.actions[0] if self.brain.actions else None
             if next_action and \
-                not isinstance(action_to_perform, swappositionaction.SwapPositionAction) and \
-                isinstance(next_action, moveaction.MoveAction) and \
+                not action_to_perform.isinstance('SwapPositionAction') and \
+                next_action.isinstance('MoveAction') and \
                 next_action.parent:
 
                 next_action.fail(self)
@@ -102,7 +100,7 @@ class Creature(entity.Entity):
             i.hidden = False
             i.position = self.position
             instances.scene_root.append(i)
-            self.held_item = item.Fist()
+            self.held_item = fist.Fist()
 
     def on_hit(self, action, action_context={}):
         damage_dealt = action_context.get('damage') if 'damage' in action_context else 0
@@ -126,7 +124,7 @@ class Creature(entity.Entity):
         self.update_fov()
 
     def get_action(self, other=None):
-        if isinstance(self, player.Player) and isinstance(other, player.Player):
+        if self.isinstance('Player') and other.isinstance('Player'):
             return swappositionaction.SwapPositionAction(self)
 
         direction = utils.math.sub(self.position, other.position)
@@ -138,7 +136,7 @@ class Creature(entity.Entity):
         result = []
 
         for e in current_scene.children:
-            if not isinstance(e, entity.Entity):
+            if not e.isinstance('Entity'):
                 continue
 
             if e == self:

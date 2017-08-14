@@ -6,8 +6,6 @@ import instances
 import level
 import twitchchatmanager
 import utils
-from entities import stairs
-from entities.creatures import player
 from scenes import scene
 
 
@@ -49,11 +47,11 @@ class LevelScene(scene.Scene):
         self.console.clear()
 
         # Draw items and creatures
-        for e in [n for n in self.children if not isinstance(n, player.Player)]:
+        for e in [n for n in self.children if not n.isinstance('Player')]:
             e.draw(self.console)
 
         # Draw players
-        for e in [n for n in self.children if isinstance(n, player.Player)]:
+        for e in [n for n in self.children if n.isinstance('Player')]:
             e.draw(self.console)
 
         console.blit(self.console, self.x, self.y, self.width, self.height)
@@ -122,14 +120,14 @@ class LevelScene(scene.Scene):
 
     @property
     def players(self):
-        return [p for p in self.children if isinstance(p, player.Player)]
+        return [p for p in self.children if p.isinstance('Player')]
 
     def active_player_count(self):
         return len([p for p in self.players if p.state != 'EXITED'])
 
     @property
     def downward_stair(self):
-        return [e for e in self.children if isinstance(e, stairs.Stairs) and e.name == 'Down'][0]
+        return [e for e in self.children if e.isinstance('Stairs') and e.name == 'Down'][0]
 
     def change_level(self):
         if not self.change_level_requested:
@@ -138,7 +136,7 @@ class LevelScene(scene.Scene):
 
     def get_location_near_stairs(self):
         # Find stair location
-        stair_location = [e for e in self.children if isinstance(e, stairs.Stairs) and e.name == 'Up'][0].position
+        stair_location = [e for e in self.children if e.isinstance('Stairs') and e.name == 'Up'][0].position
 
         # Find open areas around stairs
         rect = utils.rect(stair_location[0] - 3, stair_location[1] - 3, 7, 7)

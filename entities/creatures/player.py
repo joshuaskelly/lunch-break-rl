@@ -5,9 +5,11 @@ import palette
 import utils
 
 from ai import action
+
+from ai.actions import attackaction
+from ai.actions import throwaction
+
 from entities import creature
-from entities import entity
-from entities import item
 
 
 class Player(creature.Creature):
@@ -93,7 +95,7 @@ class Player(creature.Creature):
                         batched_attack = action.BatchedAction()
 
                         for attack_dir in moves:
-                            act = action.AttackAction(attack_dir)
+                            act = attackaction.AttackAction(attack_dir)
                             act.parent = batched_attack
                             self.brain.add_action(act)
 
@@ -113,13 +115,13 @@ class Player(creature.Creature):
                     target_entity = None
                     dest = utils.math.add(self.position, direction)
 
-                    es = [e for e in instances.scene_root.children if isinstance(e, entity.Entity) and e.position == dest]
+                    es = [e for e in instances.scene_root.children if e.isinstance('Entity') and e.position == dest]
 
                     if es:
                         target_entity = es[0]
 
                     if target_entity:
-                        act = action.ThrowAction(target_entity)
+                        act = throwaction.ThrowAction(target_entity)
                         self.brain.actions.append(act)
                         self._has_taken_action = True
 
@@ -132,5 +134,5 @@ class Player(creature.Creature):
                 elif commands[0].upper() == '!STOP':
                     next_action = self.brain.actions[0] if self.brain.actions else None
 
-                    if isinstance(next_action, action.MoveAction):
+                    if next_action.isinstance('MoveAction'):
                         next_action.fail(self)

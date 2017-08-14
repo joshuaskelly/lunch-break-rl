@@ -4,9 +4,6 @@ import instances
 import utils
 from ai import action
 from entities import animation
-from entities import creature
-from entities import item
-from entities.creatures import player
 
 
 class ThrowAction(action.Action):
@@ -52,10 +49,10 @@ class ThrowAction(action.Action):
             entities = current_scene.get_entity_at(*point)
             if entities:
                 for hit_entity in entities:
-                    if isinstance(hit_entity, creature.Creature):
-                        if isinstance(thrown_entity, item.HeldItem):
+                    if hit_entity.isinstance('Creature'):
+                        if thrown_entity.isinstance('HeldItem'):
                             # Have player equip thrown_entity item
-                            if isinstance(hit_entity, player.Player) and hit_entity.held_item is None:
+                            if hit_entity.isinstance('Player') and hit_entity.held_item is None:
                                 act = thrown_entity.get_action(owner)
                                 action_to_perform = act.perform
                                 target_entity = hit_entity
@@ -67,7 +64,7 @@ class ThrowAction(action.Action):
                                 target_entity = hit_entity
 
                         # Use potion on target player
-                        elif isinstance(thrown_entity, item.UsableItem):
+                        elif thrown_entity.isinstance('UsableItem'):
                             action_to_perform = thrown_entity.use
                             target_entity = hit_entity
 
@@ -79,18 +76,15 @@ class ThrowAction(action.Action):
 
             dest = point
 
-        if isinstance(thrown_entity, creature.Creature):
+        if thrown_entity.isinstance('Creature'):
             # Cancel any pending actions
             target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
             if target_next_action:
                 target_next_action.fail(self.target)
 
-        if isinstance(target_entity, creature.Creature):
-            # Do something?
-            pass
-
-        ani = animation.ThrowMotion(thrown_entity.position, dest, 1.0)
+        ani = animation.ThrowMotion(thrown_entity.position, dest, 0.25)
         thrown_entity.append(ani)
+        thrown_entity.hidden = True
         thrown_entity.position = dest
 
         def action_callback():

@@ -3,7 +3,6 @@ import palette
 
 from ai import action
 from entities import entity
-from entities.creatures import player
 
 
 class Stairs(entity.Entity):
@@ -32,12 +31,12 @@ class StairsDown(Stairs):
         self.name = 'Down'
 
     def get_action(self, other=None):
-        if not isinstance(other, player.Player):
+        if not other.isinstance('Player'):
             return None
 
         class NextLevel(action.Action):
             def prerequisite(self, owner):
-                return isinstance(owner, player.Player)
+                return owner.isinstance('Player')
 
             def perform(self, owner):
                 owner.current_health = owner.max_health

@@ -2,7 +2,7 @@ import instances
 import palette
 
 from entities import entity
-from entities import item
+from entities.items.weapons import pickaxe
 from entities.creatures import player
 
 regular_viewers = [
@@ -48,7 +48,7 @@ class TwitchChatManager(entity.Entity):
                         # Set player color
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
                             player_color = palette.BRIGHT_BLUE
-                            bonus = item.PickAxe()
+                            bonus = pickaxe.PickAxe()
 
                         elif event.nickname.lower() in regular_viewers:
                             player_color = palette.BRIGHT_RED
@@ -69,7 +69,7 @@ class TwitchChatManager(entity.Entity):
 
                 elif event.message.upper() == '!LEAVE':
                     for e in current_scene.children:
-                        if not isinstance(e, player.Player):
+                        if not e.isinstance('Player'):
                             continue
 
                         if e.name == event.nickname:

@@ -1,8 +1,6 @@
 import instances
 import palette
 
-from entities import entity
-from entities.creatures import player
 from ui import progressbar
 from ui import window
 
@@ -16,13 +14,13 @@ class EntitiesWindow(window.Window):
 
         row = 1
         for e in instances.scene_root.children:
-            if isinstance(e, player.Player):
+            if e.isinstance('Player'):
                 continue
 
             if row >= self.height - 1:
                 break
 
-            if isinstance(e, entity.Entity) and e.visible:
+            if e.isinstance('Entity') and e.visible:
                 self.data.draw_str(1, row, '{}:{}'.format(e.char, e.name[:self.width - 4]), fg=e.fg)
                 row += 1
 

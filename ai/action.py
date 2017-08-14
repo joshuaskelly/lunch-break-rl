@@ -1,6 +1,30 @@
+import inspect
+
+
 class Action(object):
+    __base_classes = ()
+
     def __init__(self):
         self.parent = None
+
+        if not self.__base_classes:
+            self.__base_classes = tuple([c.__name__ for c in inspect.getmro(self.__class__) if c is not object])
+
+    def isinstance(self, cls):
+        """Returns if this entity is an instance of the given class
+
+        cls: A string, an instance, or a type
+        """
+        if isinstance(cls, str):
+            pass
+
+        elif type(cls) is type:
+            cls = cls.__name__
+
+        else:
+            cls = cls.__class__.__name__
+
+        return cls in self.__base_classes
 
     def prerequisite(self, owner):
         return True
@@ -22,26 +46,13 @@ class Action(object):
 
 
 class BatchedAction(Action):
+    """A skip op action. Useful for creating hierarchical actions."""
     def perform(self, owner):
         # Perform the next action
         owner.brain.perform_action()
 
 
-class PerformHeldItemAction(Action):
-    def __init__(self, target):
-        super().__init__()
-        self.target = target
-
-    def prerequisite(self, owner):
-        return True
-
-    def perform(self, owner):
-        held_action = owner.held_item.move_to_action(owner)
-
-
 class IdleAction(Action):
+    """A no-op action. Useful for timing."""
     def prerequisite(self, owner):
         return True
-
-    def perform(self, owner):
-        pass

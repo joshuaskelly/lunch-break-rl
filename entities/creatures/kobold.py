@@ -49,7 +49,7 @@ class KoboldBrain(brain.Brain):
         return None
 
     def is_threat(self, entity):
-        return entity.__class__.__name__ == 'Player'
+        return entity.isinstance('Player')
 
     def set_state(self, state_class):
         old_state = self.state

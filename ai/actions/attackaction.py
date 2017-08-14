@@ -27,8 +27,6 @@ class AttackAction(action.Action):
         if not self.weapon:
             self.weapon = owner.held_item
 
-        self.weapon.on_use()
-
         damage_dealt = 1
         verb = 'attacks'
 
@@ -47,3 +45,4 @@ class AttackAction(action.Action):
         }
 
         self.target.on_hit(self, action_context)
+        self.weapon.on_use()

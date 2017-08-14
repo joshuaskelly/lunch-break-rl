@@ -1,7 +1,6 @@
 import instances
 import palette
 
-from entities.creatures import player
 from ui import progressbar
 from ui import window
 
@@ -15,7 +14,7 @@ class PlayerWindow(window.Window):
 
         row = 1
         for entity in instances.scene_root.children:
-            if not isinstance(entity, player.Player):
+            if not entity.isinstance('Player'):
                 continue
 
             if row >= self.height - 1:

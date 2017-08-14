@@ -3,9 +3,11 @@ import random
 import instances
 import utils
 
-from ai import action
+from ai.actions import attackaction
+from ai.actions import equipitemaction
+from ai.actions import useitemaction
+
 from entities import entity
-from entities import creature
 
 
 class Item(entity.Entity):
@@ -25,20 +27,20 @@ class HeldItem(Item):
         self.chance_to_break = 1 / 4
 
     def get_action(self, other=None):
-        if other.held_item.__class__.__name__ == 'Fist':
-            return action.EquipItemAction(self)
+        if other.held_item.isinstance('Fist'):
+            return equipitemaction.EquipItemAction(self)
 
         return None
 
     def get_perform_action(self, target):
         direction = utils.math.sub(target.position, self.position)
-        return action.AttackAction(direction)
+        return attackaction.AttackAction(direction)
 
     def on_use(self):
         if random.random() < self.chance_to_break:
             instances.console.print('{} {} breaks!'.format(self.parent.name, self.name))
 
-            if isinstance(self.parent, creature.Creature):
+            if self.parent.isinstance('Creature'):
                 self.parent.drop_held_item()
 
             self.remove()
@@ -46,7 +48,7 @@ class HeldItem(Item):
 
 class UsableItem(Item):
     def get_action(self, other=None):
-        return action.UseItemAction(self)
+        return useitemaction.UseItemAction(self)
 
     def use(self, target):
         instances.console.print('{} is being used on {}'.format(self.name, target.name))

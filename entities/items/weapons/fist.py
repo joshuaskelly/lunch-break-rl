@@ -7,3 +7,6 @@ class Fist(weapon.Weapon):
 
         self.damage = 1
         self.verb = 'punches'
+
+    def on_use(self):
+        pass

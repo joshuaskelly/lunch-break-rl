@@ -1,6 +1,6 @@
 import utils
 
-from ai import action
+from ai.actions import moveaction
 
 
 class DirectionHelper(object):
@@ -50,6 +50,6 @@ class MoveHelper(object):
     @staticmethod
     def move_to_action(move):
         if move in DirectionHelper.dir_map:
-            return action.MoveAction(DirectionHelper.get_direction(move.upper()))
+            return moveaction.MoveAction(DirectionHelper.get_direction(move.upper()))
 
         return None

@@ -28,4 +28,4 @@ class EquipItemAction(action.Action):
             instances.scene_root.level.append(old_item)
 
         if owner.visible:
-            instances.console.print('{} is equiping {}'.format(owner.name, self.item.name))
+            instances.console.print('{} is equipping {}'.format(owner.name, self.item.name))

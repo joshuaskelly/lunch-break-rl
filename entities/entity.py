@@ -1,8 +1,12 @@
+import inspect
+
 import instances
 import utils
 
 
 class Entity(object):
+    __base_classes = ()
+
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
         self.char = char
         self.position = position
@@ -13,6 +17,25 @@ class Entity(object):
         self.hidden = False
         self.always_show = False
         self.parent = None
+
+        if not self.__base_classes:
+            self.__base_classes = tuple([c.__name__ for c in inspect.getmro(self.__class__) if c is not object])
+
+    def isinstance(self, cls):
+        """Returns if this entity is an instance of the given class
+
+        cls: A string, an instance, or a type
+        """
+        if isinstance(cls, str):
+            pass
+
+        elif type(cls) is type:
+            cls = cls.__name__
+
+        else:
+            cls = cls.__class__.__name__
+
+        return cls in self.__base_classes
 
     @property
     def x(self):

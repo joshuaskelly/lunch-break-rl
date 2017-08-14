@@ -1,6 +1,3 @@
-from ai import action
-
-
 class Brain(object):
     def __init__(self, owner):
         self.owner = owner
@@ -19,7 +16,7 @@ class Brain(object):
                 current_action.fail(self.owner)
 
     def add_action(self, new_action):
-        if isinstance(new_action, action.Action):
+        if new_action.isinstance('Action'):
             self.actions.append(new_action)
 
     def fail_next_action(self):
