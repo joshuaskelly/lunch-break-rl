@@ -37,10 +37,7 @@ class WeaponState(attackaction.AttackActionInterface):
         return True
 
     def on_attack(self, action):
-        print('{} {} {} for {} damage!'.format(action.performer.name,
-                                               action.performer.weapon.verb,
-                                               action.target.name,
-                                               action.performer.weapon.damage))
+        pass
 
     def after_attack(self, action):
         pass

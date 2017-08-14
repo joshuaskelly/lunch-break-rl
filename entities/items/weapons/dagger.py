@@ -14,7 +14,7 @@ class Dagger(weapon.Weapon):
         self.damage = 2
         self.name = 'dagger'
         self.verb = 'stabs'
-        self.counter_chance = 0.5
+        self.counter_chance = 1 / 2
 
 registry.Registry.register(Dagger, 'weapon', 'common')
 

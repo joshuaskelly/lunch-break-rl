@@ -12,7 +12,7 @@ from ai.actions import movetoaction
 from entities import animation
 from entities import creature
 
-from entities.items.weapons import sword
+from entities.items.weapons import dagger
 
 
 class Kobold(creature.Creature):
@@ -24,8 +24,8 @@ class Kobold(creature.Creature):
         self.current_health = self.max_health
         self.sight_radius = 3.5
 
-        if random.random() <= 0.25:
-            self.equip_weapon(sword.Sword())
+        if random.random() <= 1 / 5:
+            self.equip_weapon(dagger.Dagger())
 
 registry.Registry.register(Kobold, 'monster', 'common')
 
