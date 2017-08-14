@@ -26,7 +26,7 @@ class PlayerWindow(window.Window):
             pb.current_value = entity.current_health
             pb.draw(self.data)
             
-            weapon = entity.held_item
+            weapon = entity.weapon
             self.data.draw_char(self.width - 2, row + 1, weapon.char, fg=weapon.fg)
             
             row += 3

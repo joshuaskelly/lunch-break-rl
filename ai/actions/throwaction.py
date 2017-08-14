@@ -16,11 +16,11 @@ class ThrowAction(action.Action):
     def perform(self):
         thrown_entity = self.target
 
-        weapon = self.performer.held_item
+        weapon = self.performer.weapon
         weapon_range = 3
 
-        if hasattr(weapon, 'range'):
-            weapon_range = weapon.range
+        if hasattr(weapon, 'throw_distance'):
+            weapon_range = weapon.throw_distance
 
         # Determine direction of throw
         dx, dy = utils.math.sub(thrown_entity.position, self.performer.position)
@@ -50,7 +50,8 @@ class ThrowAction(action.Action):
                     if hit_entity.isinstance('Creature'):
                         if thrown_entity.isinstance('HeldItem'):
                             # Have player equip thrown_entity item
-                            if hit_entity.isinstance('Player') and hit_entity.held_item is None:
+                            # TODO: Fix the below as it will never be True
+                            if hit_entity.isinstance('Player') and hit_entity.weapon is None:
                                 act = thrown_entity.get_action(self.performer)
                                 action_to_perform = act.perform
                                 target_entity = hit_entity

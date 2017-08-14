@@ -25,7 +25,7 @@ class Kobold(creature.Creature):
         self.sight_radius = 3.5
 
         if random.random() <= 0.25:
-            self.equip_held_item(sword.Sword())
+            self.equip_weapon(sword.Sword())
 
 registry.Registry.register(Kobold, 'monster', 'common')
 

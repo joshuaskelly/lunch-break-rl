@@ -27,7 +27,7 @@ class HeldItem(Item):
         self.chance_to_break = 1 / 4
 
     def get_action(self, requester=None):
-        if requester and requester.held_item.isinstance('Fist'):
+        if requester and requester.weapon.isinstance('Fist'):
             return equipitemaction.EquipItemAction(requester, self)
 
         return None
@@ -41,7 +41,7 @@ class HeldItem(Item):
             instances.console.print('{} {} breaks!'.format(self.parent.name, self.name))
 
             if self.parent.isinstance('Creature'):
-                self.parent.drop_held_item()
+                self.parent.drop_weapon()
 
             self.remove()
 

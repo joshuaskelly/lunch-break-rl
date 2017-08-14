@@ -8,41 +8,40 @@ class AttackAction(action.Action):
     def __init__(self, performer, target=None, direction=None):
         super().__init__(performer, target)
         self.weapon = None
+        if target and not direction:
+            direction = utils.math.sub(target.position, performer.position)
+
         self.direction = direction
 
-        if not direction:
-            print('no direction!')
-
     def prerequisite(self):
+        # TODO: Fix directional attacking
         target_pos = utils.math.add(self.performer.position, self.direction)
         entities = instances.scene_root.get_entity_at(*target_pos)
         self.target = entities[0] if entities else None
 
-        if not self.target or not self.performer:
-            return False
-
-        return utils.is_next_to(self.performer, self.target)
+        return self.performer.can_attack(self.target) and self.target.allow_attack(self)
 
     def perform(self):
-        if not self.weapon:
-            self.weapon = self.performer.held_item
+        self.target.on_attack(self)
+        self.target.after_attack(self)
 
-        damage_dealt = 1
-        verb = 'attacks'
+        # TODO: When to call this?
+        #self.weapon.on_use()
 
-        if hasattr(self.weapon, 'damage'):
-            damage_dealt = self.weapon.damage
 
-        if hasattr(self.weapon, 'verb'):
-            verb = self.weapon.verb
+class AttackActionInterface(object):
+    def can_attack(self, other):
+        """Determines if performer can attack target"""
+        return True
 
-        if self.performer.visible:
-            instances.console.print('{} {} {}'.format(self.performer.name, verb, self.target.name))
+    def allow_attack(self, action):
+        """Determines if target will allow attack"""
+        return True
 
-        action_context = {
-            'damage': damage_dealt,
-            'owner': self.performer
-        }
+    def on_attack(self, action):
+        """Called on target to handle being attacked"""
+        pass
 
-        self.target.on_hit(self, action_context)
-        self.weapon.on_use()
+    def after_attack(self, action):
+        """Called on target after attack has occurred"""
+        pass

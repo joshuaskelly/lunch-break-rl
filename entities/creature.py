@@ -19,12 +19,12 @@ class Creature(entity.Entity):
         self.name = 'Creature'
         self.current_health = 10
         self.max_health = 10
-        self.held_item = None
+        self.weapon = None
         self.visible_tiles = set()
         self.state = 'NORMAL'
         self.sight_radius = 7.5
 
-        self.equip_held_item(fist.Fist())
+        self.equip_weapon(fist.Fist())
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
@@ -39,7 +39,7 @@ class Creature(entity.Entity):
             target_entity = es[0]
 
             # Let special item actions override bumped entity's default action
-            action_to_perform = self.held_item.get_special_action(self, target_entity)
+            action_to_perform = self.weapon.get_special_action(self, target_entity)
 
             # Get bumped entity's default action
             if not action_to_perform:
@@ -88,31 +88,22 @@ class Creature(entity.Entity):
         x, y = self.position
         self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision, radius=self.sight_radius)
 
-    def equip_held_item(self, new_item):
-        self.held_item = new_item
-        self.held_item.hidden = True
+    def equip_weapon(self, new_item):
+        self.weapon = new_item
+        self.weapon.hidden = True
         self.append(new_item)
 
-    def drop_held_item(self):
-        if self.held_item.__class__.__name__ != 'Fist':
-            i = self.held_item
+    def drop_weapon(self):
+        if self.weapon.__class__.__name__ != 'Fist':
+            i = self.weapon
             i.remove()
             i.hidden = False
             i.position = self.position
             instances.scene_root.append(i)
-            self.held_item = fist.Fist()
-
-    def on_hit(self, action, action_context={}):
-        damage_dealt = action_context.get('damage') if 'damage' in action_context else 0
-        self.current_health -= damage_dealt
-        ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
-        self.append(ani)
-
-        if self.current_health > 0 and hasattr(self.held_item, 'on_hurt'):
-            self.held_item.on_hurt(damage_dealt, action)
+            self.weapon = fist.Fist()
 
     def die(self):
-        self.drop_held_item()
+        self.drop_weapon()
         instances.console.print('{} perishes!'.format(self.name))
         self.remove()
 
@@ -147,3 +138,36 @@ class Creature(entity.Entity):
                 result.append(e)
 
         return result
+
+    def can_attack(self, target):
+        """Determines if performer can attack target
+        
+        target: An entity
+        """
+        return self.weapon.state.can_attack(target)
+
+    def allow_attack(self, action):
+        """Determines if target will allow attack"""
+        return self.weapon.state.allow_attack(action)
+
+    def on_attack(self, action):
+        """Called on target to handle being attacked"""
+        self.weapon.state.on_attack(action)
+
+        damage_dealt = action.performer.weapon.damage
+        verb = action.performer.weapon.verb
+
+        if action.performer.visible:
+            instances.console.print('{} {} {}'.format(action.performer.name, verb, action.target.name))
+
+        self.current_health -= damage_dealt
+        ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
+        self.append(ani)
+
+        if self.current_health > 0:
+            # Put held_item logic here?
+            pass
+
+    def after_attack(self, action):
+        """Called on target after attack has occurred"""
+        self.weapon.state.after_attack(action)

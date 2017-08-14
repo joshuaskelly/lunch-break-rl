@@ -139,5 +139,21 @@ class Entity(object):
 
         return self.offset in instances.scene_root.level.visible_tiles
 
-    def on_hit(self, action, action_context={}):
+    def can_attack(self, target):
+        """Determines if performer can attack target
+
+        target: An entity
+        """
+        return True
+
+    def allow_attack(self, action):
+        """Determines if target will allow attack"""
+        return True
+
+    def on_attack(self, action):
+        """Called on target to handle being attacked"""
+        pass
+
+    def after_attack(self, action):
+        """Called on target after attack has occurred"""
         pass

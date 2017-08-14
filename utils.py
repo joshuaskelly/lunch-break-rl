@@ -1,3 +1,5 @@
+from math import sqrt
+
 def cp437(string):
     """Converts utf8 to codepage 437"""
     return ''.join([chr(ord(c.encode('cp437'))) for c in string])
@@ -47,3 +49,8 @@ class math(object):
     @staticmethod
     def sub(lhs, rhs):
         return lhs[0] - rhs[0], lhs[1] - rhs[1]
+
+    @staticmethod
+    def distance(lhs, rhs):
+        d = math.sub(lhs, rhs)
+        return sqrt(d[0] ** 2 + d[1] ** 2)

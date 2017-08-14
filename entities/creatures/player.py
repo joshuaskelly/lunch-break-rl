@@ -102,7 +102,7 @@ class Player(creature.Creature):
                         self.brain.add_action(batched_attack)
 
                 elif commands[0].upper() == '!DROP':
-                    self.drop_held_item()
+                    self.drop_weapon()
                     self._has_taken_action = True
 
                 elif commands[0].upper() == '!THROW':

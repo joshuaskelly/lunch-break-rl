@@ -11,14 +11,14 @@ class EquipItemAction(action.Action):
         return True
 
     def perform(self):
-        old_item = self.performer.held_item
+        old_item = self.performer.weapon
         old_item.position = self.target.position
         old_item.remove()
         old_item.hidden = False
 
-        self.performer.held_item = self.target
+        self.performer.weapon = self.target
         self.target.remove()
-        self.performer.equip_held_item(self.target)
+        self.performer.equip_weapon(self.target)
 
         if old_item and old_item.__class__.__name__ != 'Fist':
             if old_item.parent:

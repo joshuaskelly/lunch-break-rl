@@ -3,7 +3,7 @@ import palette
 
 from entities import entity
 from entities.items.weapons import pickaxe
-from entities.items.weapons import dagger
+from entities.items.weapons import sword
 from entities.creatures import player
 
 regular_viewers = [
@@ -43,7 +43,7 @@ class TwitchChatManager(entity.Entity):
                 if event.message.upper() == '!JOIN':
                     player_names = [e.name for e in current_scene.children if hasattr(e, 'name')]
 
-                    bonus = dagger.Dagger()
+                    bonus = sword.Sword()
 
                     if not event.nickname in player_names:
                         # Set player color
@@ -63,7 +63,7 @@ class TwitchChatManager(entity.Entity):
                         p.name = event.nickname
 
                         if bonus:
-                            p.equip_held_item(bonus)
+                            p.equip_weapon(bonus)
 
                         current_scene.append(p)
                         instances.console.print('{} has joined!'.format(event.nickname))

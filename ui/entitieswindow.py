@@ -29,7 +29,7 @@ class EntitiesWindow(window.Window):
                     pb.current_value = e.current_health
                     pb.draw(self.data)
 
-                    weapon = e.held_item
+                    weapon = e.weapon
                     self.data.draw_char(self.width - 2, row, weapon.char, fg=weapon.fg)
 
                     row += 1

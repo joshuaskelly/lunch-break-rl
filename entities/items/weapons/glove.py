@@ -11,7 +11,7 @@ class Glove(weapon.Weapon):
 
         self.name = 'glove'
         self.verb = 'throws'
-        self.range = 5
+        self.throw_distance = 5
 
     def get_perform_action(self, requester, target):
         return throwaction.ThrowAction(requester, target)

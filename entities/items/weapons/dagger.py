@@ -1,31 +1,44 @@
+import random
+
 import instances
 import palette
 import registry
-import utils
 
-from ai.actions import attackaction
 from entities.items import weapon
 
 
 class Dagger(weapon.Weapon):
     def __init__(self, char='d', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
         super().__init__(char, position, fg, bg)
-
+        self.state = DefaultCounterWeaponState(self)
         self.damage = 2
         self.name = 'dagger'
         self.verb = 'stabs'
-
-    def on_hurt(self, damage, attack_action):
-        if hasattr(attack_action, 'tags'):
-            if 'counter' in attack_action.tags:
-                return
-
-        direction = utils.math.sub(attack_action.performer.position, attack_action.target.position)
-        counter = attackaction.AttackAction(attack_action.target, attack_action.performer, direction)
-        counter.tags = ['counter']
-
-        if counter.prerequisite():
-            instances.console.print('{} counter attacks!'.format(attack_action.target.name))
-            counter.perform()
+        self.counter_chance = 0.5
 
 registry.Registry.register(Dagger, 'weapon', 'common')
+
+
+class DefaultCounterWeaponState(weapon.WeaponState):
+    def __init__(self, weapon):
+        super().__init__(weapon)
+        self.weapon = weapon
+
+    @property
+    def counter_chance(self):
+        if hasattr(self.weapon, 'counter_chance'):
+            return self.weapon.counter_chance
+
+        return 0
+
+    def allow_attack(self, action):
+        return True
+
+    def after_attack(self, action):
+        if random.random() < self.counter_chance:
+            instances.console.print('{} counters {}\'s attack!'.format(action.target.name,
+                                                                       action.performer.name))
+            counter = action.target.weapon.Action(performer=action.target,
+                                                  target=action.performer)
+            action.target.brain.actions.append(counter)
+            action.target.brain.perform_action()
