@@ -65,7 +65,7 @@ class TwitchChatManager(entity.Entity):
                             p.equip_weapon(bonus)
 
                         current_scene.append(p)
-                        instances.console.print('{} has joined!'.format(event.nickname))
+                        instances.console.print('{} has joined!'.format(p.display_string))
 
                 elif event.message.upper() == '!LEAVE':
                     for e in current_scene.children:
@@ -74,4 +74,4 @@ class TwitchChatManager(entity.Entity):
 
                         if e.name == event.nickname:
                             e.die()
-                            instances.console.print('{} has left.'.format(event.nickname))
+                            instances.console.print('{} has left.'.format(e.display_string))

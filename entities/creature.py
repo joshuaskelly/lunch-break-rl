@@ -101,10 +101,11 @@ class Creature(entity.Entity):
             i.position = self.position
             instances.scene_root.append(i)
             self.weapon = fist.Fist()
+            instances.console.print('{} drops {}'.format(self.display_string, i.display_string))
 
     def die(self):
         self.drop_weapon()
-        instances.console.print('{} perishes!'.format(self.name))
+        instances.console.print('{} perishes!'.format(self.display_string))
         self.remove()
 
     def tick(self, tick):
@@ -158,7 +159,7 @@ class Creature(entity.Entity):
         verb = action.performer.weapon.verb
 
         if action.performer.visible:
-            instances.console.print('{} {} {}'.format(action.performer.name, verb, action.target.name))
+            instances.console.print('{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
 
         self.current_health -= damage_dealt
         ani = animation.FlashBackground(bg=palette.BRIGHT_RED)

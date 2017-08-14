@@ -37,8 +37,8 @@ class DefaultParryWeaponState(weapon.WeaponState):
             ani = animation.FlashBackground(bg=palette.BRIGHT_YELLOW)
             self.weapon.parent.append(ani)
 
-            instances.console.print('{} parries {}\'s attack!'.format(action.target.name,
-                                                                      action.performer.name))
+            instances.console.print('{} parries {}\'s attack!'.format(action.target.display_string,
+                                                                      action.performer.display_string))
             return False
 
         return True

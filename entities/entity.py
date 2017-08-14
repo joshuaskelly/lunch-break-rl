@@ -38,6 +38,10 @@ class Entity(object):
         return cls in self.__base_classes
 
     @property
+    def display_string(self):
+        return '<color fg="{}">{}</color>'.format(self.fg, self.name)
+
+    @property
     def x(self):
         return self.position[0]
 
