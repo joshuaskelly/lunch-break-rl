@@ -30,20 +30,20 @@ class StairsDown(Stairs):
         self.dark_fg = palette.YELLOW
         self.name = 'Down'
 
-    def get_action(self, other=None):
-        if not other.isinstance('Player'):
+    def get_action(self, requester=None):
+        if not requester.isinstance('Player'):
             return None
 
         class NextLevel(action.Action):
-            def prerequisite(self, owner):
-                return owner.isinstance('Player')
+            def prerequisite(self):
+                return self.performer.isinstance('Player')
 
-            def perform(self, owner):
-                owner.current_health = owner.max_health
-                owner.state = 'EXITED'
-                owner.position = -1, -1
+            def perform(self):
+                self.performer.current_health = self.performer.max_health
+                self.performer.state = 'EXITED'
+                self.performer.position = -1, -1
 
                 # Start a countdown timer
                 instances.scene_root.change_level()
 
-        return NextLevel()
+        return NextLevel(requester)

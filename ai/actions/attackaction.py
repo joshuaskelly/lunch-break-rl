@@ -5,27 +5,27 @@ from ai import action
 
 
 class AttackAction(action.Action):
-    def __init__(self, direction):
-        super().__init__()
-        self.target = None
+    def __init__(self, performer, target=None, direction=None):
+        super().__init__(performer, target)
         self.weapon = None
         self.direction = direction
 
-    def prerequisite(self, owner):
-        target_pos = utils.math.add(owner.position, self.direction)
+        if not direction:
+            print('no direction!')
+
+    def prerequisite(self):
+        target_pos = utils.math.add(self.performer.position, self.direction)
         entities = instances.scene_root.get_entity_at(*target_pos)
         self.target = entities[0] if entities else None
 
-        if not self.target or not owner:
+        if not self.target or not self.performer:
             return False
 
-        return utils.is_next_to(owner, self.target)
+        return utils.is_next_to(self.performer, self.target)
 
-    def perform(self, owner):
-        self.owner = owner
-
+    def perform(self):
         if not self.weapon:
-            self.weapon = owner.held_item
+            self.weapon = self.performer.held_item
 
         damage_dealt = 1
         verb = 'attacks'
@@ -36,12 +36,12 @@ class AttackAction(action.Action):
         if hasattr(self.weapon, 'verb'):
             verb = self.weapon.verb
 
-        if owner.visible:
-            instances.console.print('{} {} {}'.format(owner.name, verb, self.target.name))
+        if self.performer.visible:
+            instances.console.print('{} {} {}'.format(self.performer.name, verb, self.target.name))
 
         action_context = {
             'damage': damage_dealt,
-            'owner': owner
+            'owner': self.performer
         }
 
         self.target.on_hit(self, action_context)

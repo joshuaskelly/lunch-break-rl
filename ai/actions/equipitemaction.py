@@ -4,22 +4,21 @@ from ai import action
 
 
 class EquipItemAction(action.Action):
-    def __init__(self, item):
-        super().__init__()
-        self.item = item
+    def __init__(self, performer, target=None):
+        super().__init__(performer, target)
 
-    def prerequisite(self, owner):
+    def prerequisite(self):
         return True
 
-    def perform(self, owner):
-        old_item = owner.held_item
-        old_item.position = self.item.position
+    def perform(self):
+        old_item = self.performer.held_item
+        old_item.position = self.target.position
         old_item.remove()
         old_item.hidden = False
 
-        owner.held_item = self.item
-        self.item.remove()
-        owner.equip_held_item(self.item)
+        self.performer.held_item = self.target
+        self.target.remove()
+        self.performer.equip_held_item(self.target)
 
         if old_item and old_item.__class__.__name__ != 'Fist':
             if old_item.parent:
@@ -27,5 +26,5 @@ class EquipItemAction(action.Action):
 
             instances.scene_root.level.append(old_item)
 
-        if owner.visible:
-            instances.console.print('{} is equipping {}'.format(owner.name, self.item.name))
+        if self.performer.visible:
+            instances.console.print('{} is equipping {}'.format(self.performer.name, self.target.name))

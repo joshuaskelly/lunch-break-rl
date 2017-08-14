@@ -7,25 +7,23 @@ from entities import animation
 
 
 class ThrowAction(action.Action):
-    def __init__(self, target):
-        super().__init__()
-        self.target = target
+    def __init__(self, performer, target):
+        super().__init__(performer, target)
 
-    def prerequisite(self, owner):
-        return utils.is_next_to(owner, self.target)
+    def prerequisite(self):
+        return utils.is_next_to(self.performer, self.target)
 
-    def perform(self, owner):
-        self.owner = owner
+    def perform(self):
         thrown_entity = self.target
 
-        weapon = owner.held_item
+        weapon = self.performer.held_item
         weapon_range = 3
 
         if hasattr(weapon, 'range'):
             weapon_range = weapon.range
 
         # Determine direction of throw
-        dx, dy = utils.math.sub(thrown_entity.position, owner.position)
+        dx, dy = utils.math.sub(thrown_entity.position, self.performer.position)
         dest = thrown_entity.position
 
         # Determine destination of throw
@@ -53,13 +51,13 @@ class ThrowAction(action.Action):
                         if thrown_entity.isinstance('HeldItem'):
                             # Have player equip thrown_entity item
                             if hit_entity.isinstance('Player') and hit_entity.held_item is None:
-                                act = thrown_entity.get_action(owner)
+                                act = thrown_entity.get_action(self.performer)
                                 action_to_perform = act.perform
                                 target_entity = hit_entity
 
                             # Perform an attack roll otherwise
                             else:
-                                act = hit_entity.get_action(owner)
+                                act = hit_entity.get_action(self.performer)
                                 action_to_perform = act.perform
                                 target_entity = hit_entity
 
@@ -80,7 +78,7 @@ class ThrowAction(action.Action):
             # Cancel any pending actions
             target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
             if target_next_action:
-                target_next_action.fail(self.target)
+                target_next_action.fail()
 
         ani = animation.ThrowMotion(thrown_entity.position, dest, 0.25)
         thrown_entity.append(ani)
@@ -89,9 +87,9 @@ class ThrowAction(action.Action):
 
         def action_callback():
             if action_to_perform:
-                action_to_perform(target_entity)
+                action_to_perform()
 
-            if owner.visible:
-                instances.console.print('{} {} {}'.format(owner.name, 'throws', thrown_entity.name))
+            if self.performer.visible:
+                instances.console.print('{} {} {}'.format(self.performer.name, 'throws', thrown_entity.name))
 
         ani.on_done = action_callback

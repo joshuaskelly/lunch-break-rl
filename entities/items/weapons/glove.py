@@ -13,10 +13,10 @@ class Glove(weapon.Weapon):
         self.verb = 'throws'
         self.range = 5
 
-    def get_perform_action(self, target):
-        return throwaction.ThrowAction(target)
+    def get_perform_action(self, requester, target):
+        return throwaction.ThrowAction(requester, target)
 
-    def get_special_action(self, target):
-        return throwaction.ThrowAction(target)
+    def get_special_action(self, requester, target):
+        return throwaction.ThrowAction(requester, target)
 
 registry.Registry.register(Glove, 'weapon', 'rare')

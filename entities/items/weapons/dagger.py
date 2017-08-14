@@ -15,19 +15,17 @@ class Dagger(weapon.Weapon):
         self.name = 'dagger'
         self.verb = 'stabs'
 
-    def on_hurt(self, damage, hurt_action):
-        if hasattr(hurt_action, 'tags'):
-            if 'counter' in hurt_action.tags:
+    def on_hurt(self, damage, attack_action):
+        if hasattr(attack_action, 'tags'):
+            if 'counter' in attack_action.tags:
                 return
 
-        owner = hurt_action.target
-        attacker = hurt_action.owner
-        direction = utils.math.sub(attacker.position, owner.position)
-        counter = attackaction.AttackAction(direction)
+        direction = utils.math.sub(attack_action.performer.position, attack_action.target.position)
+        counter = attackaction.AttackAction(attack_action.target, attack_action.performer, direction)
         counter.tags = ['counter']
 
-        if counter.prerequisite(owner):
-            instances.console.print('{} counter attacks!'.format(owner.name))
-            counter.perform(owner)
+        if counter.prerequisite():
+            instances.console.print('{} counter attacks!'.format(attack_action.target.name))
+            counter.perform()
 
 registry.Registry.register(Dagger, 'weapon', 'common')

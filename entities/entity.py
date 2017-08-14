@@ -116,10 +116,10 @@ class Entity(object):
             child.parent = None
             child.position = None
 
-    def get_action(self, other=None):
+    def get_action(self, requester=None):
         """Returns an action
 
-        other: An entity that is requesting the action. Usually this is
+        requester: An entity that is requesting the action. Usually this is
             because it wants to perform an action on this entity.
 
         Returns: An Action or None

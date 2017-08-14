@@ -4,7 +4,9 @@ import inspect
 class Action(object):
     __base_classes = ()
 
-    def __init__(self):
+    def __init__(self, performer, target=None):
+        self.performer = performer
+        self.target = target
         self.parent = None
 
         if not self.__base_classes:
@@ -26,20 +28,20 @@ class Action(object):
 
         return cls in self.__base_classes
 
-    def prerequisite(self, owner):
+    def prerequisite(self):
         return True
 
-    def perform(self, owner):
+    def perform(self):
         pass
 
-    def fail(self, owner):
+    def fail(self):
         if self.parent:
-            while owner.brain.actions and owner.brain.actions[0] != self.parent:
-                owner.brain.actions.pop(0)
+            while self.performer.brain.actions and self.performer.brain.actions[0] != self.parent:
+                self.performer.brain.actions.pop(0)
 
-            if self.parent == owner.brain.actions[0]:
-                parent_action = owner.brain.actions.pop(0)
-                parent_action.fail(owner)
+            if self.parent == self.performer.brain.actions[0]:
+                parent_action = self.performer.brain.actions.pop(0)
+                parent_action.fail()
 
             else:
                 raise RuntimeError('Failed to find action parent')
@@ -47,12 +49,12 @@ class Action(object):
 
 class BatchedAction(Action):
     """A skip op action. Useful for creating hierarchical actions."""
-    def perform(self, owner):
+    def perform(self):
         # Perform the next action
-        owner.brain.perform_action()
+        self.performer.brain.perform_action()
 
 
 class IdleAction(Action):
     """A no-op action. Useful for timing."""
-    def prerequisite(self, owner):
+    def prerequisite(self):
         return True

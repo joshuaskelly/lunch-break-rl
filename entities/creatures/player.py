@@ -48,10 +48,10 @@ class Player(creature.Creature):
         if not moves:
             return
 
-        batched_move = action.BatchedAction()
+        batched_move = action.BatchedAction(self)
 
         for command in moves:
-            move_action = helpers.MoveHelper.move_to_action(command)
+            move_action = helpers.MoveHelper.move_to_action(self, command)
 
             if move_action:
                 move_action.parent = batched_move
@@ -92,10 +92,10 @@ class Player(creature.Creature):
                     moves = [helpers.DirectionHelper.get_direction(m) for m in moves if m in helpers.DirectionHelper.valid_moves]
 
                     if moves:
-                        batched_attack = action.BatchedAction()
+                        batched_attack = action.BatchedAction(self)
 
                         for attack_dir in moves:
-                            act = attackaction.AttackAction(attack_dir)
+                            act = attackaction.AttackAction(self, direction=attack_dir)
                             act.parent = batched_attack
                             self.brain.add_action(act)
 
@@ -121,7 +121,7 @@ class Player(creature.Creature):
                         target_entity = es[0]
 
                     if target_entity:
-                        act = throwaction.ThrowAction(target_entity)
+                        act = throwaction.ThrowAction(self, target_entity)
                         self.brain.actions.append(act)
                         self._has_taken_action = True
 
@@ -134,5 +134,5 @@ class Player(creature.Creature):
                 elif commands[0].upper() == '!STOP':
                     next_action = self.brain.actions[0] if self.brain.actions else None
 
-                    if next_action.isinstance('MoveAction'):
-                        next_action.fail(self)
+                    if next_action and next_action.isinstance('MoveAction'):
+                        next_action.fail()

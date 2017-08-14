@@ -9,11 +9,16 @@ class Brain(object):
     def perform_action(self):
         if self.actions:
             current_action = self.actions.pop(0)
-            if current_action.prerequisite(self.owner):
-                current_action.perform(self.owner)
+
+            # Make sure our owner is the entity actually doing the action
+            if current_action.performer is not self.owner:
+                raise RuntimeError('Performing action not as owner!')
+
+            if current_action.prerequisite():
+                current_action.perform()
 
             else:
-                current_action.fail(self.owner)
+                current_action.fail()
 
     def add_action(self, new_action):
         if new_action.isinstance('Action'):
@@ -21,4 +26,4 @@ class Brain(object):
 
     def fail_next_action(self):
         if self.actions:
-            self.actions[0].fail(self.owner)
+            self.actions[0].fail()

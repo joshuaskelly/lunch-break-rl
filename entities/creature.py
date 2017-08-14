@@ -39,15 +39,15 @@ class Creature(entity.Entity):
             target_entity = es[0]
 
             # Let special item actions override bumped entity's default action
-            action_to_perform = self.held_item.get_special_action(target_entity)
+            action_to_perform = self.held_item.get_special_action(self, target_entity)
 
             # Get bumped entity's default action
             if not action_to_perform:
                 action_to_perform = target_entity.get_action(self)
 
         # Perform the action if possible
-        if action_to_perform and action_to_perform.prerequisite(self):
-            action_to_perform.perform(self)
+        if action_to_perform and action_to_perform.prerequisite():
+            action_to_perform.perform()
 
             # Because we have bumped, cancel our move action
             next_action = self.brain.actions[0] if self.brain.actions else None
@@ -56,7 +56,7 @@ class Creature(entity.Entity):
                 next_action.isinstance('MoveAction') and \
                 next_action.parent:
 
-                next_action.fail(self)
+                next_action.fail()
 
         if target_entity and target_entity.position == dest and action_to_perform:
             return
@@ -123,12 +123,13 @@ class Creature(entity.Entity):
         self.brain.perform_action()
         self.update_fov()
 
-    def get_action(self, other=None):
-        if self.isinstance('Player') and other.isinstance('Player'):
-            return swappositionaction.SwapPositionAction(self)
+    def get_action(self, requester=None):
+        # TODO: Put this specialization into player.py?
+        if self.isinstance('Player') and requester.isinstance('Player'):
+            return swappositionaction.SwapPositionAction(requester, self)
 
-        direction = utils.math.sub(self.position, other.position)
-        return attackaction.AttackAction(direction)
+        direction = utils.math.sub(self.position, requester.position)
+        return attackaction.AttackAction(requester, self, direction)
 
     @property
     def visible_entities(self):

@@ -3,6 +3,7 @@ import palette
 
 from entities import entity
 from entities.items.weapons import pickaxe
+from entities.items.weapons import dagger
 from entities.creatures import player
 
 regular_viewers = [
@@ -42,7 +43,7 @@ class TwitchChatManager(entity.Entity):
                 if event.message.upper() == '!JOIN':
                     player_names = [e.name for e in current_scene.children if hasattr(e, 'name')]
 
-                    bonus = None
+                    bonus = dagger.Dagger()
 
                     if not event.nickname in player_names:
                         # Set player color

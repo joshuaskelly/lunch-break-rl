@@ -2,13 +2,12 @@ from ai import action
 
 
 class UseItemAction(action.Action):
-    def __init__(self, item):
-        super().__init__()
-        self.item = item
+    def __init__(self, performer, target):
+        super().__init__(performer, target)
 
-    def prerequisite(self, owner):
+    def prerequisite(self):
         return True
 
-    def perform(self, owner):
-        self.item.use(owner)
-        self.item.remove()
+    def perform(self):
+        self.target.use(self.performer)
+        self.target.remove()

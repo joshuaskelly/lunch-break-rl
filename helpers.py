@@ -48,8 +48,8 @@ class MoveHelper(object):
         return moves
 
     @staticmethod
-    def move_to_action(move):
+    def move_to_action(performer, move):
         if move in DirectionHelper.dir_map:
-            return moveaction.MoveAction(DirectionHelper.get_direction(move.upper()))
+            return moveaction.MoveAction(performer, DirectionHelper.get_direction(move.upper()))
 
         return None

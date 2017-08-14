@@ -11,10 +11,10 @@ from entities import entity
 
 
 class Item(entity.Entity):
-    def get_action(self, other=None):
+    def get_action(self, requester=None):
         pass
 
-    def get_special_action(self, target):
+    def get_special_action(self, requester, target):
         return None
 
     def on_use(self):
@@ -26,15 +26,15 @@ class HeldItem(Item):
         super().__init__(char, position, fg, bg)
         self.chance_to_break = 1 / 4
 
-    def get_action(self, other=None):
-        if other.held_item.isinstance('Fist'):
-            return equipitemaction.EquipItemAction(self)
+    def get_action(self, requester=None):
+        if requester and requester.held_item.isinstance('Fist'):
+            return equipitemaction.EquipItemAction(requester, self)
 
         return None
 
-    def get_perform_action(self, target):
+    def get_perform_action(self, requester, target):
         direction = utils.math.sub(target.position, self.position)
-        return attackaction.AttackAction(direction)
+        return attackaction.AttackAction(requester, target, direction)
 
     def on_use(self):
         if random.random() < self.chance_to_break:
@@ -47,8 +47,8 @@ class HeldItem(Item):
 
 
 class UsableItem(Item):
-    def get_action(self, other=None):
-        return useitemaction.UseItemAction(self)
+    def get_action(self, requester=None):
+        return useitemaction.UseItemAction(requester, self)
 
     def use(self, target):
         instances.console.print('{} is being used on {}'.format(self.name, target.name))

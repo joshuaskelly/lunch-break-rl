@@ -130,14 +130,14 @@ class KoboldIdleState(KoboldState):
         else:
             # Idle behavior. Wait and wander.
             if not self.brain.actions:
-                batched_action = action.BatchedAction()
+                batched_action = action.BatchedAction(self.owner)
 
                 for _ in range(random.randint(1, 3)):
-                    idle_action = action.IdleAction()
+                    idle_action = action.IdleAction(self.owner)
                     idle_action.parent = batched_action
                     self.brain.add_action(idle_action)
 
-                wander_action = wanderaction.WanderAction()
+                wander_action = wanderaction.WanderAction(self.owner)
                 wander_action.parent = batched_action
                 self.brain.add_action(wander_action)
 
@@ -161,18 +161,18 @@ class KoboldAggroState(KoboldState):
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
         self.owner.append(ani)
-        self.brain.add_action(action.IdleAction())
+        self.brain.add_action(action.IdleAction(self.owner))
 
     def on_state_exit(self, next_state):
         ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
         self.owner.append(ani)
-        self.brain.add_action(action.IdleAction())
+        self.brain.add_action(action.IdleAction(self.owner))
         self.context['threat'] = None
 
     def tick(self, tick):
         if self.owner.can_see(self.threat):
             if self.aggro_counter <= 0:
-                self.brain.add_action(movetoaction.MoveToAction(self.threat.position, self.brain.owner.sight_radius))
+                self.brain.add_action(movetoaction.MoveToAction(self.owner, self.threat.position, self.brain.owner.sight_radius))
                 self.aggro_counter = self.aggro_cooldown
 
         else:
