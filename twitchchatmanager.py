@@ -1,8 +1,10 @@
+import random
+
 import instances
 import palette
+import registry
 
 from entities import entity
-from entities.items.weapons import pickaxe
 from entities.creatures import player
 
 regular_viewers = [
@@ -25,7 +27,8 @@ regular_viewers = [
     'hawaii_beach',
     'robojester',
     'gusanolocovg',
-    'newobj'
+    'newobj',
+    'that_bluestone'
 ]
 
 
@@ -48,7 +51,7 @@ class TwitchChatManager(entity.Entity):
                         # Set player color
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
                             player_color = palette.BRIGHT_BLUE
-                            bonus = pickaxe.PickAxe()
+                            bonus = random.choice(registry.Registry.get('weapon', 'uncommon'))()
 
                         elif event.nickname.lower() in regular_viewers:
                             player_color = palette.BRIGHT_RED

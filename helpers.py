@@ -5,6 +5,7 @@ from ai.actions import moveaction
 
 class DirectionHelper(object):
     valid_moves = 'u', 'd', 'l', 'r', 'U', 'D', 'L', 'R'
+    directions = (1, 0), (0, 1), (-1, 0), (0, -1)
     dir_map = {
         (1, 0): 'R',
         (0, 1): 'D',

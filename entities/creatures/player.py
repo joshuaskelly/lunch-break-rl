@@ -95,7 +95,8 @@ class Player(creature.Creature):
                         batched_attack = action.BatchedAction(self)
 
                         for attack_dir in moves:
-                            act = attackaction.AttackAction(self, direction=attack_dir)
+                            #act = attackaction.AttackAction(self, direction=attack_dir)
+                            act = self.weapon.Action(self, direction=attack_dir)
                             act.parent = batched_attack
                             self.brain.add_action(act)
 

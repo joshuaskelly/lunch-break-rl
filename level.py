@@ -1,6 +1,7 @@
 import tdl
 
 import game
+import instances
 import palette
 import utils
 
@@ -17,6 +18,10 @@ class LevelEntity(entity.Entity):
     def on_attacked(self, action):
         if action.performer.weapon.name == 'pick axe':
             self.level.draw_char(self.position[0], self.position[1], '.')
+            instances.console.print('{} destroys the wall'.format(action.performer.display_string))
+
+        else:
+            instances.console.print('{} {} the wall'.format(action.performer.display_string, action.performer.weapon.verb))
 
 
 class Level(entity.Entity):

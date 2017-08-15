@@ -138,10 +138,10 @@ def generate_level(width, height):
 
             elif random.random() < 1 / 70:
                 rarity = 'common'
-                if random.random() < 1 / 100 and registry.Registry.get('weapon', 'rare'):
+                if random.random() < 1 / 50 and registry.Registry.get('weapon', 'rare'):
                     rarity = 'rare'
 
-                elif random.random() < 1 / 3 and registry.Registry.get('weapon', 'uncommon'):
+                elif random.random() < 1 / 15 and registry.Registry.get('weapon', 'uncommon'):
                     rarity = 'uncommon'
 
                 weapon_classes = registry.Registry.get('weapon', rarity)
@@ -153,10 +153,10 @@ def generate_level(width, height):
 
             elif random.random() < 1 / 70:
                 rarity = 'common'
-                if random.random() < 1 / 100 and registry.Registry.get('item', 'rare'):
+                if random.random() < 1 / 50 and registry.Registry.get('item', 'rare'):
                     rarity = 'rare'
 
-                elif random.random() < 1 / 3 and registry.Registry.get('item', 'uncommon'):
+                elif random.random() < 1 / 15 and registry.Registry.get('item', 'uncommon'):
                     rarity = 'uncommon'
 
                 item_classes = registry.Registry.get('item', rarity)
