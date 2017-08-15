@@ -36,9 +36,12 @@ class DefaultCounterWeaponState(weapon.WeaponState):
 
     def after_attacked(self, action):
         if random.random() <= self.counter_chance:
-            instances.console.print('{} counters {}\'s attack!'.format(action.target.display_string,
-                                                                       action.performer.display_string))
             counter = action.target.weapon.Action(performer=action.target,
                                                   target=action.performer)
-            action.target.brain.actions.append(counter)
-            action.target.brain.perform_action()
+
+            if counter.prerequisite():
+                instances.console.print('{} counters {}\'s attack!'.format(action.target.display_string,
+                                                                           action.performer.display_string))
+                
+                action.target.brain.actions.append(counter)
+                action.target.brain.perform_action()
