@@ -45,6 +45,9 @@ class LevelScene(scene.Scene):
     def handle_events(self, event):
         super().handle_events(event)
 
+        if game.Game.args.debug and event.type == 'KEYDOWN' and event.char.upper() == 'G':
+            self.init_scene()
+
     def draw(self, console):
         self.console.clear()
 
@@ -82,8 +85,8 @@ class LevelScene(scene.Scene):
         # Place players near stair
         for p in self.players:
             if p.state == 'EXITED':
-                p.max_health += health_bonus
-                p.current_health += health_bonus
+                # Overheal exited players up to 2x max health
+                p.current_health = min(p.current_health + health_bonus, p.max_health * 2)
 
             p.brain.actions = []
             p.visible_tiles = set()

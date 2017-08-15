@@ -39,9 +39,8 @@ class StairsDown(Stairs):
                 return self.performer.isinstance('Player')
 
             def perform(self):
-                self.performer.current_health = self.performer.max_health
                 self.performer.state = 'EXITED'
-                self.performer.position = -1, -1
+                self.performer.position = -2, -2
 
                 # Start a countdown timer
                 instances.scene_root.change_level()

@@ -1,7 +1,7 @@
 import instances
 import palette
 
-from ui import progressbar
+from ui import healthbar
 from ui import window
 
 
@@ -25,7 +25,7 @@ class EntitiesWindow(window.Window):
                 row += 1
 
                 if hasattr(e, 'max_health') and hasattr(e, 'current_health'):
-                    pb = progressbar.ProgressBar(1, row, self.width - 3, e.max_health, palette.BRIGHT_RED)
+                    pb = healthbar.HealthBar(1, row, self.width - 3, e)
                     pb.current_value = e.current_health
                     pb.draw(self.data)
 

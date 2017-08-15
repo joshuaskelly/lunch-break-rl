@@ -15,7 +15,7 @@ class ProgressBar(entity.Entity):
 
     def draw(self, console):
         bar_width = int(self.current_value / self.max_value * self.width)
-        v = '{}/{}'.format(int(self.current_value), self.max_value)
+        v = ' {}/{}'.format(int(self.current_value), self.max_value)
         
         for i in range(self.width):
             c = ' '

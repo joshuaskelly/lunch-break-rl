@@ -1,7 +1,7 @@
 import instances
 import palette
 
-from ui import progressbar
+from ui import healthbar
 from ui import window
 
 
@@ -22,7 +22,7 @@ class PlayerWindow(window.Window):
 
             self.data.draw_str(1, row, entity.name[:self.width - 2], fg=entity.fg)
 
-            pb = progressbar.ProgressBar(1, row + 1, self.width - 3, entity.max_health, palette.BRIGHT_RED)
+            pb = healthbar.HealthBar(1, row + 1, self.width - 3, entity)
             pb.current_value = entity.current_health
             pb.draw(self.data)
             
