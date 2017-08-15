@@ -48,8 +48,12 @@ class LevelScene(scene.Scene):
     def draw(self, console):
         self.console.clear()
 
-        # Draw items and creatures
-        for e in [n for n in self.children if not n.isinstance('Player')]:
+        # Draw items
+        for e in [n for n in self.children if not n.isinstance('Player') and not n.isinstance('Creature')]:
+            e.draw(self.console)
+
+        # Draw creatures
+        for e in [n for n in self.children if not n.isinstance('Player') and n.isinstance('Creature')]:
             e.draw(self.console)
 
         # Draw players
