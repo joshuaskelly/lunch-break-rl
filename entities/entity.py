@@ -12,7 +12,7 @@ class Entity(object):
         self.position = position
         self.fg = fg
         self.bg = bg
-        self.name = self.__class__.__name__
+        self.name = self.__class__.__name__.lower()
         self._children = []
         self.hidden = False
         self.always_show = False
@@ -154,10 +154,17 @@ class Entity(object):
         """Determines if target will allow attack"""
         return True
 
-    def on_attack(self, action):
+    def before_attacked(self, action):
+        """Called on target before attack occurs"""
+
+    def on_attacked(self, action):
         """Called on target to handle being attacked"""
-        pass
+
+    def after_attacked(self, action):
+        """Called on target after attack has occurred"""
+
+    def before_attack(self, action):
+        """Called on performer before attack occurs"""
 
     def after_attack(self, action):
-        """Called on target after attack has occurred"""
-        pass
+        """Called on performer after attack has occurred"""

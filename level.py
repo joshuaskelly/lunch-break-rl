@@ -14,7 +14,7 @@ class LevelEntity(entity.Entity):
         self.name = 'wall'
         self.level = level
 
-    def on_attack(self, action):
+    def on_attacked(self, action):
         if action.performer.weapon.name == 'pick axe':
             self.level.draw_char(self.position[0], self.position[1], '.')
 

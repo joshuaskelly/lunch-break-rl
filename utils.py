@@ -51,6 +51,10 @@ class math(object):
         return lhs[0] - rhs[0], lhs[1] - rhs[1]
 
     @staticmethod
+    def mul(vector, scalar):
+        return vector[0] * scalar, vector[1] * scalar
+
+    @staticmethod
     def distance(lhs, rhs):
         d = math.sub(lhs, rhs)
         return sqrt(d[0] ** 2 + d[1] ** 2)

@@ -1,3 +1,5 @@
+import tdl
+
 import instances
 import utils
 
@@ -14,16 +16,22 @@ class AttackAction(action.Action):
         self.direction = direction
 
     def prerequisite(self):
-        # TODO: Fix directional attacking
-        target_pos = utils.math.add(self.performer.position, self.direction)
-        entities = instances.scene_root.get_entity_at(*target_pos)
+        p1 = utils.math.add(self.performer.position, self.direction)
+        p2 = utils.math.mul(self.direction, self.performer.weapon.range - 1)
+        p2 = utils.math.add(p1, p2)
+
+        entities = instances.scene_root.get_entities_along_path(*p1, *p2)
+
         self.target = entities[0] if entities else None
 
         return self.performer.can_attack(self.target) and self.target.allow_attack(self)
 
     def perform(self):
-        self.target.on_attack(self)
-        self.target.after_attack(self)
+        self.performer.before_attack(self)
+        self.target.before_attacked(self)
+        self.target.on_attacked(self)
+        self.performer.after_attack(self)
+        self.target.after_attacked(self)
 
         # TODO: When to call this?
         #self.weapon.on_use()
@@ -38,10 +46,11 @@ class AttackActionInterface(object):
         """Determines if target will allow attack"""
         return True
 
-    def on_attack(self, action):
-        """Called on target to handle being attacked"""
-        pass
+    def before_attacked(self, action):
+        """Called on target before attack occurs"""
 
-    def after_attack(self, action):
+    def on_attacked(self, action):
+        """Called on target to handle being attacked"""
+
+    def after_attacked(self, action):
         """Called on target after attack has occurred"""
-        pass

@@ -94,13 +94,13 @@ class Creature(entity.Entity):
         self.append(new_item)
 
     def drop_weapon(self):
-        if self.weapon.__class__.__name__ != 'Fist':
+        if not self.weapon.isinstance('Fist'):
             i = self.weapon
             i.remove()
             i.hidden = False
             i.position = self.position
             instances.scene_root.append(i)
-            self.weapon = fist.Fist()
+            self.equip_weapon(fist.Fist())
             instances.console.print('{} drops {}'.format(self.display_string, i.display_string))
 
     def die(self):
@@ -151,9 +151,13 @@ class Creature(entity.Entity):
         """Determines if target will allow attack"""
         return self.weapon.state.allow_attack(action)
 
-    def on_attack(self, action):
+    def before_attacked(self, action):
+        """Called on target before attack occurs"""
+        self.weapon.state.before_attacked(action)
+
+    def on_attacked(self, action):
         """Called on target to handle being attacked"""
-        self.weapon.state.on_attack(action)
+        self.weapon.state.on_attacked(action)
 
         damage_dealt = action.performer.weapon.damage
         verb = action.performer.weapon.verb
@@ -169,6 +173,14 @@ class Creature(entity.Entity):
             # Put held_item logic here?
             pass
 
-    def after_attack(self, action):
+    def after_attacked(self, action):
         """Called on target after attack has occurred"""
+        self.weapon.state.after_attacked(action)
+
+    def before_attack(self, action):
+        """Called on performer before attack occurs"""
+        self.weapon.state.before_attack(action)
+
+    def after_attack(self, action):
+        """Called on performer after attack has occurred"""
         self.weapon.state.after_attack(action)

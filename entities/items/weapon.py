@@ -36,7 +36,16 @@ class WeaponState(attackaction.AttackActionInterface):
     def allow_attack(self, action):
         return True
 
-    def on_attack(self, action):
+    def before_attacked(self, action):
+        pass
+
+    def on_attacked(self, action):
+        pass
+
+    def after_attacked(self, action):
+        pass
+
+    def before_attack(self, action):
         pass
 
     def after_attack(self, action):

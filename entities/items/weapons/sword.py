@@ -33,7 +33,7 @@ class DefaultParryWeaponState(weapon.WeaponState):
         return 0
 
     def allow_attack(self, action):
-        if random.random() < self.parry_chance:
+        if random.random() <= self.parry_chance:
             ani = animation.FlashBackground(bg=palette.BRIGHT_YELLOW)
             self.weapon.parent.append(ani)
 

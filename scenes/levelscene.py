@@ -1,5 +1,7 @@
 import random
 
+import tdl
+
 import dungeongenerator
 import game
 import instances
@@ -114,6 +116,14 @@ class LevelScene(scene.Scene):
                 result.append(level.LevelEntity((x, y), self.level))
 
         return result
+
+    def get_entities(self, coords):
+        g = self.get_entity_at
+        return [entity for entity_sublist in [g(*pos) for pos in coords] for entity in entity_sublist if entity]
+
+    def get_entities_along_path(self, x1, y1, x2, y2):
+        coords = tdl.map.bresenham(x1, y1, x2, y2)
+        return self.get_entities(coords)
 
     def check_visibility(self, x, y):
         return (x, y) in self.level.visible_tiles

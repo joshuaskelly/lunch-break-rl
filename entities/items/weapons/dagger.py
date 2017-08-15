@@ -34,8 +34,8 @@ class DefaultCounterWeaponState(weapon.WeaponState):
     def allow_attack(self, action):
         return True
 
-    def after_attack(self, action):
-        if random.random() < self.counter_chance:
+    def after_attacked(self, action):
+        if random.random() <= self.counter_chance:
             instances.console.print('{} counters {}\'s attack!'.format(action.target.display_string,
                                                                        action.performer.display_string))
             counter = action.target.weapon.Action(performer=action.target,
