@@ -16,7 +16,7 @@ from entities.items.weapons import dagger
 
 
 class Kobold(creature.Creature):
-    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=(0, 0, 0)):
+    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.name = 'kobold'
         self.brain = KoboldBrain(self)

@@ -13,7 +13,7 @@ from entities.items import weapon
 
 
 class BattleAxe(weapon.Weapon):
-    def __init__(self, char='b', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='b', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.damage = 6
         self.total_damage = 6

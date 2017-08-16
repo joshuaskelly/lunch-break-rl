@@ -5,7 +5,7 @@ from entities.items import weapon
 
 
 class PickAxe(weapon.Weapon):
-    def __init__(self, char='p', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='p', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
 
         self.damage = 2

@@ -109,7 +109,7 @@ class Level(entity.Entity):
 
         return 0
 
-    def draw_char(self, x, y, char, fg=(255, 255, 255), bg=(0, 0, 0)):
+    def draw_char(self, x, y, char, fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         self.data.draw_char(x, y, char, fg, bg)
 
     def get_char(self, x, y):

@@ -1,6 +1,8 @@
 import tdl
 
 import instances
+import palette
+
 from entities import entity
 
 
@@ -13,7 +15,7 @@ class Animation(entity.Entity):
 
 
 class FlashBackground(Animation):
-    def __init__(self, bg=(255, 255, 255), interval=0.25, repeat=2):
+    def __init__(self, bg=palette.BLACK, interval=0.25, repeat=2):
         super().__init__()
 
         self.time = 0
@@ -50,7 +52,7 @@ class FlashBackground(Animation):
 
 
 class Flash(Animation):
-    def __init__(self, char, fg=(255, 255, 255), bg=(0, 0, 0), interval=0.25, repeat=2):
+    def __init__(self, char, fg=palette.BRIGHT_WHITE, bg=palette.BLACK, interval=0.25, repeat=2):
         super().__init__()
 
         self.time = 0

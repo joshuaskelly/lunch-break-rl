@@ -1,6 +1,7 @@
 import random
 
 import instances
+import palette
 import utils
 
 from ai.actions import attackaction
@@ -22,7 +23,7 @@ class Item(entity.Entity):
 
 
 class HeldItem(Item):
-    def __init__(self, char, position=(0, 0), fg=(255, 255, 255),  bg=(0, 0, 0)):
+    def __init__(self, char, position=(0, 0), fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.chance_to_break = 1 / 4
 

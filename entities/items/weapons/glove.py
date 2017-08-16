@@ -6,7 +6,7 @@ from entities.items import weapon
 
 
 class Glove(weapon.Weapon):
-    def __init__(self, char='g', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='g', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
 
         self.name = 'glove'

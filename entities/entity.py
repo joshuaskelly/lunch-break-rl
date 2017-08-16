@@ -1,13 +1,14 @@
 import inspect
 
 import instances
+import palette
 import utils
 
 
 class Entity(object):
     __base_classes = ()
 
-    def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
+    def __init__(self, char, position=(0, 0), fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         self.position = position
         self.char = char
         self.fg = fg

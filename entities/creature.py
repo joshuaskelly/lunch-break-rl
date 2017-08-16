@@ -13,7 +13,7 @@ from entities.items.weapons import fist
 
 
 class Creature(entity.Entity):
-    def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
+    def __init__(self, char, position=(0, 0), fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.brain = brain.Brain(self)
         self.name = 'Creature'

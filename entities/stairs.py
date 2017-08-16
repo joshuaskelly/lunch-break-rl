@@ -6,7 +6,7 @@ from entities import entity
 
 
 class Stairs(entity.Entity):
-    def __init__(self, char='<', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='<', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.dark_fg = palette.YELLOW
         self.name = 'Up'
@@ -25,7 +25,7 @@ class Stairs(entity.Entity):
 
 
 class StairsDown(Stairs):
-    def __init__(self, char='>', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='>', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.dark_fg = palette.YELLOW
         self.name = 'Down'

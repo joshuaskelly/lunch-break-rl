@@ -8,7 +8,7 @@ from entities.items import weapon
 
 
 class Dagger(weapon.Weapon):
-    def __init__(self, char='d', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='d', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.state = DefaultCounterWeaponState(self)
         self.damage = 2

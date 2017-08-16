@@ -9,7 +9,7 @@ from entities.items import weapon
 
 
 class Sword(weapon.Weapon):
-    def __init__(self, char='s', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=(0, 0, 0)):
+    def __init__(self, char='s', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.state = DefaultParryWeaponState(self)
         self.damage = 3
