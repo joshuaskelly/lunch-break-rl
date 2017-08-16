@@ -1,8 +1,5 @@
-import random
-
 import helpers
 import instances
-import palette
 import registry
 import utils
 
@@ -13,8 +10,8 @@ from entities.items import weapon
 
 
 class BattleAxe(weapon.Weapon):
-    def __init__(self, char='b', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='b', position=(0, 0)):
+        super().__init__(char, position)
         self.damage = 6
         self.total_damage = 6
         self.name = 'battle axe'

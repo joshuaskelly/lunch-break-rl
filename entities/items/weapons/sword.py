@@ -9,8 +9,8 @@ from entities.items import weapon
 
 
 class Sword(weapon.Weapon):
-    def __init__(self, char='s', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='s', position=(0, 0)):
+        super().__init__(char, position)
         self.state = DefaultParryWeaponState(self)
         self.damage = 3
         self.name = 'sword'

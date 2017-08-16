@@ -1,15 +1,14 @@
 import random
 
 import instances
-import palette
 import registry
 
 from entities.items import weapon
 
 
 class Dagger(weapon.Weapon):
-    def __init__(self, char='d', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='d', position=(0, 0)):
+        super().__init__(char, position)
         self.state = DefaultCounterWeaponState(self)
         self.damage = 2
         self.name = 'dagger'

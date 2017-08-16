@@ -1,15 +1,14 @@
 import random
 
 import instances
-import palette
 import registry
 
 from entities.items import weapon
 
 
 class Whip(weapon.Weapon):
-    def __init__(self, char='w', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='w', position=(0, 0)):
+        super().__init__(char, position)
         self.state = DefaultDisarmWeaponState(self)
         self.damage = 2
         self.range = 2

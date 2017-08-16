@@ -1,4 +1,3 @@
-import palette
 import registry
 
 from ai.actions import throwaction
@@ -6,8 +5,8 @@ from entities.items import weapon
 
 
 class Glove(weapon.Weapon):
-    def __init__(self, char='g', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='g', position=(0, 0)):
+        super().__init__(char, position)
 
         self.name = 'glove'
         self.verb = 'throws'

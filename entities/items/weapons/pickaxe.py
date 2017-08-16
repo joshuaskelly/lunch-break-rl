@@ -1,12 +1,11 @@
-import palette
 import registry
 
 from entities.items import weapon
 
 
 class PickAxe(weapon.Weapon):
-    def __init__(self, char='p', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='p', position=(0, 0)):
+        super().__init__(char, position)
 
         self.damage = 2
         self.name = 'pick axe'
