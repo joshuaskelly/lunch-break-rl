@@ -86,7 +86,7 @@ class Creature(entity.Entity):
             return
 
         x, y = self.position
-        self.visible_tiles = tdl.map.quick_fov(x, y, instances.scene_root.check_collision, radius=self.sight_radius)
+        self.visible_tiles = tdl.map.quick_fov(x, y, lambda x, y: not instances.scene_root.is_visibility_blocked(x, y), radius=self.sight_radius)
 
     def equip_weapon(self, new_item):
         self.weapon = new_item

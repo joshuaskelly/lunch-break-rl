@@ -8,20 +8,8 @@ from entities import entity
 class Stairs(entity.Entity):
     def __init__(self, char='<', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
-        self.dark_fg = palette.YELLOW
+        self.fog_color = palette.YELLOW
         self.name = 'Up'
-
-    def draw(self, console):
-        level = instances.scene_root.level
-
-        if self.visible:
-            console.draw_char(*self.offset, self.char, self.fg, self.bg)
-
-        elif self.position in level.seen_tiles:
-            console.draw_char(*self.offset, self.char, self.dark_fg, self.bg)
-
-        for child in self.children:
-            child.draw(console)
 
 
 class StairsDown(Stairs):

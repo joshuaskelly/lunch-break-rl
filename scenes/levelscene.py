@@ -109,6 +109,14 @@ class LevelScene(scene.Scene):
 
         return char == ord(' ') or char == ord('.')
 
+    def is_visibility_blocked(self, x, y):
+        """Returns True if visibility is blocked at the given coord."""
+        blockers = [c for c in self.children if c.blocks_visibility and c.position == (x, y)]
+        if blockers:
+            return True
+
+        return not self.check_collision(x, y)
+
     def is_solid(self, x, y):
         return not self.check_collision(x, y)
 
@@ -136,6 +144,7 @@ class LevelScene(scene.Scene):
         return self.get_entities(coords)
 
     def check_visibility(self, x, y):
+        """Returns true if given coordinate is in the player visible tiles"""
         return (x, y) in self.level.visible_tiles
 
     @property

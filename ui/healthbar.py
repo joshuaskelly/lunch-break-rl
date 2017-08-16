@@ -33,6 +33,9 @@ class HealthBar(entity.Entity):
         else:
             self.color = palette.BRIGHT_RED
 
+        if percentage > 0 and bar_width == 0:
+            bar_width = 1
+
         for i in range(self.width):
             c = ' '
             if i < len(display_text) and self.show_text:

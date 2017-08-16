@@ -18,6 +18,8 @@ class Entity(object):
         self.hidden = False
         self.always_show = False
         self.parent = None
+        self.blocks_visibility = False
+        self.fog_color = None
 
         if not self.__base_classes:
             self.__base_classes = tuple([c.__name__ for c in inspect.getmro(self.__class__) if c is not object])
@@ -75,6 +77,9 @@ class Entity(object):
     def draw(self, console):
         if self.visible:
             console.draw_char(*self.offset, self.char, self.fg, self.bg)
+
+        elif self.fog_color and  self.position in instances.scene_root.level.seen_tiles:
+            console.draw_char(*self.offset, self.char, self.fog_color, self.bg)
 
         for child in self.children:
             child.draw(console)

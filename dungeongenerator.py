@@ -2,6 +2,7 @@ import random
 
 import tdl
 
+import helpers
 import level
 import palette
 import registry
@@ -9,6 +10,7 @@ import utils
 
 from data import room_templates
 from entities import creatures
+from entities import door
 from entities import items
 from entities import stairs
 
@@ -134,14 +136,31 @@ def generate_level(width, height):
         '.': palette.BRIGHT_BLACK
     }
 
+    #temp_level = new_level.data.__copy__()
+
     # Colorize tiles
     for x, y in new_level.data:
         char, fg, bg = new_level.data.get_char(x, y)
+
+        if chr(char) == '+':
+            char = ord('.')
+
+            coords = helpers.DirectionHelper.directions
+            coords = [utils.math.add(c, (x, y)) for c in coords]
+            chars = [new_level.data.get_char(*c)[0] for c in coords if c in new_level.data]
+
+            if ord('+') not in chars:
+                d = door.Door(position=(x, y))
+                new_entities.append(d)
+
         fg = color_table.get(chr(char))
         if not fg:
             fg = palette.WHITE
 
         new_level.data.draw_char(x, y, char, fg, bg)
+
+    #new_level.data.blit(temp_level)
+    #temp_level.clear()
 
     # Placing Entities
     for (x, y) in new_level.data:
