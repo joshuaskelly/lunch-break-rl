@@ -3,8 +3,10 @@ import random
 import tdl
 
 import level
+import palette
 import registry
 import utils
+
 from data import room_templates
 from entities import creatures
 from entities import items
@@ -125,6 +127,21 @@ def generate_level(width, height):
 
             ent = stairs.StairsDown(position=coord)
             new_entities.append(ent)
+
+    color_table = {
+        '#': palette.WHITE,
+        'X': palette.get_nearest((171, 82, 54)),
+        '.': palette.BRIGHT_BLACK
+    }
+
+    # Colorize tiles
+    for x, y in new_level.data:
+        char, fg, bg = new_level.data.get_char(x, y)
+        fg = color_table.get(chr(char))
+        if not fg:
+            fg = palette.WHITE
+
+        new_level.data.draw_char(x, y, char, fg, bg)
 
     # Placing Entities
     for (x, y) in new_level.data:

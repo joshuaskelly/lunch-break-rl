@@ -112,6 +112,9 @@ class LevelScene(scene.Scene):
     def is_solid(self, x, y):
         return not self.check_collision(x, y)
 
+    def get_level_entity_at(self, x, y):
+        return level.LevelEntity((x, y), self.level)
+
     def get_entity_at(self, x, y):
         result = []
         for e in self.children:
@@ -183,6 +186,11 @@ class LevelScene(scene.Scene):
             self.level.visible_tiles = self.level.visible_tiles.union(p.visible_tiles)
             self.level.seen_tiles = self.level.seen_tiles.union(p.visible_tiles)
 
-        if game.Game.args.no_fog_of_war:
+        if game.Game.args.debug:
+            for e in [c for c in self.children if c.isinstance('Creature')]:
+                self.level.visible_tiles = self.level.visible_tiles.union(e.visible_tiles)
+                self.level.seen_tiles = self.level.seen_tiles.union(e.visible_tiles)
+
+        if game.Game.args.no_fog:
             self.level.visible_tiles = self.level.visible_tiles.union([(v[0], v[1]) for v in self.level.data])
             self.level.seen_tiles = self.level.seen_tiles.union([(s[0], s[1]) for s in self.level.data])

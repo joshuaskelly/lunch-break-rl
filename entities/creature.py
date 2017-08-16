@@ -108,12 +108,19 @@ class Creature(entity.Entity):
         instances.console.print('{} perishes!'.format(self.display_string))
         self.remove()
 
+    def make_blood_trail(self):
+        level_entity = instances.scene_root.get_level_entity_at(*self.position)
+        level_entity.fg = palette.BRIGHT_RED
+
     def tick(self, tick):
         super().tick(tick)
 
         self.brain.tick(tick)
         self.brain.perform_action()
         self.update_fov()
+
+        if self.current_health == 1 and self.max_health > 1:
+            self.make_blood_trail()
 
     def get_action(self, requester=None):
         # TODO: Put this specialization into player.py?
@@ -166,8 +173,12 @@ class Creature(entity.Entity):
             instances.console.print('{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
 
         self.current_health -= damage_dealt
-        ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
-        self.append(ani)
+
+        if damage_dealt > 0:
+            ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
+            self.append(ani)
+
+            self.make_blood_trail()
 
         if self.current_health > 0:
             # Put held_item logic here?

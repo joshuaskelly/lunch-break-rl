@@ -10,10 +10,58 @@ from entities import entity
 
 class LevelEntity(entity.Entity):
     def __init__(self, position, level):
+        self.is_initing = True
+        self.__cache = None
         char, fg, bg = level.get_char(*position)
+        self.level = level
         super().__init__(char, position, fg, bg)
         self.name = 'wall'
-        self.level = level
+        self.is_initing = False
+
+    @property
+    def char(self):
+        char, _, _ = self._get_char(*self.position)
+        self.__cache = None
+        return char
+
+    @char.setter
+    def char(self, char):
+        if self.is_initing:
+            return
+
+        self.level.draw_char(*self.position, char, self.fg, self.bg)
+        self.__cache = None
+
+    @property
+    def fg(self):
+        _, fg, _ = self._get_char(*self.position)
+        self.__cache = None
+        return fg
+
+    @fg.setter
+    def fg(self, fg):
+        if self.is_initing:
+            return
+
+        self.level.draw_char(*self.position, self.char, fg, self.bg)
+        self.__cache = None
+
+    @property
+    def bg(self):
+        _, _, bg = self._get_char(*self.position)
+        self.__cache = None
+        return bg
+
+    @bg.setter
+    def bg(self, bg):
+        self.level.draw_char(*self.position, self.char, self.fg, bg)
+        self.__cache = None
+
+    def _get_char(self, x, y):
+        if not self.__cache:
+            self.__cache = self.level.get_char(x, y)
+
+        return self.__cache
 
     def on_attacked(self, action):
         if action.performer.weapon.name == 'pick axe':
@@ -71,12 +119,14 @@ class Level(entity.Entity):
         for x, y in self.data:
             ch, fg, bg = self.data.get_char(x, y)
 
-            if (x, y) in self.seen_tiles or game.Game.args.no_fog_of_war == 'true':
+            if (x, y) in self.seen_tiles or game.Game.args.no_fog == 'true':
                 if (x, y) in self.visible_tiles:
-                    fg = palette.WHITE
+                    pass
+                    #fg = palette.WHITE
+                    #fg = color_table[chr(ch)][True]
 
                 else:
-                    fg = palette.BRIGHT_BLACK
+                    fg = palette.get_nearest((95, 87, 79))
 
                 ox, oy = utils.math.add(self.position, (x, y))
                 console.draw_char(ox, oy, ch, fg, bg)

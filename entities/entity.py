@@ -8,8 +8,8 @@ class Entity(object):
     __base_classes = ()
 
     def __init__(self, char, position=(0, 0), fg=(255, 255, 255), bg=(0, 0, 0)):
-        self.char = char
         self.position = position
+        self.char = char
         self.fg = fg
         self.bg = bg
         self.name = self.__class__.__name__.lower()
