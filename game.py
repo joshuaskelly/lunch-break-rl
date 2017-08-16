@@ -49,7 +49,7 @@ class Game(object):
         tick_count = 0
         timer = 0
         last_time = 0
-        seconds_per_tick = int(Game.config['GAME']['turn'])
+        seconds_per_tick = float(Game.config['GAME']['turn'])
 
         running = True
         while running:

@@ -16,7 +16,7 @@ class GameScene(scene.Scene):
         super().__init__(x, y, width, height)
 
         self.level_scene = None
-        self.seconds_per_tick = int(game.Game.args.turn) if game.Game.args.turn else 2
+        self.seconds_per_tick = float(game.Game.config['GAME']['turn'])
 
         # Singleton-ish
         if not GameScene.instance:
