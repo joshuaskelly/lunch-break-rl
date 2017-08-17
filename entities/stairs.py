@@ -11,6 +11,9 @@ class Stairs(entity.Entity):
         self.fog_color = palette.YELLOW
         self.name = 'Up'
 
+    def allow_throw(self, action):
+        return False
+
 
 class StairsDown(Stairs):
     def __init__(self, char='>', position=(0, 0), fg=palette.BRIGHT_YELLOW, bg=palette.BLACK):

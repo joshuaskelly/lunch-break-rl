@@ -12,6 +12,7 @@ class Whip(weapon.Weapon):
         self.state = DefaultDisarmWeaponState(self)
         self.damage = 2
         self.range = 2
+        self.name = 'whip'
         self.verb = 'whips'
         self.disarm_chance = 1 / 2
 

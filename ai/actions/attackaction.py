@@ -38,7 +38,7 @@ class AttackAction(action.Action):
 
 
 class AttackActionInterface(object):
-    def can_attack(self, other):
+    def can_attack(self, target):
         """Determines if performer can attack target"""
         return True
 

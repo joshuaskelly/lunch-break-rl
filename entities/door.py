@@ -9,3 +9,6 @@ class Door(entity.Entity):
         super().__init__(char, position, fg=palette.get_nearest((171, 82, 54)))
         self.blocks_visibility = True
         self.fog_color = palette.get_nearest((95, 87, 79))
+
+    def allow_throw(self, action):
+        return False

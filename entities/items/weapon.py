@@ -11,7 +11,6 @@ class Weapon(item.HeldItem):
         self.state = WeaponState(self)
         self.damage = 3
         self.range = 1
-        self.name = 'weapon'
         self.verb = 'hits'
 
     def in_range(self, target):

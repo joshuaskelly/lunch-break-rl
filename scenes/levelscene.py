@@ -91,6 +91,7 @@ class LevelScene(scene.Scene):
             p.brain.actions = []
             p.visible_tiles = set()
             p.state = 'NORMAL'
+            p.brain.fail_next_action()
             p.position = self.get_location_near_stairs()
 
         self.children.append(twitchchatmanager.TwitchChatManager())
@@ -132,6 +133,17 @@ class LevelScene(scene.Scene):
         if not result:
             if self.is_solid(x, y):
                 result.append(level.LevelEntity((x, y), self.level))
+
+        def sort_ents(ent):
+            if ent.isinstance('Creature'):
+                return 2
+
+            elif ent.isinstance('Player'):
+                return 1
+
+            return 0
+
+        result.sort(key=sort_ents, reverse=True)
 
         return result
 

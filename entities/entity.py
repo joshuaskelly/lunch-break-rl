@@ -149,6 +149,7 @@ class Entity(object):
 
         return self.offset in instances.scene_root.level.visible_tiles
 
+    # Implements AttackActionInterface
     def can_attack(self, target):
         """Determines if performer can attack target
 
@@ -174,3 +175,12 @@ class Entity(object):
 
     def after_attack(self, action):
         """Called on performer after attack has occurred"""
+
+    #Implements ThrowActionInterface
+    def can_throw(self, target):
+        """Determine if performer can throw target"""
+        return True
+
+    def allow_throw(self, action):
+        """Determine if target allows throw"""
+        return True

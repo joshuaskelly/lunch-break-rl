@@ -11,32 +11,23 @@ class ThrowAction(action.Action):
         super().__init__(performer, target)
 
     def prerequisite(self):
-        return utils.is_next_to(self.performer, self.target)
+        return self.performer.can_throw(self.target) and \
+               self.target.allow_throw(self) and \
+               utils.is_next_to(self.performer, self.target)
 
     def perform(self):
-        thrown_entity = self.target
-
         weapon = self.performer.weapon
-        weapon_range = 3
+        throw_distance = 3
 
         if hasattr(weapon, 'throw_distance'):
-            weapon_range = weapon.throw_distance
+            throw_distance = weapon.throw_distance
 
-        # Determine direction of throw
-        dx, dy = utils.math.sub(thrown_entity.position, self.performer.position)
-        dest = thrown_entity.position
+        throw_direction = utils.math.sub(self.target.position, self.performer.position)
+        dest = utils.math.add(self.target.position, utils.math.mul(throw_direction, throw_distance))
 
-        # Determine destination of throw
-        if dx != 0:
-            dest = dest[0] + dx * weapon_range, dest[1]
-
-        elif dy != 0:
-            dest = dest[0], dest[1] + dy * weapon_range
-
-        path = tdl.map.bresenham(*thrown_entity.position, *dest)
-        dest = thrown_entity.position
+        path = tdl.map.bresenham(*self.target.position, *dest)
+        dest = self.target.position
         action_to_perform = None
-        target_entity = None
 
         current_scene = instances.scene_root
         done = False
@@ -48,49 +39,45 @@ class ThrowAction(action.Action):
             if entities:
                 for hit_entity in entities:
                     if hit_entity.isinstance('Creature'):
-                        if thrown_entity.isinstance('HeldItem'):
-                            # Have player equip thrown_entity item
-                            # TODO: Fix the below as it will never be True
-                            if hit_entity.isinstance('Player') and hit_entity.weapon is None:
-                                act = thrown_entity.get_action(self.performer)
-                                action_to_perform = act.perform
-                                target_entity = hit_entity
+                        if self.target.isinstance('HeldItem'):
+                            act = hit_entity.get_action(self.performer)
+                            action_to_perform = act.perform
 
-                            # Perform an attack roll otherwise
-                            else:
-                                act = hit_entity.get_action(self.performer)
-                                action_to_perform = act.perform
-                                target_entity = hit_entity
-
-                        # Use potion on target player
-                        elif thrown_entity.isinstance('UsableItem'):
-                            action_to_perform = thrown_entity.use
-                            target_entity = hit_entity
+                        # Use potion on target
+                        elif self.target.isinstance('UsableItem'):
+                            action_to_perform = self.target.use
 
                         done = True
                         break
-
             if done:
                 break
 
             dest = point
 
-        if thrown_entity.isinstance('Creature'):
+        if self.target.isinstance('Creature'):
             # Cancel any pending actions
-            target_next_action = self.target.brain.actions[0] if self.target.brain.actions else None
-            if target_next_action:
-                target_next_action.fail()
+            self.target.brain.fail_next_action()
 
-        ani = animation.ThrowMotion(thrown_entity.position, dest, 0.25)
-        thrown_entity.append(ani)
-        thrown_entity.hidden = True
-        thrown_entity.position = dest
+        ani = animation.ThrowMotion(self.target.position, dest, 0.25)
+        self.target.append(ani)
+        self.target.hidden = True
+        self.target.position = dest
 
         def action_callback():
             if action_to_perform:
                 action_to_perform()
 
             if self.performer.visible:
-                instances.console.print('{} {} {}'.format(self.performer.display_string, 'throws', thrown_entity.display_string))
+                instances.console.print('{} {} {}'.format(self.performer.display_string, 'throws', self.target.display_string))
 
         ani.on_done = action_callback
+
+
+class ThrowActionInterface(object):
+    def can_throw(self, target):
+        """Determine if performer can throw target"""
+        return True
+
+    def allow_throw(self, action):
+        """Determine if target allows throw"""
+        return True
