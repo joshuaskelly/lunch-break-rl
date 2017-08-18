@@ -179,7 +179,7 @@ class Entity(object):
     #Implements ThrowActionInterface
     def can_throw(self, target):
         """Determine if performer can throw target"""
-        return True
+        return utils.is_next_to(self, target)
 
     def allow_throw(self, action):
         """Determine if target allows throw"""
