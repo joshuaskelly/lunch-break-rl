@@ -12,8 +12,7 @@ class ThrowAction(action.Action):
 
     def prerequisite(self):
         return self.performer.can_throw(self.target) and \
-               self.target.allow_throw(self) and \
-               utils.is_next_to(self.performer, self.target)
+               self.target.allow_throw(self)
 
     def perform(self):
         weapon = self.performer.weapon

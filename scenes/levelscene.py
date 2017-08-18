@@ -135,10 +135,13 @@ class LevelScene(scene.Scene):
                 result.append(level.LevelEntity((x, y), self.level))
 
         def sort_ents(ent):
-            if ent.isinstance('Creature'):
-                return 2
+            if ent.isinstance('Creature') and not ent.isinstance('Player'):
+                return 3
 
             elif ent.isinstance('Player'):
+                return 2
+
+            elif ent.isinstance('Item'):
                 return 1
 
             return 0
