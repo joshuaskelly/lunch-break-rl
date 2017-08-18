@@ -58,3 +58,12 @@ class math(object):
     def distance(lhs, rhs):
         d = math.sub(lhs, rhs)
         return sqrt(d[0] ** 2 + d[1] ** 2)
+
+    @staticmethod
+    def length(vector):
+        return math.distance((0, 0), vector)
+
+    @staticmethod
+    def normalize(vector):
+        length = math.length(vector)
+        return vector[0] / length, vector[1] / length

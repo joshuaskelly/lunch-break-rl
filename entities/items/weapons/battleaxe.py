@@ -21,7 +21,7 @@ class BattleAxe(weapon.Weapon):
     def Action(self):
         return BattleAxeAttackAction
 
-registry.Registry.register(BattleAxe, 'weapon', 'rare')
+registry.Registry.register(BattleAxe, 'weapon', 'uncommon')
 
 
 class BattleAxeAttackAction(action.Action):
