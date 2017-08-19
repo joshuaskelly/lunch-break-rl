@@ -3,12 +3,14 @@ import tdl
 import instances
 import palette
 import utils
+
 from ai import brain
 from ai.actions import attackaction
 from ai.actions import swappositionaction
+
 from entities import animation
 from entities import entity
-from entities import item
+from entities.items.consumables import corpse
 from entities.items.weapons import fist
 
 
@@ -104,6 +106,10 @@ class Creature(entity.Entity):
             instances.console.print('{} drops {}'.format(self.display_string, i.display_string))
 
     def die(self):
+        c = corpse.Corpse()
+        c.position = self.position
+        instances.scene_root.append(c)
+
         self.drop_weapon()
         instances.console.print('{} perishes!'.format(self.display_string))
         self.remove()

@@ -8,7 +8,7 @@ class MoveToAction(action.Action):
     def __init__(self, performer, destination, max_moves=None):
         super().__init__(performer)
         self.destination = destination
-        self.max_moves = int(max_moves)
+        self.max_moves = max_moves
 
     def prerequisite(self):
         scene_root = instances.scene_root
@@ -20,7 +20,7 @@ class MoveToAction(action.Action):
         path = instances.scene_root.level.pathfinder.get_path(*self.performer.position, *self.destination)
 
         if self.max_moves:
-            path = path[:self.max_moves]
+            path = path[:int(self.max_moves)]
 
         moves = helpers.MoveHelper.path_to_moves(self.performer.position, path)
 

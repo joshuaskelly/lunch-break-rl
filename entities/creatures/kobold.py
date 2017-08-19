@@ -74,7 +74,7 @@ class KoboldBrain(brain.Brain):
         self.state.tick(tick)
 
     def get_threats(self):
-        return[e for e in self.owner.visible_entities if self.is_threat(e)]
+        return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
         return entity.isinstance('Player')
@@ -192,7 +192,7 @@ class KoboldAggroState(KoboldState):
         super().__init__(brain)
         self.aggro_counter = 0
         self.aggro_cooldown = 5
-        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position), reverse=True)[0]
+        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_RED, bg=palette.BLACK)
@@ -231,6 +231,14 @@ class KoboldHurtState(KoboldState):
 
     def tick(self, tick):
         # Idle behavior. Wait and wander.
+        corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
+        corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
+
+        target = corpses[0] if corpses else None
+
+        if target:
+            act = movetoaction.MoveToAction(self.owner, target.position)
+
         if not self.brain.actions:
             batched_action = action.BatchedAction(self.owner)
 
@@ -258,9 +266,7 @@ class KoboldFleeState(KoboldState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
-        self.threat = sorted(self.brain.threats,
-                             key=lambda t: utils.math.distance(self.owner.position, t.position),
-                             reverse=True)[0]
+        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
 
     def tick(self, tick):
         if self.threat and self.threat.position:
