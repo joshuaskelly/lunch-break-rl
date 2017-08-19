@@ -230,28 +230,31 @@ class KoboldHurtState(KoboldState):
         self.brain = brain
 
     def tick(self, tick):
-        # Idle behavior. Wait and wander.
-        corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
-        corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
-
-        target = corpses[0] if corpses else None
-
-        if target:
-            act = movetoaction.MoveToAction(self.owner, target.position)
-
         if not self.brain.actions:
-            batched_action = action.BatchedAction(self.owner)
+            # Attempt to heal
+            corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
+            corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
-            for _ in range(random.randint(1, 3)):
-                idle_action = action.IdleAction(self.owner)
-                idle_action.parent = batched_action
-                self.brain.add_action(idle_action)
+            target = corpses[0] if corpses else None
 
-            wander_action = wanderaction.WanderAction(self.owner)
-            wander_action.parent = batched_action
-            self.brain.add_action(wander_action)
+            if target:
+                act = movetoaction.MoveToAction(self.owner, target.position)
+                self.brain.add_action(act)
 
-            self.brain.add_action(batched_action)
+            # Wander otherwise
+            else:
+                batched_action = action.BatchedAction(self.owner)
+
+                for _ in range(random.randint(1, 3)):
+                    idle_action = action.IdleAction(self.owner)
+                    idle_action.parent = batched_action
+                    self.brain.add_action(idle_action)
+
+                wander_action = wanderaction.WanderAction(self.owner)
+                wander_action.parent = batched_action
+                self.brain.add_action(wander_action)
+
+                self.brain.add_action(batched_action)
 
     def on_threat_spotted(self, threat):
         """Called when a threatening entity is in sight"""
