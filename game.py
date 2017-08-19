@@ -29,7 +29,7 @@ class Game(object):
         Game.config = config
 
         # Configure tdl
-        tdl.set_font('terminal32x32_gs_ro.png')
+        tdl.set_font('terminal8x8_gs_ro.png')
         tdl.set_fps(int(Game.config['ENGINE']['fps']))
         self.console = tdl.init(54, 30, 'lunch break roguelike', renderer=Game.config['ENGINE']['renderer'])
         self._last_time = time.time()

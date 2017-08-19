@@ -8,7 +8,6 @@ import utils
 
 from ai import action
 from ai import brain
-
 from ai.actions import wanderaction
 from ai.actions import moveaction
 from ai.actions import movetoaction
@@ -37,47 +36,45 @@ class KoboldBrain(brain.Brain):
     def __init__(self, owner):
         super().__init__(owner)
         self.state = None
-        self.context = {'threat': None}
+        self.context = {'threats': []}
         self.set_state(KoboldIdleState)
         self.last_health = owner.current_health
         self.wounded_threshold = 2
 
     @property
-    def threat(self):
-        return self.context.get('threat')
+    def threats(self):
+        return self.context.get('threats')
 
-    @threat.setter
-    def threat(self, value):
-        self.context['threat'] = value
+    @threats.setter
+    def threats(self, value):
+        self.context['threats'] = value
 
     def tick(self, tick):
         # Check if critically hurt
-        if self.last_health > self.wounded_threshold and self.owner.current_health <= self.wounded_threshold:
+        if self.last_health > self.wounded_threshold >= self.owner.current_health:
             self.on_wounded()
 
-        elif self.last_health <= self.wounded_threshold and self.owner.current_health > self.wounded_threshold:
+        elif self.last_health <= self.wounded_threshold < self.owner.current_health:
             self.on_no_longer_wounded()
 
         self.last_health = self.owner.current_health
 
         # Check for threats
-        self.threat = self.get_nearest_threat()
-        if self.threat:
-            self.state.on_threat_spotted(self.threat)
+        current_threats = self.get_threats()
+        for threat in current_threats:
+            if threat not in self.threats:
+                self.threats.append(threat)
+                self.state.on_threat_spotted(threat)
 
-        if not self.owner.can_see(self.threat):
-            self.state.on_threat_lost(self.threat)
-            self.threat = None
+        for threat in self.threats:
+            if threat not in current_threats:
+                self.threats.remove(threat)
+                self.state.on_threat_lost(threat)
 
         self.state.tick(tick)
 
-    def get_nearest_threat(self):
-        """Returns the closes visible entity that is a threat"""
-        threats = [e for e in self.owner.visible_entities if self.is_threat(e)]
-        if threats:
-            return threats[0]
-
-        return None
+    def get_threats(self):
+        return[e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
         return entity.isinstance('Player')
@@ -94,7 +91,6 @@ class KoboldBrain(brain.Brain):
 
         if old_state:
             old_state.on_state_exit(new_state)
-            #old_state.brain = None
 
         self.state = new_state
         self.state.on_state_enter(old_state)
@@ -131,16 +127,16 @@ class KoboldState(object):
         """Called when a threatening entity is in sight"""
         pass
 
+    def on_threat_lost(self, threat):
+        """Called when a threatening entity is no longer in sight"""
+        pass
+
     def on_wounded(self):
         """Called when owner is critically wounded"""
         pass
 
     def on_no_longer_wounded(self):
         """Called when owner is no longer critically wounded"""
-        pass
-
-    def on_threat_lost(self, threat):
-        """Called when a threatening entity is no longer in sight"""
         pass
 
     def on_state_enter(self, prev_state):
@@ -196,17 +192,10 @@ class KoboldAggroState(KoboldState):
         super().__init__(brain)
         self.aggro_counter = 0
         self.aggro_cooldown = 5
-
-    @property
-    def threat(self):
-        return self.brain.threat
-
-    @threat.setter
-    def threat(self, value):
-        self.brain.threat = value
+        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position), reverse=True)[0]
 
     def on_state_enter(self, prev_state):
-        ani = animation.Flash('!', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
+        ani = animation.Flash('!', fg=palette.BRIGHT_RED, bg=palette.BLACK)
         self.owner.append(ani)
         self.brain.add_action(action.IdleAction(self.owner))
 
@@ -217,15 +206,16 @@ class KoboldAggroState(KoboldState):
             self.brain.add_action(action.IdleAction(self.owner))
 
     def tick(self, tick):
-        if self.threat:
-            if self.aggro_counter <= 0:
-                self.brain.add_action(movetoaction.MoveToAction(self.owner, self.threat.position, self.brain.owner.sight_radius))
-                self.aggro_counter = self.aggro_cooldown
-
-        else:
-            self.brain.set_state(KoboldIdleState)
+        if self.aggro_counter <= 0:
+            self.brain.add_action(movetoaction.MoveToAction(self.owner, self.threat.position, self.brain.owner.sight_radius))
+            self.aggro_counter = self.aggro_cooldown
 
         self.aggro_counter -= 1
+
+    def on_threat_lost(self, threat):
+        if threat == self.threat:
+            self.threat = None
+            self.brain.set_state(KoboldIdleState)
 
     def on_wounded(self):
         self.brain.fail_next_action()
@@ -268,14 +258,9 @@ class KoboldFleeState(KoboldState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
-
-    @property
-    def threat(self):
-        return self.context.get('threat')
-
-    @threat.setter
-    def threat(self, value):
-        self.context['threat'] = value
+        self.threat = sorted(self.brain.threats,
+                             key=lambda t: utils.math.distance(self.owner.position, t.position),
+                             reverse=True)[0]
 
     def tick(self, tick):
         if self.threat and self.threat.position:
@@ -297,4 +282,17 @@ class KoboldFleeState(KoboldState):
         self.brain.set_state(KoboldAggroState)
 
     def on_threat_lost(self, threat):
-        self.brain.set_state(KoboldHurtState)
+        if threat == self.threat:
+            self.threat = None
+            self.brain.set_state(KoboldHurtState)
+
+    def on_state_enter(self, prev_state):
+        ani = animation.Flash('!', fg=palette.BRIGHT_BLUE, bg=palette.BLACK)
+        self.owner.append(ani)
+        self.brain.add_action(action.IdleAction(self.owner))
+
+    def on_state_exit(self, next_state):
+        if isinstance(next_state, KoboldHurtState):
+            ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
+            self.owner.append(ani)
+            self.brain.add_action(action.IdleAction(self.owner))
