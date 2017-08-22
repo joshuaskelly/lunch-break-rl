@@ -17,5 +17,3 @@ class Glove(weapon.Weapon):
 
     def get_special_action(self, requester, target):
         return throwaction.ThrowAction(requester, target)
-
-registry.Registry.register(Glove, 'weapon', 'rare')

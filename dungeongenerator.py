@@ -159,47 +159,23 @@ def generate_level(width, height):
 
         new_level.data.draw_char(x, y, char, fg, bg)
 
-    #new_level.data.blit(temp_level)
-    #temp_level.clear()
-
     # Placing Entities
     for (x, y) in new_level.data:
         ch, fg, bg = new_level.data.get_char(x, y)
         if ch == ord('.'):
             if random.random() < 1 / 30:
-                monster_classes = registry.Registry.get('monster', 'common')
-                MonsterClass = random.choice(monster_classes)
+                MonsterClass = registry.Registry.get('monster')
                 mon = MonsterClass(position=(x, y))
                 new_entities.append(mon)
 
             elif random.random() < 1 / 70:
-                rarity = 'common'
-                if random.random() < 1 / 40 and registry.Registry.get('weapon', 'rare'):
-                    rarity = 'rare'
-
-                elif random.random() < 1 / 10 and registry.Registry.get('weapon', 'uncommon'):
-                    rarity = 'uncommon'
-
-                weapon_classes = registry.Registry.get('weapon', rarity)
-
-                if weapon_classes:
-                    WeaponClass = random.choice(weapon_classes)
-                    weapon = WeaponClass(position=(x, y))
-                    new_entities.append(weapon)
+                WeaponClass = registry.Registry.get('weapon')
+                weapon = WeaponClass(position=(x, y))
+                new_entities.append(weapon)
 
             elif random.random() < 1 / 70:
-                rarity = 'common'
-                if random.random() < 1 / 40 and registry.Registry.get('item', 'rare'):
-                    rarity = 'rare'
-
-                elif random.random() < 1 / 10 and registry.Registry.get('item', 'uncommon'):
-                    rarity = 'uncommon'
-
-                item_classes = registry.Registry.get('item', rarity)
-
-                if item_classes:
-                    ItemClass = random.choice(item_classes)
-                    item = ItemClass(position=(x, y))
-                    new_entities.append(item)
+                ItemClass = registry.Registry.get('item')
+                item = ItemClass(position=(x, y))
+                new_entities.append(item)
 
     return new_level, new_entities

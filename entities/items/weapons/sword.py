@@ -17,7 +17,7 @@ class Sword(weapon.Weapon):
         self.verb = 'slashes'
         self.parry_chance = 1 / 3
 
-registry.Registry.register(Sword, 'weapon', 'common')
+registry.Registry.register(Sword, 'weapon', 5)
 
 
 class DefaultParryWeaponState(weapon.WeaponState):

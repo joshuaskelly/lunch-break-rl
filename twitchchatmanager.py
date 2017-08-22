@@ -51,7 +51,7 @@ class TwitchChatManager(entity.Entity):
                         # Set player color
                         if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
                             player_color = palette.BRIGHT_BLUE
-                            bonus = random.choice(registry.Registry.get('weapon', 'uncommon'))()
+                            bonus = registry.Registry.get('weapon')()
 
                         elif event.nickname.lower() in regular_viewers:
                             player_color = palette.BRIGHT_RED

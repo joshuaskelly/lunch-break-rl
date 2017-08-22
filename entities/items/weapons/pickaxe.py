@@ -11,4 +11,4 @@ class PickAxe(weapon.Weapon):
         self.name = 'pick axe'
         self.verb = 'strikes'
 
-registry.Registry.register(PickAxe, 'weapon', 'uncommon')
+registry.Registry.register(PickAxe, 'weapon', 3)

@@ -1,30 +1,37 @@
+import random
+from bisect import bisect
+from itertools import accumulate
+
 class Registry(object):
-    _registered_entities = {}
+    _registered_categories = {}
 
     @staticmethod
-    def register(klass, type, rarity):
-        type_dict = Registry._registered_entities.get(type)
-        if not type_dict:
-            type_dict = {}
+    def register(klass, category, weight):
+        entry = Registry._registered_categories.get(category)
+        category_list = entry[0] if entry else None
+        weight_table = entry[1] if entry else None
 
-        item_listing = type_dict.get(rarity)
-        if not item_listing:
-            item_listing = []
+        if not category_list:
+            category_list = []
 
-        if klass not in item_listing:
-            item_listing.append(klass)
+        if not weight_table:
+            weight_table = []
 
-        type_dict[rarity] = item_listing
-        Registry._registered_entities[type] = type_dict
+        if (klass, weight) not in category_list:
+            category_list.append((weight, klass))
+
+        weight_table = list(accumulate([i[0] for i in category_list]))
+
+        Registry._registered_categories[category] = category_list, weight_table
 
     @staticmethod
-    def get(type, rarity):
-        type_dict = Registry._registered_entities.get(type)
-        if not type_dict:
-            return []
+    def get(category):
+        entry = Registry._registered_categories.get(category)
+        if not entry:
+            return None
 
-        item_listing = type_dict.get(rarity)
-        if not item_listing:
-            return []
+        category_list, weight_table = entry
 
-        return item_listing
+        chosen = category_list[bisect(weight_table, random.random() * weight_table[-1])][1]
+
+        return chosen

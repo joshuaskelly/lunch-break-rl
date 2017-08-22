@@ -11,8 +11,14 @@ class Potion(consumable.Consumable):
 
         self.heal_amount = 4
 
+    def get_action(self, requester=None):
+        if requester.current_health >= requester.max_health:
+            return None
+
+        return super().get_action(requester)
+
     def use(self, target):
         instances.console.print('{} recovers {} health!'.format(target.display_string, self.heal_amount))
         target.current_health = min(target.max_health, target.current_health + self.heal_amount)
 
-registry.Registry.register(Potion, 'item', 'uncommon')
+registry.Registry.register(Potion, 'item', 3)

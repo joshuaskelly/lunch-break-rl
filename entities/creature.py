@@ -25,6 +25,7 @@ class Creature(entity.Entity):
         self.visible_tiles = set()
         self.state = 'NORMAL'
         self.sight_radius = 7.5
+        self.alive = True
 
         self.equip_weapon(fist.Fist())
 
@@ -106,6 +107,8 @@ class Creature(entity.Entity):
             instances.console.print('{} drops {}'.format(self.display_string, i.display_string))
 
     def die(self):
+        self.alive = False
+
         c = corpse.Corpse()
         c.position = self.position
         instances.scene_root.append(c)

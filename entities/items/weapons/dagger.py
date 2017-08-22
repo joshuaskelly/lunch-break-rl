@@ -15,7 +15,7 @@ class Dagger(weapon.Weapon):
         self.verb = 'stabs'
         self.counter_chance = 1 / 2
 
-registry.Registry.register(Dagger, 'weapon', 'common')
+registry.Registry.register(Dagger, 'weapon', 5)
 
 
 class DefaultCounterWeaponState(weapon.WeaponState):

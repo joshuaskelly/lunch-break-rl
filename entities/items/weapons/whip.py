@@ -16,7 +16,7 @@ class Whip(weapon.Weapon):
         self.verb = 'whips'
         self.disarm_chance = 1 / 2
 
-registry.Registry.register(Whip, 'weapon', 'uncommon')
+registry.Registry.register(Whip, 'weapon', 3)
 
 
 class DefaultDisarmWeaponState(weapon.WeaponState):

@@ -29,7 +29,7 @@ class Kobold(creature.Creature):
         if random.random() <= 1 / 5:
             self.equip_weapon(dagger.Dagger())
 
-registry.Registry.register(Kobold, 'monster', 'common')
+registry.Registry.register(Kobold, 'monster', 5)
 
 
 class KoboldBrain(brain.Brain):
@@ -50,6 +50,9 @@ class KoboldBrain(brain.Brain):
         self.context['threats'] = value
 
     def tick(self, tick):
+        if not self.owner.alive:
+            return
+
         # Check if critically hurt
         if self.last_health > self.wounded_threshold >= self.owner.current_health:
             self.on_wounded()
@@ -86,6 +89,9 @@ class KoboldBrain(brain.Brain):
         self.state.on_no_longer_wounded()
 
     def set_state(self, state_class):
+        if not self.owner.alive:
+            return
+
         old_state = self.state
         new_state = state_class(self)
 
