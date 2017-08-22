@@ -73,7 +73,7 @@ class LevelScene(scene.Scene):
         # Persist players in level
         self._children = [p for p in self.players if not p.idle]
 
-        self.level, new_entities = dungeongenerator.generate_level(29, 22)
+        self.level, new_entities = dungeongenerator.generate_level(29, 22, len(self._children))
         self.append(self.level)
 
         # Add generated entities to scene

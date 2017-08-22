@@ -18,7 +18,7 @@ creatures.register()
 items.register()
 
 
-def generate_level(width, height):
+def generate_level(width, height, player_count):
     new_entities = []
     new_level = level.Level(0, 0, width, height)
 
@@ -163,17 +163,17 @@ def generate_level(width, height):
     for (x, y) in new_level.data:
         ch, fg, bg = new_level.data.get_char(x, y)
         if ch == ord('.'):
-            if random.random() < 1 / 30:
+            if random.random() < 1 / 30 * max(1.0, player_count / 3):
                 MonsterClass = registry.Registry.get('monster')
                 mon = MonsterClass(position=(x, y))
                 new_entities.append(mon)
 
-            elif random.random() < 1 / 70:
+            elif random.random() < 1 / 80:
                 WeaponClass = registry.Registry.get('weapon')
                 weapon = WeaponClass(position=(x, y))
                 new_entities.append(weapon)
 
-            elif random.random() < 1 / 70:
+            elif random.random() < 1 / 80:
                 ItemClass = registry.Registry.get('item')
                 item = ItemClass(position=(x, y))
                 new_entities.append(item)
