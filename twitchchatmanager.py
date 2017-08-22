@@ -1,11 +1,10 @@
-import random
-
 import instances
 import palette
 import registry
 
 from entities import entity
 from entities.creatures import player
+from entities.items.weapons import battleaxe
 
 regular_viewers = [
     'daemianend',
@@ -45,7 +44,7 @@ class TwitchChatManager(entity.Entity):
                 if event.message.upper() == '!JOIN':
                     player_names = [e.name for e in current_scene.children if hasattr(e, 'name')]
 
-                    bonus = None
+                    bonus = battleaxe.BattleAxe()
 
                     if not event.nickname in player_names:
                         # Set player color
@@ -78,3 +77,21 @@ class TwitchChatManager(entity.Entity):
                         if e.name == event.nickname:
                             e.die()
                             instances.console.print('{} has left.'.format(e.display_string))
+
+                elif event.message.upper().startswith('!CHEER'):
+                    s = event.message.split(' ')
+                    if len(s) <= 1:
+                        return
+
+                    player_names = [p.name for p in instances.scene_root.players if p.state != 'EXITED']
+                    if event.nickname in player_names:
+                        return
+
+                    player_name = s[1].lower()
+                    if player_name[0] == '@':
+                        player_name = player_name[1:]
+
+                    target_player = [p for p in instances.scene_root.players if p.state != 'EXITED' and p.name == player_name]
+                    target_player = target_player[0] if target_player else None
+                    if target_player:
+                        target_player.cheer_counter += 4

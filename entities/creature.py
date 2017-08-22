@@ -35,18 +35,12 @@ class Creature(entity.Entity):
         action_to_perform = None
         target_entity = None
 
-        es = instances.scene_root.get_entity_at(*dest)
-
-        # Determine bump action
-        if es:
-            target_entity = es[0]
-
-            # Let special item actions override bumped entity's default action
-            action_to_perform = self.weapon.get_special_action(self, target_entity)
-
+        for target_entity in instances.scene_root.get_entity_at(*dest):
             # Get bumped entity's default action
-            if not action_to_perform:
-                action_to_perform = target_entity.get_action(self)
+            action_to_perform = target_entity.get_action(self)
+
+            if action_to_perform:
+                break
 
         # Perform the action if possible
         if action_to_perform and action_to_perform.prerequisite():

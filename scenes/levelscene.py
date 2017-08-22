@@ -92,6 +92,7 @@ class LevelScene(scene.Scene):
             p.visible_tiles = set()
             p.state = 'NORMAL'
             p.brain.fail_next_action()
+            p.cheer_counter = 0
             p.position = self.get_location_near_stairs()
 
         self.children.append(twitchchatmanager.TwitchChatManager())
@@ -140,6 +141,9 @@ class LevelScene(scene.Scene):
 
             elif ent.isinstance('Player'):
                 return 2
+
+            elif ent.isinstance('Corpse'):
+                return 0.5
 
             elif ent.isinstance('Item'):
                 return 1

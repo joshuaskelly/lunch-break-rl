@@ -5,6 +5,7 @@ import palette
 import utils
 
 from ai import action
+from ai import brain
 
 from ai.actions import attackaction
 from ai.actions import throwaction
@@ -16,9 +17,11 @@ class Player(creature.Creature):
     def __init__(self, char='@', position=(0, 0), fg=palette.BRIGHT_RED, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.name = 'Player'
+        self.brain = PlayerBrain(self)
         self._last_action_tick = 0
         self._current_tick = 999999
         self._has_taken_action = False
+        self.cheer_counter = 0
 
     def update(self, time):
         super().update(time)
@@ -31,6 +34,17 @@ class Player(creature.Creature):
         if self._has_taken_action or self.state == 'EXITED':
             self._last_action_tick = tick
             self._has_taken_action = False
+
+    def half_tick(self):
+        if self.cheer_counter <= 0:
+            return
+
+        super().tick(self._current_tick)
+
+    def on_perform_action(self, action):
+        self._has_taken_action = True
+        if self.cheer_counter > 0:
+            self.cheer_counter -= 1
 
     def draw(self, console):
         if self.state != 'EXITED':
@@ -102,6 +116,8 @@ class Player(creature.Creature):
 
                         self.brain.add_action(batched_attack)
 
+                    self._has_taken_action = True
+
                 elif commands[0].upper() == '!DROP':
                     self.drop_weapon()
                     self._has_taken_action = True
@@ -113,18 +129,13 @@ class Player(creature.Creature):
                     if not direction:
                         return
 
-                    target_entity = None
                     dest = utils.math.add(self.position, direction)
 
-                    es = [e for e in instances.scene_root.children if e.isinstance('Entity') and e.position == dest]
-
-                    if es:
-                        target_entity = es[0]
-
-                    if target_entity:
+                    for target_entity in instances.scene_root.get_entity_at(*dest):
                         act = throwaction.ThrowAction(self, target_entity)
-                        self.brain.actions.append(act)
-                        self._has_taken_action = True
+                        if act.prerequisite():
+                            self.brain.add_action(act)
+                            break
 
                 elif commands[0].upper() == '!STAIRS' and game.Game.args.debug:
                     stair = instances.scene_root.downward_stair
@@ -137,3 +148,23 @@ class Player(creature.Creature):
 
                     if next_action and next_action.isinstance('MoveAction'):
                         next_action.fail()
+
+        elif event.type == 'HALF-TICK':
+            self.half_tick()
+
+
+class PlayerBrain(brain.Brain):
+    def perform_action(self):
+        if self.actions:
+            current_action = self.actions.pop(0)
+
+            # Make sure our owner is the entity actually doing the action
+            if current_action.performer is not self.owner:
+                raise RuntimeError('Performing action not as owner!')
+
+            if current_action.prerequisite():
+                current_action.perform()
+                self.owner.on_perform_action(current_action)
+
+            else:
+                current_action.fail()

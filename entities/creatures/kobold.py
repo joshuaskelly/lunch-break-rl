@@ -80,7 +80,7 @@ class KoboldBrain(brain.Brain):
         return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
-        return entity.isinstance('Player')
+        return entity.isinstance('Player') and entity.alive
 
     def on_wounded(self):
         self.state.on_wounded()
