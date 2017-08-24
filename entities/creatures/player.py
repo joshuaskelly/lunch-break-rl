@@ -7,7 +7,6 @@ import utils
 from ai import action
 from ai import brain
 
-from ai.actions import attackaction
 from ai.actions import throwaction
 
 from entities import creature

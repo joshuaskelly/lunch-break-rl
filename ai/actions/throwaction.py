@@ -67,7 +67,7 @@ class ThrowAction(action.Action):
                 action_to_perform()
 
             if self.performer.visible:
-                instances.console.print('{} {} {}'.format(self.performer.display_string, 'throws', self.target.display_string))
+                instances.console.describe(self.performer, '{} {} {}'.format(self.performer.display_string, 'throws', self.target.display_string))
 
         ani.on_done = action_callback
 

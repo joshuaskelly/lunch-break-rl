@@ -98,7 +98,7 @@ class Creature(entity.Entity):
             i.position = self.position
             instances.scene_root.append(i)
             self.equip_weapon(fist.Fist())
-            instances.console.print('{} drops {}'.format(self.display_string, i.display_string))
+            instances.console.describe(self, '{} drops {}'.format(self.display_string, i.display_string), 'Something clatters to the ground')
 
     def die(self):
         self.alive = False
@@ -108,7 +108,7 @@ class Creature(entity.Entity):
         instances.scene_root.append(c)
 
         self.drop_weapon()
-        instances.console.print('{} perishes!'.format(self.display_string))
+        instances.console.describe(self, '{} perishes!'.format(self.display_string), 'Something cries its last')
         self.remove()
 
     def make_blood_trail(self):
@@ -173,7 +173,7 @@ class Creature(entity.Entity):
         verb = action.performer.weapon.verb
 
         if action.performer.visible:
-            instances.console.print('{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
+            instances.console.describe(action.performer, '{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
 
         self.current_health -= damage_dealt
 

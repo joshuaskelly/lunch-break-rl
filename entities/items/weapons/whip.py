@@ -36,5 +36,5 @@ class DefaultDisarmWeaponState(weapon.WeaponState):
                 hasattr(action.target, 'drop_weapon') and \
                 not action.target.weapon.isinstance('Fist'):
 
-            instances.console.print('{} disarms {}'.format(action.performer.display_string, action.target.display_string))
+            instances.console.describe(action.performer, '{} disarms {}'.format(action.performer.display_string, action.target.display_string))
             action.target.drop_weapon()

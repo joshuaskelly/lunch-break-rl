@@ -20,7 +20,14 @@ class Console(window.Window):
             instances.register('console', self)
 
     def print(self, message):
-        self.messages.append(message)#[:self.width-2])
+        self.messages.append(message)
+
+    def describe(self, entity, visible_text, not_visible_text=None):
+        if entity.visible:
+            self.print(visible_text)
+
+        elif not_visible_text:
+            self.print(not_visible_text)
 
     def draw(self, console):
         super().draw(console)

@@ -39,7 +39,7 @@ class DefaultCounterWeaponState(weapon.WeaponState):
                                                   target=action.performer)
 
             if counter.prerequisite():
-                instances.console.print('{} counters {}\'s attack!'.format(action.target.display_string,
+                instances.console.describe(action.target, '{} counters {}\'s attack!'.format(action.target.display_string,
                                                                            action.performer.display_string))
                 
                 action.target.brain.actions.append(counter)

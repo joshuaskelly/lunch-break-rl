@@ -39,7 +39,7 @@ class HeldItem(Item):
 
     def on_use(self):
         if random.random() < self.chance_to_break:
-            instances.console.print('{}\'s {} breaks!'.format(self.parent.display_string, self.display_string))
+            instances.console.describe(self.parent, '{}\'s {} breaks!'.format(self.parent.display_string, self.display_string))
 
             if self.parent.isinstance('Creature'):
                 self.parent.drop_weapon()
@@ -52,4 +52,4 @@ class UsableItem(Item):
         return useitemaction.UseItemAction(requester, self)
 
     def use(self, target):
-        instances.console.print('{} is being used on {}'.format(self.display_string, target.display_string))
+        instances.console.describe(target, '{} is being used on {}'.format(self.display_string, target.display_string))

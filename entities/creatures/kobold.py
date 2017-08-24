@@ -80,7 +80,7 @@ class KoboldBrain(brain.Brain):
         return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
-        return entity.isinstance('Player') and entity.alive
+        return entity.isinstance('Player') and entity.alive and entity.position
 
     def on_wounded(self):
         self.state.on_wounded()
@@ -275,7 +275,7 @@ class KoboldFleeState(KoboldState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
-        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
+        self.threat = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
 
     def tick(self, tick):
         if self.threat and self.threat.position:

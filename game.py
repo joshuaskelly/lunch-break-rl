@@ -5,6 +5,8 @@ import time
 import tdl
 from twitchobserver import Observer
 
+import instances
+
 from scenes import gamescene
 
 
@@ -23,6 +25,7 @@ class Game(object):
     args = None
     scene_root = None
     config = None
+    instance = None
 
     def __init__(self, args):
         Game.args = args
@@ -45,10 +48,14 @@ class Game(object):
         # Twitch Observer
         nickname = Game.config['TWITCH']['Nickname']
         password = Game.config['TWITCH']['Password']
-        channel = Game.config['TWITCH']['Channel']
+        self.channel = Game.config['TWITCH']['Channel']
         self.observer = Observer(nickname, password)
         self.observer.start()
-        self.observer.join_channel(channel)
+        self.observer.join_channel(self.channel)
+
+        if not Game.instance:
+            Game.instance = self
+            instances.register('game', self)
 
     def run(self):
         tick_count = 0

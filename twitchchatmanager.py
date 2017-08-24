@@ -1,10 +1,11 @@
+import time
+
 import instances
 import palette
 import registry
 
 from entities import entity
 from entities.creatures import player
-from entities.items.weapons import battleaxe
 
 regular_viewers = [
     'daemianend',
@@ -35,6 +36,7 @@ class TwitchChatManager(entity.Entity):
     def __init__(self):
         super().__init__(' ')
         self.hidden = True
+        self.time_since_last_help_message = 0
 
     def handle_events(self, event):
         current_scene = instances.scene_root
@@ -44,7 +46,7 @@ class TwitchChatManager(entity.Entity):
                 if event.message.upper() == '!JOIN':
                     player_names = [e.name for e in current_scene.children if hasattr(e, 'name')]
 
-                    bonus = battleaxe.BattleAxe()
+                    bonus = None
 
                     if not event.nickname in player_names:
                         # Set player color
@@ -95,3 +97,11 @@ class TwitchChatManager(entity.Entity):
                     target_player = target_player[0] if target_player else None
                     if target_player:
                         target_player.cheer_counter += 4
+
+                elif event.message.upper() == '!HELP':
+                    current_time = time.time()
+                    if current_time - self.time_since_last_help_message > 30:
+                        help_message = 'Available commands: !join !leave !move [uldr] !move @username !stop !attack [uldr] !throw [uldr] !drop !cheer @username'
+                        instances.game.observer.send_message(help_message, instances.game.channel)
+                        self.time_since_last_help_message = current_time
+

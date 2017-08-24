@@ -16,5 +16,5 @@ class Corpse(consumable.Consumable):
         return super().get_action(requester)
 
     def use(self, target):
-        instances.console.print('{} devours the {}!'.format(target.display_string, self.display_string))
+        instances.console.describe(target, '{} devours the {}!'.format(target.display_string, self.display_string))
         target.current_health = min(target.max_health, target.current_health + self.heal_amount)

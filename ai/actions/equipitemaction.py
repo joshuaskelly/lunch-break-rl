@@ -27,4 +27,4 @@ class EquipItemAction(action.Action):
             instances.scene_root.level.append(old_item)
 
         if self.performer.visible:
-            instances.console.print('{} equips {}'.format(self.performer.display_string, self.target.display_string))
+            instances.console.describe(self.performer, '{} equips {}'.format(self.performer.display_string, self.target.display_string))

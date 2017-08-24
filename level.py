@@ -66,10 +66,10 @@ class LevelEntity(entity.Entity):
     def on_attacked(self, action):
         if action.performer.weapon.name == 'pick axe':
             self.level.draw_char(self.position[0], self.position[1], '.')
-            instances.console.print('{} destroys the wall'.format(action.performer.display_string))
+            instances.console.describe(action.performer, '{} destroys the wall'.format(action.performer.display_string), 'Somewhere blocks shatter')
 
         else:
-            instances.console.print('{} {} the wall'.format(action.performer.display_string, action.performer.weapon.verb))
+            instances.console.describe(action.performer, '{} {} the wall'.format(action.performer.display_string, action.performer.weapon.verb))
 
 
 class Level(entity.Entity):
