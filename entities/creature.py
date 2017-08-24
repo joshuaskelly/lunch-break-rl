@@ -11,6 +11,7 @@ from ai.actions import swappositionaction
 from entities import animation
 from entities import entity
 from entities.items.consumables import corpse
+from entities.items.weapons import debris
 from entities.items.weapons import fist
 
 
@@ -25,9 +26,12 @@ class Creature(entity.Entity):
         self.visible_tiles = set()
         self.state = 'NORMAL'
         self.sight_radius = 7.5
-        self.alive = True
 
         self.equip_weapon(fist.Fist())
+
+    @property
+    def alive(self):
+        return self.current_health > 0
 
     def move(self, x, y):
         dest = self.position[0] + x, self.position[1] + y
@@ -37,7 +41,10 @@ class Creature(entity.Entity):
 
         for target_entity in instances.scene_root.get_entity_at(*dest):
             # Get bumped entity's default action
-            action_to_perform = target_entity.get_action(self)
+            action_to_perform = self.weapon.get_special_action(self, target_entity)
+
+            if not action_to_perform:
+                action_to_perform = target_entity.get_action(self)
 
             if action_to_perform:
                 break
@@ -100,10 +107,15 @@ class Creature(entity.Entity):
             self.equip_weapon(fist.Fist())
             instances.console.describe(self, '{} drops {}'.format(self.display_string, i.display_string), 'Something clatters to the ground')
 
-    def die(self):
-        self.alive = False
+    def break_weapon(self):
+        if not self.weapon.isinstance('Fist'):
+            i = self.weapon
+            i.remove()
+            self.equip_weapon(debris.Debris())
+            instances.console.describe(self, '{}\'s {} breaks!'.format(self.display_string, i.display_string))
 
-        c = corpse.Corpse()
+    def die(self):
+        c = corpse.Corpse(self)
         c.position = self.position
         instances.scene_root.append(c)
 

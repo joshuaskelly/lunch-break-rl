@@ -176,11 +176,15 @@ class Entity(object):
     def after_attack(self, action):
         """Called on performer after attack has occurred"""
 
-    #Implements ThrowActionInterface
+    # Implements ThrowActionInterface
     def can_throw(self, target):
         """Determine if performer can throw target"""
         return utils.is_next_to(self, target)
 
     def allow_throw(self, action):
         """Determine if target allows throw"""
+        return True
+
+    # Implements EquipItemInterface
+    def can_equip(self, target):
         return True

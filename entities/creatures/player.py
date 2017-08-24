@@ -10,6 +10,7 @@ from ai import brain
 from ai.actions import throwaction
 
 from entities import creature
+from entities.items.weapons import fist
 
 
 class Player(creature.Creature):
@@ -135,6 +136,15 @@ class Player(creature.Creature):
                         if act.prerequisite():
                             self.brain.add_action(act)
                             break
+
+                    if not self.weapon.isinstance('Fist'):
+                        w = self.weapon
+                        w.remove()
+                        w.position = dest
+                        instances.scene_root.append(w)
+                        self.equip_weapon(fist.Fist())
+                        act = throwaction.ThrowAction(self, w)
+                        self.brain.add_action(act)
 
                 elif commands[0].upper() == '!STAIRS' and game.Game.args.debug:
                     stair = instances.scene_root.downward_stair

@@ -1,3 +1,5 @@
+import random
+
 import palette
 import utils
 
@@ -30,7 +32,7 @@ class WeaponState(attackaction.AttackActionInterface):
         self.weapon = weapon
 
     def can_attack(self, other):
-        return self.weapon.in_range(other)
+        return self.weapon.parent and self.weapon.parent.alive and self.weapon.in_range(other)
 
     def allow_attack(self, action):
         return True
@@ -48,4 +50,4 @@ class WeaponState(attackaction.AttackActionInterface):
         pass
 
     def after_attack(self, action):
-        pass
+        self.weapon.on_use()

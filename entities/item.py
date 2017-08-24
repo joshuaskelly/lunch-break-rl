@@ -25,7 +25,8 @@ class Item(entity.Entity):
 class HeldItem(Item):
     def __init__(self, char, position=(0, 0), fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
-        self.chance_to_break = 1 / 4
+        self.durability = 12
+        self.chance_to_break = 1 / 2
 
     def get_action(self, requester=None):
         if requester and requester.weapon.isinstance('Fist'):
@@ -38,13 +39,24 @@ class HeldItem(Item):
         return attackaction.AttackAction(requester, target, direction)
 
     def on_use(self):
-        if random.random() < self.chance_to_break:
-            instances.console.describe(self.parent, '{}\'s {} breaks!'.format(self.parent.display_string, self.display_string))
+        self.durability -= 1
 
-            if self.parent.isinstance('Creature'):
-                self.parent.drop_weapon()
+        if self.durability <= 0 and random.random() < self.chance_to_break:
+            self.break_item()
 
-            self.remove()
+    def break_item(self):
+        from entities.items.weapons import debris
+
+        old_parent = self.parent
+        old_position = self.position
+        self.remove()
+
+        if old_parent.isinstance('Player'):
+            old_parent.equip_weapon(debris.Debris())
+            instances.console.describe(self, '{}\'s {} breaks!'.format(self.display_string, self.display_string))
+
+        else:
+            old_parent.append(debris.Debris(position=old_position))
 
 
 class UsableItem(Item):

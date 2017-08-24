@@ -64,6 +64,3 @@ class BattleAxeAttackAction(action.Action):
             action.target.after_attacked(action)
 
         self.performer.weapon.damage = self.performer.weapon.total_damage
-
-        # TODO: When to call this?
-        #self.weapon.on_use()

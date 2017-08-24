@@ -3,41 +3,68 @@ import random
 import helpers
 import instances
 import palette
-import registry
 import utils
+import registry
 
 from ai import action
 from ai import brain
-from ai.actions import wanderaction
 from ai.actions import moveaction
 from ai.actions import movetoaction
+from ai.actions import wanderaction
+from ai.actions import swappositionaction
 
 from entities import animation
+from entities import entity
 from entities.creatures import monster
-from entities.items.weapons import dagger
+from entities.items.weapons import fist
 
 
-class Kobold(monster.Monster):
-    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
+class Rat(monster.Monster):
+    def __init__(self, char='R', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
-        self.max_health = 4
+        self.name = 'Rat'
+        self.brain = RatBrain(self)
+        self.max_health = 1
         self.current_health = self.max_health
-        self.name = 'kobold'
-        self.brain = KoboldBrain(self)
-        self.sight_radius = 3.5
+        self.sight_radius = 2.5
+        self.equip_weapon(RatClaws())
 
-        if random.random() <= 1 / 5:
-            self.equip_weapon(dagger.Dagger())
+    def can_equip(self, target):
+        return target.isinstance('Fist')
 
-registry.Registry.register(Kobold, 'monster', 5)
+    def get_action(self, requester=None):
+        # Rats won't hurt other rats. :)
+        if requester.isinstance('Rat'):
+            return swappositionaction.SwapPositionAction(requester, self)
+
+        return super().get_action(requester)
+
+registry.Registry.register(Rat, 'monster', 3)
 
 
-class KoboldBrain(brain.Brain):
+class RatClaws(fist.Fist):
+    def __init__(self, char='f', position=(0, 0)):
+        super().__init__(char, position)
+        self.name = 'claws'
+        self.verb = 'scratches'
+
+    def get_special_action(self, requester, target):
+        if target.isinstance('Corpse'):
+            # Add babies
+            target.append(RatBabies())
+
+        elif target.isinstance('Weapon'):
+            # Nibble
+            instances.console.describe(self.parent, "{} nibbles on {}".format(self.parent.display_string, target.display_string))
+            target.on_use()
+
+
+class RatBrain(brain.Brain):
     def __init__(self, owner):
         super().__init__(owner)
         self.state = None
         self.context = {'threats': []}
-        self.set_state(KoboldIdleState)
+        self.set_state(RatIdleState)
         self.last_health = owner.current_health
         self.wounded_threshold = 2
 
@@ -80,7 +107,7 @@ class KoboldBrain(brain.Brain):
         return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
-        return entity.isinstance('Player') and entity and entity.alive and entity.position
+        return entity.isinstance('Player') and entity.alive
 
     def on_wounded(self):
         self.state.on_wounded()
@@ -102,8 +129,9 @@ class KoboldBrain(brain.Brain):
         self.state.on_state_enter(old_state)
 
 
-class KoboldIdleState(monster.MonsterState):
+class RatIdleState(monster.MonsterState):
     """State class that encapsulates idle behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
 
@@ -128,14 +156,15 @@ class KoboldIdleState(monster.MonsterState):
         self.brain.fail_next_action()
         self.brain.actions = []
         self.context['threat'] = threat
-        self.brain.set_state(KoboldAggroState)
+        self.brain.set_state(RatAggroState)
 
     def on_wounded(self):
-        self.brain.set_state(KoboldHurtState)
+        self.brain.set_state(RatHurtState)
 
 
-class KoboldAggroState(monster.MonsterState):
+class RatAggroState(monster.MonsterState):
     """State class the encapsulates aggressive behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
         self.aggro_counter = 0
@@ -148,7 +177,7 @@ class KoboldAggroState(monster.MonsterState):
         self.brain.add_action(action.IdleAction(self.owner))
 
     def on_state_exit(self, next_state):
-        if isinstance(next_state, KoboldIdleState):
+        if isinstance(next_state, RatIdleState):
             ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
             self.owner.append(ani)
             self.brain.add_action(action.IdleAction(self.owner))
@@ -163,16 +192,17 @@ class KoboldAggroState(monster.MonsterState):
     def on_threat_lost(self, threat):
         if threat == self.threat:
             self.threat = None
-            self.brain.set_state(KoboldIdleState)
+            self.brain.set_state(RatIdleState)
 
     def on_wounded(self):
         self.brain.fail_next_action()
         self.brain.actions = []
-        self.brain.set_state(KoboldFleeState)
+        self.brain.set_state(RatFleeState)
 
 
-class KoboldHurtState(monster.MonsterState):
+class RatHurtState(monster.MonsterState):
     """Class that encapsulates hurt idle behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
@@ -180,19 +210,15 @@ class KoboldHurtState(monster.MonsterState):
     def tick(self, tick):
         if not self.brain.actions:
             # Attempt to heal
-            corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
-            corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
+            if random.random() < 1 / 32:
+                corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
+                corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
-            target = corpses[0] if corpses else None
+                target = corpses[0] if corpses else None
 
-            if not target:
-                weaker = [e for e in self.owner.visible_entities if e.isinstance('Creature') and e.current_health == 1]
-                sorted(weaker, key=lambda w: utils.math.distance(self.owner.position, w.position))
-                target = weaker[0] if weaker else None
-
-            if target:
-                act = movetoaction.MoveToAction(self.owner, target.position)
-                self.brain.add_action(act)
+                if target:
+                    act = movetoaction.MoveToAction(self.owner, target.position)
+                    self.brain.add_action(act)
 
             # Wander otherwise
             else:
@@ -211,15 +237,15 @@ class KoboldHurtState(monster.MonsterState):
 
     def on_threat_spotted(self, threat):
         """Called when a threatening entity is in sight"""
-        if threat.current_health > 1:
-            self.brain.set_state(KoboldFleeState)
+        self.brain.set_state(RatFleeState)
 
     def on_no_longer_wounded(self):
-        self.brain.set_state(KoboldIdleState)
+        self.brain.set_state(RatIdleState)
 
 
-class KoboldFleeState(monster.MonsterState):
+class RatFleeState(monster.MonsterState):
     """Class that encapsulates hurt fleeing behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
@@ -242,12 +268,12 @@ class KoboldFleeState(monster.MonsterState):
             self.brain.add_action(act)
 
     def on_no_longer_wounded(self):
-        self.brain.set_state(KoboldAggroState)
+        self.brain.set_state(RatAggroState)
 
     def on_threat_lost(self, threat):
         if threat == self.threat:
             self.threat = None
-            self.brain.set_state(KoboldHurtState)
+            self.brain.set_state(RatHurtState)
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_BLUE, bg=palette.BLACK)
@@ -255,7 +281,34 @@ class KoboldFleeState(monster.MonsterState):
         self.brain.add_action(action.IdleAction(self.owner))
 
     def on_state_exit(self, next_state):
-        if isinstance(next_state, KoboldHurtState):
+        if isinstance(next_state, RatHurtState):
             ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
             self.owner.append(ani)
             self.brain.add_action(action.IdleAction(self.owner))
+
+
+class RatBabies(entity.Entity):
+    def __init__(self):
+        super().__init__('R')
+        self.timer = 30
+        self.hidden = True
+
+    def tick(self, tick):
+        self.timer -= 1
+
+        if self.timer == 0:
+            parent = self.parent
+            neighbor_tiles = list(map(lambda x: utils.math.add(x, parent.position), helpers.DirectionHelper.directions))
+            open_tiles = [t for t in neighbor_tiles if instances.scene_root.check_collision(*t)]
+
+            if open_tiles:
+                instances.console.describe(parent, 'Rats burst from {}'.format(parent.display_string))
+
+            if parent.isinstance('Creature'):
+                parent.die()
+            else:
+                parent.remove()
+
+            for tile in open_tiles:
+                r = Rat(position=tile)
+                instances.scene_root.append(r)

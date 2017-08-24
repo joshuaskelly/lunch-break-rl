@@ -3,7 +3,6 @@ import random
 import helpers
 import instances
 import palette
-import registry
 import utils
 
 from ai import action
@@ -13,31 +12,30 @@ from ai.actions import moveaction
 from ai.actions import movetoaction
 
 from entities import animation
-from entities.creatures import monster
+from entities import creature
 from entities.items.weapons import dagger
 
 
-class Kobold(monster.Monster):
-    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
+class Monster(creature.Creature):
+    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN,
+                 bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.max_health = 4
         self.current_health = self.max_health
-        self.name = 'kobold'
-        self.brain = KoboldBrain(self)
+        self.name = 'monster'
+        self.brain = MonsterBrain(self)
         self.sight_radius = 3.5
 
         if random.random() <= 1 / 5:
             self.equip_weapon(dagger.Dagger())
 
-registry.Registry.register(Kobold, 'monster', 5)
 
-
-class KoboldBrain(brain.Brain):
+class MonsterBrain(brain.Brain):
     def __init__(self, owner):
         super().__init__(owner)
         self.state = None
         self.context = {'threats': []}
-        self.set_state(KoboldIdleState)
+        self.set_state(MonsterIdleState)
         self.last_health = owner.current_health
         self.wounded_threshold = 2
 
@@ -80,7 +78,7 @@ class KoboldBrain(brain.Brain):
         return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
-        return entity.isinstance('Player') and entity and entity.alive and entity.position
+        return entity.isinstance('Player') and entity.alive
 
     def on_wounded(self):
         self.state.on_wounded()
@@ -102,8 +100,68 @@ class KoboldBrain(brain.Brain):
         self.state.on_state_enter(old_state)
 
 
-class KoboldIdleState(monster.MonsterState):
+class MonsterState(object):
+    """State base class"""
+
+    def __init__(self, brain):
+        self.brain = brain
+
+    @property
+    def name(self):
+        return self.__class__.__name__
+
+    @property
+    def context(self):
+        if self.brain:
+            return self.brain.context
+
+        return None
+
+    @property
+    def owner(self):
+        if self.brain:
+            return self.brain.owner
+
+        return None
+
+    def tick(self, tick):
+        """Performs per tick logic"""
+        pass
+
+    def on_threat_spotted(self, threat):
+        """Called when a threatening entity is in sight"""
+        pass
+
+    def on_threat_lost(self, threat):
+        """Called when a threatening entity is no longer in sight"""
+        pass
+
+    def on_wounded(self):
+        """Called when owner is critically wounded"""
+        pass
+
+    def on_no_longer_wounded(self):
+        """Called when owner is no longer critically wounded"""
+        pass
+
+    def on_state_enter(self, prev_state):
+        """Called when transitioning to this state
+
+        prev_state: The state object transitioning from
+        """
+        pass
+
+    def on_state_exit(self, next_state):
+        """Called when transitioning from this state
+
+        next_state: The state object transitioning to
+        """
+        pass
+
+
+class MonsterIdleState(MonsterState):
     """State class that encapsulates idle behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
 
@@ -128,14 +186,15 @@ class KoboldIdleState(monster.MonsterState):
         self.brain.fail_next_action()
         self.brain.actions = []
         self.context['threat'] = threat
-        self.brain.set_state(KoboldAggroState)
+        self.brain.set_state(MonsterAggroState)
 
     def on_wounded(self):
-        self.brain.set_state(KoboldHurtState)
+        self.brain.set_state(MonsterHurtState)
 
 
-class KoboldAggroState(monster.MonsterState):
+class MonsterAggroState(MonsterState):
     """State class the encapsulates aggressive behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
         self.aggro_counter = 0
@@ -148,7 +207,7 @@ class KoboldAggroState(monster.MonsterState):
         self.brain.add_action(action.IdleAction(self.owner))
 
     def on_state_exit(self, next_state):
-        if isinstance(next_state, KoboldIdleState):
+        if isinstance(next_state, MonsterIdleState):
             ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
             self.owner.append(ani)
             self.brain.add_action(action.IdleAction(self.owner))
@@ -163,16 +222,17 @@ class KoboldAggroState(monster.MonsterState):
     def on_threat_lost(self, threat):
         if threat == self.threat:
             self.threat = None
-            self.brain.set_state(KoboldIdleState)
+            self.brain.set_state(MonsterIdleState)
 
     def on_wounded(self):
         self.brain.fail_next_action()
         self.brain.actions = []
-        self.brain.set_state(KoboldFleeState)
+        self.brain.set_state(MonsterFleeState)
 
 
-class KoboldHurtState(monster.MonsterState):
+class MonsterHurtState(MonsterState):
     """Class that encapsulates hurt idle behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
@@ -180,15 +240,11 @@ class KoboldHurtState(monster.MonsterState):
     def tick(self, tick):
         if not self.brain.actions:
             # Attempt to heal
+            # TODO: Have a more generic way of finding healing items
             corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
             corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
             target = corpses[0] if corpses else None
-
-            if not target:
-                weaker = [e for e in self.owner.visible_entities if e.isinstance('Creature') and e.current_health == 1]
-                sorted(weaker, key=lambda w: utils.math.distance(self.owner.position, w.position))
-                target = weaker[0] if weaker else None
 
             if target:
                 act = movetoaction.MoveToAction(self.owner, target.position)
@@ -211,15 +267,15 @@ class KoboldHurtState(monster.MonsterState):
 
     def on_threat_spotted(self, threat):
         """Called when a threatening entity is in sight"""
-        if threat.current_health > 1:
-            self.brain.set_state(KoboldFleeState)
+        self.brain.set_state(MonsterFleeState)
 
     def on_no_longer_wounded(self):
-        self.brain.set_state(KoboldIdleState)
+        self.brain.set_state(MonsterIdleState)
 
 
-class KoboldFleeState(monster.MonsterState):
+class MonsterFleeState(MonsterState):
     """Class that encapsulates hurt fleeing behavior"""
+
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
@@ -242,12 +298,12 @@ class KoboldFleeState(monster.MonsterState):
             self.brain.add_action(act)
 
     def on_no_longer_wounded(self):
-        self.brain.set_state(KoboldAggroState)
+        self.brain.set_state(MonsterAggroState)
 
     def on_threat_lost(self, threat):
         if threat == self.threat:
             self.threat = None
-            self.brain.set_state(KoboldHurtState)
+            self.brain.set_state(MonsterHurtState)
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_BLUE, bg=palette.BLACK)
@@ -255,7 +311,7 @@ class KoboldFleeState(monster.MonsterState):
         self.brain.add_action(action.IdleAction(self.owner))
 
     def on_state_exit(self, next_state):
-        if isinstance(next_state, KoboldHurtState):
+        if isinstance(next_state, MonsterHurtState):
             ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
             self.owner.append(ani)
             self.brain.add_action(action.IdleAction(self.owner))
