@@ -27,3 +27,6 @@ class Brain(object):
     def fail_next_action(self):
         if self.actions:
             self.actions[0].fail()
+
+    def clear(self):
+        self.actions = []

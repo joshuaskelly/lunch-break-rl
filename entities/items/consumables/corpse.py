@@ -9,7 +9,6 @@ class Corpse(consumable.Consumable):
         super().__init__('%', fg=palette.BRIGHT_RED)
         self.heal_amount = 2
         self.former = former
-        self.alive = True #?
 
     def get_action(self, requester=None):
         if requester.isinstance('Player') or requester.current_health >= requester.max_health:

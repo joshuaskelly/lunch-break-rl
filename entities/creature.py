@@ -69,6 +69,9 @@ class Creature(entity.Entity):
             self.position = self.position[0] + x, self.position[1] + y
 
     def can_move(self, x, y):
+        if not self.position:
+            return False
+
         dest = self.position[0] + x, self.position[1] + y
         return instances.scene_root.check_collision(*dest)
 
@@ -80,9 +83,6 @@ class Creature(entity.Entity):
         return target.position in self.visible_tiles
 
     def update(self, time):
-        if self.current_health <= 0:
-            self.die()
-
         super().update(time)
 
     def update_fov(self):
@@ -115,6 +115,9 @@ class Creature(entity.Entity):
             instances.console.describe(self, '{}\'s {} breaks!'.format(self.display_string, i.display_string))
 
     def die(self):
+        if self.current_health > 0:
+            self.current_health = 0
+
         c = corpse.Corpse(self)
         c.position = self.position
         instances.scene_root.append(c)
@@ -127,12 +130,21 @@ class Creature(entity.Entity):
         level_entity = instances.scene_root.get_level_entity_at(*self.position)
         level_entity.fg = palette.BRIGHT_RED
 
+    def remove(self, child=None):
+        super().remove(child)
+
+        if not child:
+            self.brain.clear()
+
     def tick(self, tick):
         super().tick(tick)
 
         self.brain.tick(tick)
         self.brain.perform_action()
         self.update_fov()
+
+        if not self.alive:
+            self.die()
 
         if self.current_health == 1 and self.max_health > 1:
             self.make_blood_trail()
@@ -184,8 +196,7 @@ class Creature(entity.Entity):
         damage_dealt = action.performer.weapon.damage
         verb = action.performer.weapon.verb
 
-        if action.performer.visible:
-            instances.console.describe(action.performer, '{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
+        instances.console.describe(action.performer, '{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
 
         self.current_health -= damage_dealt
 
@@ -195,9 +206,8 @@ class Creature(entity.Entity):
 
             self.make_blood_trail()
 
-        if self.current_health > 0:
-            # Put held_item logic here?
-            pass
+        if not self.alive:
+            self.die()
 
     def after_attacked(self, action):
         """Called on target after attack has occurred"""

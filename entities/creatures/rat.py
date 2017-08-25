@@ -20,8 +20,8 @@ from entities.items.weapons import fist
 
 
 class Rat(monster.Monster):
-    def __init__(self, char='r', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
-        super().__init__(char, position, fg, bg)
+    def __init__(self, char='r', position=(0, 0)):
+        super().__init__(char, position)
         self.name = 'Rat'
         self.brain = RatBrain(self)
         self.max_health = 1
@@ -35,6 +35,9 @@ class Rat(monster.Monster):
     def get_action(self, requester=None):
         # Rats won't hurt other rats. :)
         if requester.isinstance('Rat'):
+            if (requester.isinstance('RatKing') or self.isinstance('RatKing') or random.random() < 1 / 64):
+                return CreateRatKingAction(requester, self)
+
             return swappositionaction.SwapPositionAction(requester, self)
 
         return super().get_action(requester)
@@ -73,7 +76,30 @@ class NibbleWeaponAction(action.Action):
 
     def perform(self):
         instances.console.describe(self.performer, "{} nibbles on {}".format(self.performer.display_string, self.target.display_string))
-        self.target.on_use()
+
+        for _ in range(self.performer.weapon.damage):
+            if self.target.parent:
+                self.target.on_use()
+
+
+class CreateRatKingAction(action.Action):
+    def prerequisite(self):
+        return utils.math.distance(self.performer.position, self.target.position) == 1 and self.target.isinstance('Rat')
+
+    def perform(self):
+        a = self.performer
+        b = self.target
+
+        health = sum([e.max_health for e in [a, b]])
+        rk = RatKing(position=b.position, health=health)
+
+        if not a.isinstance('RatKing') and not b.isinstance('RatKing'):
+            instances.console.describe(rk, 'A {} forms!'.format(rk.display_string))
+
+        a.remove()
+        b.remove()
+
+        instances.scene_root.append(rk)
 
 
 class RatBrain(brain.Brain):
@@ -124,7 +150,14 @@ class RatBrain(brain.Brain):
         return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
-        return not entity.isinstance('Rat') and entity.isinstance('Creature') and entity.alive
+        if entity.isinstance('Creature') and entity.alive:
+            if entity.isinstance('Rat'):
+                return False
+
+            elif entity.current_health >= self.owner.current_health:
+                return True
+
+        return False
 
     def on_wounded(self):
         self.state.on_wounded()
@@ -326,6 +359,10 @@ class RatBabies(entity.Entity):
 
         if self.timer == 0:
             parent = self.parent
+
+            if not parent.position:
+                return
+
             neighbor_tiles = list(map(lambda x: utils.math.add(x, parent.position), helpers.DirectionHelper.directions))
             open_tiles = [t for t in neighbor_tiles if instances.scene_root.check_collision(*t)]
 
@@ -340,3 +377,43 @@ class RatBabies(entity.Entity):
             for tile in open_tiles:
                 r = Rat(position=tile)
                 instances.scene_root.append(r)
+
+
+class RatKing(Rat):
+    def __init__(self, char='R', position=(0, 0), health=2):
+        super().__init__(char, position)
+        self.name = 'rat king'
+        self.current_health = health
+        self.max_health = health
+        self.weapon.damage = health
+
+    def on_attacked(self, action):
+        super().on_attacked(action)
+        a = self.max_health // 2
+        b = self.max_health - a
+
+        instances.console.describe(self, '{} splits in two!'.format(self.display_string))
+
+        pos = self.position
+        self.remove()
+
+        neighbor_tiles = list(map(lambda x: utils.math.add(x, pos), helpers.DirectionHelper.directions))
+        neighbor_tiles.append(pos)
+        open_tiles = [t for t in neighbor_tiles if instances.scene_root.check_collision(*t)]
+        empty_tiles = [t for t in open_tiles if not instances.scene_root.get_entity_at(*t)]
+
+        a_pos = empty_tiles.pop(int(random.random() * (len(empty_tiles) - 1)))
+
+        b_pos = a_pos
+        if empty_tiles:
+            b_pos = empty_tiles.pop(int(random.random() * (len(empty_tiles) - 1)))
+
+        if a == 1:
+            instances.scene_root.append(Rat(position=a_pos))
+        else:
+            instances.scene_root.append(RatKing(position=a_pos, health=a))
+
+        if b == 1:
+            instances.scene_root.append(Rat(position=b_pos))
+        else:
+            instances.scene_root.append(RatKing(position=b_pos, health=b))

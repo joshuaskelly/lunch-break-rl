@@ -17,8 +17,7 @@ from entities.items.weapons import dagger
 
 
 class Monster(creature.Creature):
-    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN,
-                 bg=palette.BLACK):
+    def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.max_health = 4
         self.current_health = self.max_health

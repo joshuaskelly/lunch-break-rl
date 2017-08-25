@@ -17,7 +17,6 @@ class LevelEntity(entity.Entity):
         super().__init__(char, position, fg, bg)
         self.name = 'wall'
         self.is_initing = False
-        self.alive = True
 
     @property
     def char(self):
