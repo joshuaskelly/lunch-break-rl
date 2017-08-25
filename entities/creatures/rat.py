@@ -20,14 +20,14 @@ from entities.items.weapons import fist
 
 
 class Rat(monster.Monster):
-    def __init__(self, char='R', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
+    def __init__(self, char='r', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.name = 'Rat'
         self.brain = RatBrain(self)
         self.max_health = 1
         self.current_health = self.max_health
         self.sight_radius = 2.5
-        self.equip_weapon(RatClaws())
+        self.equip_weapon(RatTeeth())
 
     def can_equip(self, target):
         return target.isinstance('Fist')
@@ -39,24 +39,41 @@ class Rat(monster.Monster):
 
         return super().get_action(requester)
 
-registry.Registry.register(Rat, 'monster', 3)
+registry.Registry.register(Rat, 'monster', 8)
 
 
-class RatClaws(fist.Fist):
+class RatTeeth(fist.Fist):
     def __init__(self, char='f', position=(0, 0)):
         super().__init__(char, position)
-        self.name = 'claws'
-        self.verb = 'scratches'
+        self.name = 'teeth'
+        self.verb = 'bites'
 
     def get_special_action(self, requester, target):
+        # TODO: Makes the below actions
         if target.isinstance('Corpse'):
             # Add babies
-            target.append(RatBabies())
+            return InfestAction(requester, target)
 
         elif target.isinstance('Weapon'):
             # Nibble
-            instances.console.describe(self.parent, "{} nibbles on {}".format(self.parent.display_string, target.display_string))
-            target.on_use()
+            return NibbleWeaponAction(requester, target)
+
+
+class InfestAction(action.Action):
+    def prerequisite(self):
+        return utils.math.distance(self.performer.position, self.target.position) == 1
+
+    def perform(self):
+        self.target.append(RatBabies())
+
+
+class NibbleWeaponAction(action.Action):
+    def prerequisite(self):
+        return utils.math.distance(self.performer.position, self.target.position) == 1 and self.target.isinstance('Weapon')
+
+    def perform(self):
+        instances.console.describe(self.performer, "{} nibbles on {}".format(self.performer.display_string, self.target.display_string))
+        self.target.on_use()
 
 
 class RatBrain(brain.Brain):
@@ -107,7 +124,7 @@ class RatBrain(brain.Brain):
         return [e for e in self.owner.visible_entities if self.is_threat(e)]
 
     def is_threat(self, entity):
-        return entity.isinstance('Player') and entity.alive
+        return not entity.isinstance('Rat') and entity.isinstance('Creature') and entity.alive
 
     def on_wounded(self):
         self.state.on_wounded()
@@ -138,18 +155,29 @@ class RatIdleState(monster.MonsterState):
     def tick(self, tick):
         # Idle behavior. Wait and wander.
         if not self.brain.actions:
-            batched_action = action.BatchedAction(self.owner)
+            if random.random() < 1 / 32:
+                corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
+                corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
-            for _ in range(random.randint(1, 3)):
-                idle_action = action.IdleAction(self.owner)
-                idle_action.parent = batched_action
-                self.brain.add_action(idle_action)
+                target = corpses[0] if corpses else None
 
-            wander_action = wanderaction.WanderAction(self.owner)
-            wander_action.parent = batched_action
-            self.brain.add_action(wander_action)
+                if target:
+                    act = movetoaction.MoveToAction(self.owner, target.position)
+                    self.brain.add_action(act)
 
-            self.brain.add_action(batched_action)
+            else:
+                batched_action = action.BatchedAction(self.owner)
+
+                for _ in range(random.randint(1, 3)):
+                    idle_action = action.IdleAction(self.owner)
+                    idle_action.parent = batched_action
+                    self.brain.add_action(idle_action)
+
+                wander_action = wanderaction.WanderAction(self.owner)
+                wander_action.parent = batched_action
+                self.brain.add_action(wander_action)
+
+                self.brain.add_action(batched_action)
 
     def on_threat_spotted(self, threat):
         # Forget whatever we were doing.

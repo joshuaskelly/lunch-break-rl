@@ -28,18 +28,10 @@ class AttackAction(action.Action):
 
     def perform(self):
         self.performer.before_attack(self)
-
-        if self.target.alive:
-            self.target.before_attacked(self)
-
-        if self.target.alive:
-            self.target.on_attacked(self)
-
-        if self.performer.alive:
-            self.performer.after_attack(self)
-
-        if self.target.alive:
-            self.target.after_attacked(self)
+        self.target.before_attacked(self)
+        self.target.on_attacked(self)
+        self.performer.after_attack(self)
+        self.target.after_attacked(self)
 
 
 class AttackActionInterface(object):
