@@ -16,6 +16,9 @@ fps = 30
 ; Renderer to use. Options are ['GLSL', 'OPENGL', 'SDL']
 renderer = OPENGL
 
+; Font to use.
+font = terminal32x32_gs_ro.png
+
 [GAME]
 ; The length of a turn in seconds
 turn = 2
@@ -30,6 +33,23 @@ Password = oauth:abcdefghijklmnopqrstuvwxyz0123
 
 ; Channel to listen to
 Channel = channel
+
+; Broadcaster display color. Default is orange (255, 163, 0).
+BroadcasterColor = 255, 163, 0
+
+; Subscriber color. Default is blue (41, 173, 255).
+SubscriberColor = 41, 173, 255
+
+; Viewer display color. Default is orange (255, 163, 0).
+ViewerColor = 255, 163, 0
+
+; Special viewer display color. Default is red (255, 0, 77).
+SpecialViewerColor = 255, 0, 77
+
+; List of special viewers names separated by newlines.
+SpecialViewers =
+    joshuaskelly
+    gusanolocovg
 
 ```
 

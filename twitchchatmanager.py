@@ -1,5 +1,6 @@
 import time
 
+import game
 import instances
 import palette
 import registry
@@ -7,36 +8,18 @@ import registry
 from entities import entity
 from entities.creatures import player
 
-regular_viewers = [
-    'daemianend',
-    'cuddigan',
-    'fourbitfriday',
-    'falseparklocation',
-    'pythooonuser',
-    'gui2203',
-    'nimphious',
-    'loggercito',
-    'firedrgn',
-    'kingdred405',
-    'slayerdarth',
-    'smyyth',
-    'paspartout',
-    'nixrod',
-    'glasscaskettv',
-    '109thanos',
-    'hawaii_beach',
-    'robojester',
-    'gusanolocovg',
-    'newobj',
-    'that_bluestone'
-]
-
 
 class TwitchChatManager(entity.Entity):
+    special_viewers = []
+
     def __init__(self):
         super().__init__(' ')
         self.hidden = True
         self.time_since_last_help_message = 0
+        TwitchChatManager.special_viewers = [viewer.lower() for viewer in game.Game.config['TWITCH']['SpecialViewers'].split('\n') if viewer]
+
+    def get_config_color(self, key):
+        return tuple([int(d) for d in game.Game.config['TWITCH'][key].strip(' ').split(',')])
 
     def handle_events(self, event):
         current_scene = instances.scene_root
@@ -50,15 +33,35 @@ class TwitchChatManager(entity.Entity):
 
                     if not event.nickname in player_names:
                         # Set player color
-                        if event.tags['subscriber'] != '0' and event.nickname != 'joshuaskelly':
-                            player_color = palette.BRIGHT_BLUE
+                        if 'broadcaster' in event.tags['badges']:
+                            try:
+                                player_color = self.get_config_color('BroadcasterColor')
+
+                            except:
+                                player_color = palette.get_nearest((255, 163, 0))
+
+                        elif event.tags['subscriber'] != '0':
+                            try:
+                                player_color = self.get_config_color('SubscriberColor')
+
+                            except:
+                                player_color = palette.BRIGHT_BLUE
+
                             bonus = registry.Registry.get('weapon')()
 
-                        elif event.nickname.lower() in regular_viewers:
-                            player_color = palette.BRIGHT_RED
+                        elif event.nickname.lower() in TwitchChatManager.special_viewers:
+                            try:
+                                player_color = self.get_config_color('SpecialViewerColor')
+
+                            except:
+                                player_color = palette.BRIGHT_RED
 
                         else:
-                            player_color = palette.get_nearest((255, 163, 0))
+                            try:
+                                player_color = self.get_config_color('ViewerColor')
+
+                            except:
+                                player_color = palette.get_nearest((255, 163, 0))
 
                         # Add player
                         pos = current_scene.get_location_near_stairs()
