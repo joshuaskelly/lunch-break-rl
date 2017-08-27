@@ -180,7 +180,7 @@ class KoboldHurtState(monster.MonsterState):
     def tick(self, tick):
         if not self.brain.actions:
             # Attempt to heal
-            corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
+            corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse') and e.position != self.owner.position]
             corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
             target = corpses[0] if corpses else None

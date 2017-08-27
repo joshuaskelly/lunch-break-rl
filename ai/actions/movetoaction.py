@@ -14,6 +14,9 @@ class MoveToAction(action.Action):
         scene_root = instances.scene_root
         level = scene_root.level
 
+        if not self.destination:
+            return False
+
         return self.destination in level.data and scene_root.check_collision(*self.destination)
 
     def perform(self):

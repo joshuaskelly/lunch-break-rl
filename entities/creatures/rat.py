@@ -22,7 +22,7 @@ from entities.items.weapons import fist
 class Rat(monster.Monster):
     def __init__(self, char='r', position=(0, 0)):
         super().__init__(char, position)
-        self.name = 'Rat'
+        self.name = 'rat'
         self.brain = RatBrain(self)
         self.max_health = 1
         self.current_health = self.max_health
@@ -42,7 +42,7 @@ class Rat(monster.Monster):
 
         return super().get_action(requester)
 
-registry.Registry.register(Rat, 'monster', 8)
+registry.Registry.register(Rat, 'monster', 3.5)
 
 
 class RatTeeth(fist.Fist):
@@ -106,10 +106,10 @@ class RatBrain(brain.Brain):
     def __init__(self, owner):
         super().__init__(owner)
         self.state = None
-        self.context = {'threats': []}
+        self.context = {'threats': [],
+                        'allies': []}
         self.set_state(RatIdleState)
         self.last_health = owner.current_health
-        self.wounded_threshold = 2
 
     @property
     def threats(self):
@@ -119,16 +119,17 @@ class RatBrain(brain.Brain):
     def threats(self, value):
         self.context['threats'] = value
 
+    @property
+    def allies(self):
+        return self.context.get('allies')
+
+    @allies.setter
+    def allies(self, value):
+        self.context['allies'] = value
+
     def tick(self, tick):
         if not self.owner.alive:
             return
-
-        # Check if critically hurt
-        if self.last_health > self.wounded_threshold >= self.owner.current_health:
-            self.on_wounded()
-
-        elif self.last_health <= self.wounded_threshold < self.owner.current_health:
-            self.on_no_longer_wounded()
 
         self.last_health = self.owner.current_health
 
@@ -144,6 +145,8 @@ class RatBrain(brain.Brain):
                 self.threats.remove(threat)
                 self.state.on_threat_lost(threat)
 
+        self.allies = [e for e in self.owner.visible_entities if e.isinstance('Rat')]
+
         self.state.tick(tick)
 
     def get_threats(self):
@@ -158,12 +161,6 @@ class RatBrain(brain.Brain):
                 return True
 
         return False
-
-    def on_wounded(self):
-        self.state.on_wounded()
-
-    def on_no_longer_wounded(self):
-        self.state.on_no_longer_wounded()
 
     def set_state(self, state_class):
         if not self.owner.alive:
@@ -186,10 +183,10 @@ class RatIdleState(monster.MonsterState):
         super().__init__(brain)
 
     def tick(self, tick):
-        # Idle behavior. Wait and wander.
         if not self.brain.actions:
+            # Lay babies...
             if random.random() < 1 / 32:
-                corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
+                corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse') and e.position != self.owner.position]
                 corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
                 target = corpses[0] if corpses else None
@@ -198,6 +195,7 @@ class RatIdleState(monster.MonsterState):
                     act = movetoaction.MoveToAction(self.owner, target.position)
                     self.brain.add_action(act)
 
+            # ...or wander.
             else:
                 batched_action = action.BatchedAction(self.owner)
 
@@ -213,14 +211,21 @@ class RatIdleState(monster.MonsterState):
                 self.brain.add_action(batched_action)
 
     def on_threat_spotted(self, threat):
-        # Forget whatever we were doing.
-        self.brain.fail_next_action()
-        self.brain.actions = []
-        self.context['threat'] = threat
-        self.brain.set_state(RatAggroState)
+        allies = self.brain.allies[:]
+        allies.append(self.owner)
+        health = sum([a.current_health for a in allies])
 
-    def on_wounded(self):
-        self.brain.set_state(RatHurtState)
+        if health > threat.current_health:
+            for ally in allies:
+                ally.brain.set_state(RatAggroState)
+                ally.brain.state.threat = threat
+
+        else:
+            # Forget whatever we were doing.
+            self.brain.fail_next_action()
+            self.brain.actions = []
+            self.context['threat'] = threat
+            self.brain.set_state(RatFleeState)
 
 
 class RatAggroState(monster.MonsterState):
@@ -230,7 +235,14 @@ class RatAggroState(monster.MonsterState):
         super().__init__(brain)
         self.aggro_counter = 0
         self.aggro_cooldown = 5
-        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
+        self.threat_visible = True
+        self.threat_lost_counter = 0
+
+        threats = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))
+        self.threat = threats[0] if threats else None
+
+        if not self.threat:
+            self.threat_visible = False
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_RED, bg=palette.BLACK)
@@ -244,64 +256,26 @@ class RatAggroState(monster.MonsterState):
             self.brain.add_action(action.IdleAction(self.owner))
 
     def tick(self, tick):
-        if self.aggro_counter <= 0:
+        if self.aggro_counter <= 0 and self.threat_lost_counter == 0:
             self.brain.add_action(movetoaction.MoveToAction(self.owner, self.threat.position, self.brain.owner.sight_radius))
             self.aggro_counter = self.aggro_cooldown
 
         self.aggro_counter -= 1
 
-    def on_threat_lost(self, threat):
-        if threat == self.threat:
-            self.threat = None
-            self.brain.set_state(RatIdleState)
+        if not self.threat_visible:
+            self.threat_lost_counter += 1
 
-    def on_wounded(self):
-        self.brain.fail_next_action()
-        self.brain.actions = []
-        self.brain.set_state(RatFleeState)
-
-
-class RatHurtState(monster.MonsterState):
-    """Class that encapsulates hurt idle behavior"""
-
-    def __init__(self, brain):
-        super().__init__(brain)
-        self.brain = brain
-
-    def tick(self, tick):
-        if not self.brain.actions:
-            # Attempt to heal
-            if random.random() < 1 / 32:
-                corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse')]
-                corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
-
-                target = corpses[0] if corpses else None
-
-                if target:
-                    act = movetoaction.MoveToAction(self.owner, target.position)
-                    self.brain.add_action(act)
-
-            # Wander otherwise
-            else:
-                batched_action = action.BatchedAction(self.owner)
-
-                for _ in range(random.randint(1, 3)):
-                    idle_action = action.IdleAction(self.owner)
-                    idle_action.parent = batched_action
-                    self.brain.add_action(idle_action)
-
-                wander_action = wanderaction.WanderAction(self.owner)
-                wander_action.parent = batched_action
-                self.brain.add_action(wander_action)
-
-                self.brain.add_action(batched_action)
+            if self.threat_lost_counter >= 5:
+                self.threat = None
+                self.brain.set_state(RatIdleState)
 
     def on_threat_spotted(self, threat):
-        """Called when a threatening entity is in sight"""
-        self.brain.set_state(RatFleeState)
+        if threat == self.threat:
+            self.threat_visible = True
 
-    def on_no_longer_wounded(self):
-        self.brain.set_state(RatIdleState)
+    def on_threat_lost(self, threat):
+        if threat == self.threat:
+            self.threat_visible = False
 
 
 class RatFleeState(monster.MonsterState):
@@ -328,13 +302,10 @@ class RatFleeState(monster.MonsterState):
             act = moveaction.MoveAction(self.owner, direction)
             self.brain.add_action(act)
 
-    def on_no_longer_wounded(self):
-        self.brain.set_state(RatAggroState)
-
     def on_threat_lost(self, threat):
         if threat == self.threat:
             self.threat = None
-            self.brain.set_state(RatHurtState)
+            self.brain.set_state(RatIdleState)
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_BLUE, bg=palette.BLACK)
@@ -342,7 +313,7 @@ class RatFleeState(monster.MonsterState):
         self.brain.add_action(action.IdleAction(self.owner))
 
     def on_state_exit(self, next_state):
-        if isinstance(next_state, RatHurtState):
+        if isinstance(next_state, RatIdleState):
             ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
             self.owner.append(ani)
             self.brain.add_action(action.IdleAction(self.owner))
