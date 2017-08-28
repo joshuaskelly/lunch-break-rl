@@ -37,6 +37,7 @@ def generate_level(width, height, player_count):
              0x0,0x0,0x0]
 
     cursor = random.randint(0, 2)
+    start_cursor = cursor
     floor[cursor] |= STAIRUP
 
     def up():
@@ -87,7 +88,7 @@ def generate_level(width, height, player_count):
     moves = random.randint(8, 20)
     while moves > 0:
         current_cursor = random.choice(possible_moves)()
-        if current_cursor:
+        if current_cursor and current_cursor != start_cursor:
             moves -= 1
 
     floor[cursor] |= STAIRDOWN

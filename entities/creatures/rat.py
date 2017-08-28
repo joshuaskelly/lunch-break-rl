@@ -53,7 +53,7 @@ class RatTeeth(fist.Fist):
 
     def get_special_action(self, requester, target):
         # TODO: Makes the below actions
-        if target.isinstance('Corpse') or target.isinstance('Creature') and isinstance(target.brain.state, monster.MonsterSleepState):
+        if target.isinstance('Corpse') or target.isinstance('Creature') and hasattr(target.brain, 'state') and isinstance(target.brain.state, monster.MonsterSleepState):
             # Add babies
             return InfestAction(requester, target)
 
@@ -166,7 +166,7 @@ class RatBrain(brain.Brain):
             if entity.isinstance('Rat'):
                 return False
 
-            elif isinstance(entity.brain.state, monster.MonsterSleepState):
+            elif hasattr(entity.brain, 'state') and isinstance(entity.brain.state, monster.MonsterSleepState):
                 return False
 
             elif entity.current_health >= self.owner.current_health:
@@ -198,7 +198,7 @@ class RatIdleState(monster.MonsterState):
         if not self.brain.actions:
             # Lay babies...
             if random.random() < 1 / 32:
-                corpses = [e for e in self.owner.visible_entities if (e.isinstance('Corpse') or e.isinstance('Creature') and isinstance(e.brain.state, monster.MonsterSleepState)) and e.position != self.owner.position]
+                corpses = [e for e in self.owner.visible_entities if (e.isinstance('Corpse') or e.isinstance('Creature') and hasattr(e.brain, 'state') and isinstance(e.brain.state, monster.MonsterSleepState)) and e.position != self.owner.position]
                 corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
                 target = corpses[0] if corpses else None
