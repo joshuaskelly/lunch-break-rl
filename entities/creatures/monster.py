@@ -19,11 +19,11 @@ from entities.items.weapons import dagger
 class Monster(creature.Creature):
     def __init__(self, char='K', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
+        self.name = 'monster'
         self.max_health = 4
         self.current_health = self.max_health
-        self.name = 'monster'
-        self.brain = MonsterBrain(self)
         self.sight_radius = 3.5
+        self.brain = MonsterBrain(self)
 
         if random.random() <= 1 / 5:
             self.equip_weapon(dagger.Dagger())
@@ -51,8 +51,13 @@ class MonsterBrain(brain.Brain):
             return
 
         # Check if critically hurt
-        if self.last_health > self.wounded_threshold >= self.owner.current_health:
-            self.on_wounded()
+        if self.last_health > self.owner.current_health:
+            # We are hurt bad
+            if self.last_health > self.wounded_threshold >= self.owner.current_health:
+                self.on_wounded()
+
+            else:
+                self.on_hurt()
 
         elif self.last_health <= self.wounded_threshold < self.owner.current_health:
             self.on_no_longer_wounded()
@@ -79,6 +84,9 @@ class MonsterBrain(brain.Brain):
     def is_threat(self, entity):
         return entity.isinstance('Player') and entity.alive
 
+    def on_hurt(self):
+        self.state.on_hurt()
+
     def on_wounded(self):
         self.state.on_wounded()
 
@@ -97,6 +105,10 @@ class MonsterBrain(brain.Brain):
 
         self.state = new_state
         self.state.on_state_enter(old_state)
+
+    def reset(self):
+        self.clear()
+        self.set_state(MonsterIdleState)
 
 
 class MonsterState(object):
@@ -133,6 +145,10 @@ class MonsterState(object):
 
     def on_threat_lost(self, threat):
         """Called when a threatening entity is no longer in sight"""
+        pass
+
+    def on_hurt(self):
+        """Called when owner is hurt"""
         pass
 
     def on_wounded(self):
@@ -314,3 +330,33 @@ class MonsterFleeState(MonsterState):
             ani = animation.Flash('?', fg=palette.BRIGHT_YELLOW, bg=palette.BLACK)
             self.owner.append(ani)
             self.brain.add_action(action.IdleAction(self.owner))
+
+
+class MonsterSleepState(MonsterState):
+    def __init__(self, brain):
+        super().__init__(brain)
+        self.old_sight_radius = self.owner.sight_radius
+        self.sleep_timer = random.randrange(10, 45)
+        self.sleep_animation = None
+
+    def tick(self, tick):
+        self.sleep_timer -= 1
+        if self.sleep_timer <= 0 and random.random() < 1 / 8:
+            self.wakeup()
+
+    def on_state_enter(self, prev_state):
+        self.sleep_animation = animation.Flash('Z', fg=palette.BRIGHT_BLUE, bg=palette.BLACK, interval=0.5, repeat=self.sleep_timer * 4)
+        self.owner.append(self.sleep_animation)
+        self.owner.sight_radius = 0.5
+        self.brain.clear()
+
+    def on_hurt(self):
+        self.wakeup()
+
+    def on_state_exit(self, next_state):
+        self.owner.sight_radius = self.old_sight_radius
+        self.owner.remove(self.sleep_animation)
+
+    def wakeup(self):
+        self.brain.reset()
+        instances.console.describe(self.owner, '{} wakes up!'.format(self.owner.display_string))

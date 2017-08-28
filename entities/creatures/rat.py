@@ -35,14 +35,14 @@ class Rat(monster.Monster):
     def get_action(self, requester=None):
         # Rats won't hurt other rats. :)
         if requester.isinstance('Rat'):
-            if (requester.isinstance('RatKing') or self.isinstance('RatKing') or random.random() < 1 / 64):
+            if (requester.isinstance('RatKing') or self.isinstance('RatKing') or random.random() < 1 / 96):
                 return CreateRatKingAction(requester, self)
 
             return swappositionaction.SwapPositionAction(requester, self)
 
         return super().get_action(requester)
 
-registry.Registry.register(Rat, 'monster', 3.5)
+registry.Registry.register(Rat, 'monster', 3)
 
 
 class RatTeeth(fist.Fist):
@@ -53,13 +53,19 @@ class RatTeeth(fist.Fist):
 
     def get_special_action(self, requester, target):
         # TODO: Makes the below actions
-        if target.isinstance('Corpse'):
+        if target.isinstance('Corpse') or target.isinstance('Creature') and isinstance(target.brain.state, monster.MonsterSleepState):
             # Add babies
             return InfestAction(requester, target)
 
         elif target.isinstance('Weapon'):
             # Nibble
-            return NibbleWeaponAction(requester, target)
+            if target.isinstance('Debris') or random.random() <= 0.5:
+                return None
+
+            else:
+                return NibbleWeaponAction(requester, target)
+
+        return None
 
 
 class InfestAction(action.Action):
@@ -67,7 +73,10 @@ class InfestAction(action.Action):
         return utils.math.distance(self.performer.position, self.target.position) == 1
 
     def perform(self):
-        self.target.append(RatBabies())
+        rbs = [b for b in self.target.children if b.isinstance('RatBabies')]
+
+        if not rbs:
+            self.target.append(RatBabies())
 
 
 class NibbleWeaponAction(action.Action):
@@ -145,7 +154,7 @@ class RatBrain(brain.Brain):
                 self.threats.remove(threat)
                 self.state.on_threat_lost(threat)
 
-        self.allies = [e for e in self.owner.visible_entities if e.isinstance('Rat')]
+        self.allies = [e for e in self.owner.visible_entities if e.isinstance('Rat') and e.position and e.alive]
 
         self.state.tick(tick)
 
@@ -155,6 +164,9 @@ class RatBrain(brain.Brain):
     def is_threat(self, entity):
         if entity.isinstance('Creature') and entity.alive:
             if entity.isinstance('Rat'):
+                return False
+
+            elif isinstance(entity.brain.state, monster.MonsterSleepState):
                 return False
 
             elif entity.current_health >= self.owner.current_health:
@@ -186,7 +198,7 @@ class RatIdleState(monster.MonsterState):
         if not self.brain.actions:
             # Lay babies...
             if random.random() < 1 / 32:
-                corpses = [e for e in self.owner.visible_entities if e.isinstance('Corpse') and e.position != self.owner.position]
+                corpses = [e for e in self.owner.visible_entities if (e.isinstance('Corpse') or e.isinstance('Creature') and isinstance(e.brain.state, monster.MonsterSleepState)) and e.position != self.owner.position]
                 corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
                 target = corpses[0] if corpses else None
@@ -269,6 +281,10 @@ class RatAggroState(monster.MonsterState):
                 self.threat = None
                 self.brain.set_state(RatIdleState)
 
+        allies = self.brain.allies[:]
+        allies.append(self.owner)
+        health = sum([a.current_health for a in allies])
+
     def on_threat_spotted(self, threat):
         if threat == self.threat:
             self.threat_visible = True
@@ -328,6 +344,9 @@ class RatBabies(entity.Entity):
     def tick(self, tick):
         self.timer -= 1
 
+        if self.timer == 5 and self.parent.isinstance('Creature'):
+            instances.console.describe(self.parent, '{} looks ill'.format(self.parent.display_string))
+
         if self.timer == 0:
             parent = self.parent
 
@@ -359,7 +378,6 @@ class RatKing(Rat):
         self.weapon.damage = health
 
     def on_attacked(self, action):
-        super().on_attacked(action)
         a = self.max_health // 2
         b = self.max_health - a
 

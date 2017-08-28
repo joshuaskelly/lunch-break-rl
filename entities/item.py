@@ -29,7 +29,7 @@ class HeldItem(Item):
         self.chance_to_break = 1 / 2
 
     def get_action(self, requester=None):
-        if requester and requester.weapon.isinstance('Fist'):
+        if requester and requester.can_equip(self):
             return equipitemaction.EquipItemAction(requester, self)
 
         return None

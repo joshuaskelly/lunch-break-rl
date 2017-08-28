@@ -187,4 +187,4 @@ class Entity(object):
 
     # Implements EquipItemInterface
     def can_equip(self, target):
-        return True
+        return self.weapon.isinstance('Fist')
