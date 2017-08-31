@@ -182,4 +182,4 @@ def generate_level(width, height, player_count):
                 item = ItemClass(position=(x, y))
                 new_entities.append(item)
 
-    return new_level, new_entities
+    return new_level, new_entities, dont_place_monsters_here

@@ -121,7 +121,7 @@ class Entity(object):
             child = self
             parent = self.parent
 
-        if parent:
+        if parent and child in parent._children:
             parent._children.remove(child)
             child.parent = None
             child.position = None

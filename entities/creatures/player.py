@@ -131,12 +131,14 @@ class Player(creature.Creature):
 
                     dest = utils.math.add(self.position, direction)
 
+                    # Throw entity next to player in given direction
                     for target_entity in instances.scene_root.get_entity_at(*dest):
                         act = throwaction.ThrowAction(self, target_entity)
                         if act.prerequisite():
                             self.brain.add_action(act)
-                            break
+                            return
 
+                    # Throw held weapon in given direction
                     if not self.weapon.isinstance('Fist'):
                         w = self.weapon
                         w.remove()

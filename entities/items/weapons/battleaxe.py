@@ -47,11 +47,9 @@ class BattleAxeAttackAction(action.Action):
 
         self.sub_actions = [a for a in self.sub_actions if a.prerequisite()]
 
-        if len(self.sub_actions) > 0:
+        if len(self.sub_actions) > 0 and hasattr(self.performer.weapon, 'total_damage'):
             self.performer.weapon.damage = self.performer.weapon.total_damage // len(self.sub_actions)
             return True
-
-        self.performer.weapon.damage = self.performer.weapon.total_damage
 
         return False
 
@@ -62,5 +60,3 @@ class BattleAxeAttackAction(action.Action):
             action.target.on_attacked(action)
             action.performer.after_attack(action)
             action.target.after_attacked(action)
-
-        self.performer.weapon.damage = self.performer.weapon.total_damage

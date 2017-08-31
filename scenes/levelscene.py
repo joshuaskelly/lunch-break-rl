@@ -18,6 +18,7 @@ class LevelScene(scene.Scene):
         super().__init__(x, y, width, height)
 
         self.level = None
+        self.player_spawn_area = []
         self.tick_count = 0
         self.change_level_requested = False
         self._change_level_on_tick = 0
@@ -73,7 +74,7 @@ class LevelScene(scene.Scene):
         # Persist players in level
         self._children = [p for p in self.players if not p.idle]
 
-        self.level, new_entities = dungeongenerator.generate_level(29, 22, len(self._children))
+        self.level, new_entities, self.player_spawn_area = dungeongenerator.generate_level(29, 22, len(self._children))
         self.append(self.level)
 
         # Add generated entities to scene
@@ -183,11 +184,8 @@ class LevelScene(scene.Scene):
             self._change_level_on_tick = self.tick_count + 30
 
     def get_location_near_stairs(self):
-        # Find stair location
-        stair_location = [e for e in self.children if e.isinstance('Stairs') and e.name == 'Up'][0].position
-
         # Find open areas around stairs
-        rect = utils.rect(stair_location[0] - 3, stair_location[1] - 3, 7, 7)
+        rect = self.player_spawn_area
         filled_location = [e.position for e in self.children if hasattr(e, 'position')]
         possible_locations = []
         for point in rect:
