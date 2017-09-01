@@ -14,6 +14,8 @@ from entities import door
 from entities import items
 from entities import stairs
 
+from entities.creatures import darkness
+
 creatures.register()
 items.register()
 

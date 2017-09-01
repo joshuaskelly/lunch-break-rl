@@ -163,7 +163,7 @@ class RatBrain(brain.Brain):
 
     def is_threat(self, entity):
         if entity.isinstance('Creature') and entity.alive:
-            if entity.isinstance('Rat'):
+            if entity.isinstance('Rat') or entity.isinstance('Darkness'):
                 return False
 
             elif hasattr(entity.brain, 'state') and isinstance(entity.brain.state, monster.MonsterSleepState):
