@@ -83,7 +83,6 @@ class Game(object):
             time_elapsed = time.time() - last_time
             timer += time_elapsed
             last_time = time.time()
-            Game.scene_root.early_update(time_elapsed)
             Game.scene_root.update(time_elapsed)
 
             # Send out tick event

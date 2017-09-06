@@ -57,7 +57,7 @@ class DarknessAggroState(monster.MonsterAggroState):
         self.brain = brain
 
     def tick(self, tick):
-        pf = instances.scene_root.level.darkness_pathfinder
+        pf = instances.scene_root.level.pathfinder
 
         entities = [e for e in instances.scene_root.children if e.isinstance('Creature') and not e.isinstance('Darkness') and pf.get_path(*self.owner.position, *e.position)]
 

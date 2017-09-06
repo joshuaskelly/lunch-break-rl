@@ -32,10 +32,6 @@ class LevelScene(scene.Scene):
             LevelScene.instance = self
             instances.register('scene_root', self)
 
-    def early_update(self, time):
-        self.level.illuminated_tiles = set()
-        super().early_update(time)
-
     def update(self, time):
         super().update(time)
         self.update_fov()
@@ -251,10 +247,6 @@ class LevelScene(scene.Scene):
             ch, fg, bg = self.level.data.get_char(x, y)
             # Is it open
             if ch != ord('.'):
-                continue
-
-            # Is it illuminated
-            if (x, y) in self.level.illuminated_tiles:
                 continue
 
             # Is it reachable
