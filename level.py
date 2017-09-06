@@ -82,9 +82,11 @@ class Level(entity.Entity):
         self.erasing = False
         self.visible_tiles = set()
         self.seen_tiles = set()
+        self.illuminated_tiles = set()
         self.always_show = True
         self.pathfinder = tdl.map.AStar(width, height, callback=self.move_cost, diagnalCost=0)
         self.player_pathfinder = tdl.map.AStar(width, height, callback=self.player_move_cost, diagnalCost=0)
+        self.darkness_pathfinder = tdl.map.AStar(width, height, callback=self.darkness_move_cost, diagnalCost=0)
 
     def move_cost(self, x, y):
         if (x, y) not in self.data:
@@ -109,6 +111,19 @@ class Level(entity.Entity):
 
         return 0
 
+    def darkness_move_cost(self, x, y):
+        if (x, y) not in self.data:
+            return 0
+
+        if (x, y) in self.illuminated_tiles:
+            return 0
+
+        ch, fg, bg = self.data.get_char(x, y)
+        if ch == ord('.'):
+            return 1
+
+        return 0
+
     def draw_char(self, x, y, char, fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         self.data.draw_char(x, y, char, fg, bg)
 
@@ -121,9 +136,8 @@ class Level(entity.Entity):
 
             if (x, y) in self.seen_tiles or game.Game.args.no_fog == 'true':
                 if (x, y) in self.visible_tiles:
-                    pass
-                    #fg = palette.WHITE
-                    #fg = color_table[chr(ch)][True]
+                    if (x, y) in self.illuminated_tiles:
+                        fg = palette.get_nearest((255, 204, 170))
 
                 else:
                     fg = palette.get_nearest((95, 87, 79))

@@ -47,7 +47,8 @@ class TwitchChatManager(entity.Entity):
                             except:
                                 player_color = palette.BRIGHT_BLUE
 
-                            bonus = registry.Registry.get('weapon')()
+                            if not bonus:
+                                bonus = registry.Registry.get('weapon')()
 
                         elif event.nickname.lower() in TwitchChatManager.special_viewers:
                             try:

@@ -84,6 +84,14 @@ class Entity(object):
         for child in self.children:
             child.draw(console)
 
+    def early_update(self, time):
+        """Perform per frame logic.
+
+        time: Time elapsed since last update in seconds.
+        """
+        for child in self.children:
+            child.early_update(time)
+
     def update(self, time):
         """Perform per frame logic.
         
