@@ -5,6 +5,8 @@ import instances
 import palette
 import utils
 
+from ai import action
+from ai.actions import attackaction
 from entities import entity
 
 
@@ -62,6 +64,13 @@ class LevelEntity(entity.Entity):
             self.__cache = self.level.get_char(x, y)
 
         return self.__cache
+
+    def get_action(self, requester=None):
+        if requester.weapon.isinstance('PickAxe'):
+            direction = utils.math.sub(self.position, requester.position)
+            return attackaction.AttackAction(requester, self, direction)
+
+        return action.IdleAction(requester)
 
     def on_attacked(self, action):
         if action.performer.weapon.name == 'pick axe':

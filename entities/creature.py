@@ -73,7 +73,7 @@ class Creature(entity.Entity):
             return False
 
         dest = self.position[0] + x, self.position[1] + y
-        return instances.scene_root.check_collision(*dest)
+        return dest in instances.scene_root.level.data
 
     def can_see(self, target):
         """Returns true if target entity is in sight"""
