@@ -44,9 +44,7 @@ class ThrowAction(action.Action):
 
                         # Use potion on target
                         elif self.target.isinstance('UsableItem'):
-                            # TODO: Future Joshua fix
-                            #action_to_perform = self.target.use
-                            pass
+                            action_to_perform = self.target.use
 
                         done = True
                         break

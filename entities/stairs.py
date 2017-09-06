@@ -20,19 +20,6 @@ class StairsDown(Stairs):
         super().__init__(char, position, fg, bg)
         self.dark_fg = palette.YELLOW
         self.name = 'Down'
-        self._countdown_timer = 10
-        self._countdown_started = False
-
-    def tick(self, tick):
-        if self.visible and not self._countdown_started:
-            self._countdown_started = True
-            instances.console.print('Gloom spreads through the halls')
-
-        if self._countdown_started:
-            self._countdown_timer -= 1
-
-        if self._countdown_timer <= 0:
-            instances.scene_root.start_darkness()
 
     def get_action(self, requester=None):
         if not requester.isinstance('Player'):

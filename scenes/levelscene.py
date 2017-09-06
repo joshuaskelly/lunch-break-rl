@@ -1,5 +1,4 @@
 import random
-import utils
 
 import tdl
 
@@ -8,10 +7,8 @@ import game
 import instances
 import level
 import twitchchatmanager
+import utils
 from scenes import scene
-
-
-from entities.creatures import darkness
 
 
 class LevelScene(scene.Scene):
@@ -25,8 +22,6 @@ class LevelScene(scene.Scene):
         self.tick_count = 0
         self.change_level_requested = False
         self._change_level_on_tick = 0
-        self._downward_stair = None
-        self._spawned_darkness = False
 
         if not LevelScene.instance:
             LevelScene.instance = self
@@ -75,7 +70,6 @@ class LevelScene(scene.Scene):
         # Reset level change info
         self.change_level_requested = False
         self._change_level_on_tick = 0
-        self._spawned_darkness = False
 
         # Persist players in level
         self._children = [p for p in self.players if not p.idle]
@@ -182,10 +176,7 @@ class LevelScene(scene.Scene):
 
     @property
     def downward_stair(self):
-        if not self._downward_stair:
-            self._downward_stair = [e for e in self.children if e.isinstance('Stairs') and e.name == 'Down'][0]
-
-        return self._downward_stair
+        return [e for e in self.children if e.isinstance('Stairs') and e.name == 'Down'][0]
 
     def change_level(self):
         if not self.change_level_requested:
@@ -229,41 +220,3 @@ class LevelScene(scene.Scene):
         if game.Game.args.no_fog:
             self.level.visible_tiles = self.level.visible_tiles.union([(v[0], v[1]) for v in self.level.data])
             self.level.seen_tiles = self.level.seen_tiles.union([(s[0], s[1]) for s in self.level.data])
-
-        for d in [e for e in self.children if e.isinstance('Darkness')]:
-            self.level.visible_tiles = self.level.visible_tiles.difference(d.visible_tiles)
-            self.level.seen_tiles = self.level.seen_tiles.difference(d.visible_tiles)
-
-    def start_darkness(self):
-        if self._spawned_darkness:
-            return
-
-        self._spawned_darkness = True
-
-        pf = self.level.pathfinder
-
-        tiles = []
-        for (x, y) in self.level.data:
-            ch, fg, bg = self.level.data.get_char(x, y)
-            # Is it open
-            if ch != ord('.'):
-                continue
-
-            # Is it reachable
-            path = pf.get_path(x, y, *self.downward_stair.position)
-            if not path:
-                continue
-
-            # Add for consideration
-            t = (x, y), len(path)
-            tiles.append(t)
-
-        tiles = sorted(tiles, key=lambda t: t[1], reverse=True)
-        for i, (coord, _) in enumerate(tiles):
-            d = darkness.Darkness(position=coord)
-            self.append(d)
-            instances.console.print('Darkness has arrived')
-            return
-
-        # TODO: Future Joshua fix
-        #raise
