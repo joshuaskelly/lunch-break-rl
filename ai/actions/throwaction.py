@@ -44,7 +44,9 @@ class ThrowAction(action.Action):
 
                         # Use potion on target
                         elif self.target.isinstance('UsableItem'):
-                            action_to_perform = self.target.use
+                            act = self.target.get_action(hit_entity)
+                            if act:
+                                action_to_perform = act.perform
 
                         done = True
                         break

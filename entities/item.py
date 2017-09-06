@@ -61,7 +61,10 @@ class HeldItem(Item):
 
 class UsableItem(Item):
     def get_action(self, requester=None):
-        return useitemaction.UseItemAction(requester, self)
+        if requester.isinstance('Creature'):
+            return useitemaction.UseItemAction(requester, self)
+
+        return None
 
     def use(self, target):
         instances.console.describe(target, '{} is being used on {}'.format(self.display_string, target.display_string))

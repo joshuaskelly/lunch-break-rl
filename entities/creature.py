@@ -19,6 +19,7 @@ class Creature(entity.Entity):
     def __init__(self, char, position=(0, 0), fg=palette.BRIGHT_WHITE, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.brain = brain.Brain(self)
+        self.statuses = []
         self.name = 'Creature'
         self.current_health = 10
         self.max_health = 10
@@ -139,6 +140,9 @@ class Creature(entity.Entity):
     def tick(self, tick):
         super().tick(tick)
 
+        for status in self.statuses:
+            status.tick(tick)
+
         self.brain.tick(tick)
         self.brain.perform_action()
         self.update_fov()
@@ -173,6 +177,14 @@ class Creature(entity.Entity):
                 result.append(e)
 
         return result
+
+    def add_status(self, status):
+        status.on_status_begin()
+        self.statuses.append(status)
+
+    def remove_status(self, status):
+        status.on_status_end()
+        self.statuses.remove(status)
 
     def can_attack(self, target):
         """Determines if performer can attack target
