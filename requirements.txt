@@ -1,2 +1,2 @@
-tdl==3.1.0
+tdl==4.1.0
 twitchobserver==0.7.6
