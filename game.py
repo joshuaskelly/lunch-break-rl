@@ -26,6 +26,8 @@ class Game(object):
     scene_root = None
     config = None
     instance = None
+    tick_count = 0
+    seconds_per_tick = 0
 
     def __init__(self, args):
         Game.args = args
@@ -42,8 +44,11 @@ class Game(object):
         self.console = tdl.init(54, 30, 'lunch break roguelike', renderer=Game.config['ENGINE']['renderer'])
         self._last_time = time.time()
 
-        # Set static attributes
-        Game.scene_root = gamescene.GameScene()
+        Game.seconds_per_tick = float(Game.config['GAME']['turn'])
+
+        if not Game.instance:
+            Game.instance = self
+            instances.register('game', self)
 
         # Twitch Observer
         nickname = Game.config['TWITCH']['Nickname']
@@ -53,18 +58,22 @@ class Game(object):
         self.observer.start()
         self.observer.join_channel(self.channel)
 
-        if not Game.instance:
-            Game.instance = self
-            instances.register('game', self)
+        self.start_time = time.time()
+        Game.scene_root = gamescene.GameScene()
+
+    @property
+    def time_since_start(self):
+        return time.time() - self.start_time
 
     def run(self):
-        tick_count = 0
         timer = 0
         last_time = 0
         do_half_tick = True
-        seconds_per_tick = float(Game.config['GAME']['turn'])
+
 
         running = True
+        self.start_time = time.time()
+
         while running:
             # Draw the scene
             self.console.clear()
@@ -86,12 +95,12 @@ class Game(object):
             Game.scene_root.update(time_elapsed)
 
             # Send out tick event
-            if timer > seconds_per_tick:
+            if timer > Game.seconds_per_tick:
                 timer = 0
-                tick_count += 1
-                Game.scene_root.tick(tick_count)
+                Game.tick_count += 1
+                Game.scene_root.tick(Game.tick_count)
                 do_half_tick = True
 
-            elif timer >= seconds_per_tick / 2 and do_half_tick:
+            elif timer >= Game.seconds_per_tick / 2 and do_half_tick:
                 tdl.event.push(HalfTickEvent())
                 do_half_tick = False

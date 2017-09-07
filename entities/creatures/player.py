@@ -1,5 +1,4 @@
 import instances
-import game
 import helpers
 import palette
 import utils
@@ -18,10 +17,8 @@ class Player(creature.Creature):
         super().__init__(char, position, fg, bg)
         self.name = 'Player'
         self.brain = PlayerBrain(self)
-        self._last_action_tick = 0
-        self._current_tick = 999999
-        self._has_taken_action = False
         self.cheer_counter = 0
+        self.sight_radius = 4.5
 
     def update(self, time):
         super().update(time)
@@ -29,33 +26,23 @@ class Player(creature.Creature):
     def tick(self, tick):
         super().tick(tick)
 
-        self._current_tick = tick
-
-        if self._has_taken_action or self.state == 'EXITED':
-            self._last_action_tick = tick
-            self._has_taken_action = False
-
     def half_tick(self):
         if self.cheer_counter <= 0:
             return
 
-        super().tick(self._current_tick)
-
-    def on_perform_action(self, action):
-        self._has_taken_action = True
-        if self.cheer_counter > 0:
-            self.cheer_counter -= 1
+        super().tick(instances.game.tick_count)
 
     def draw(self, console):
-        if self.state != 'EXITED':
+        if self.state != 'PlayerExitedState':
             super().draw(console)
 
     @property
     def idle(self):
-        return self._current_tick - self._last_action_tick > 30
+        return self.brain.state.idle
 
-    def move(self, x, y):
-        super().move(x, y)
+    @property
+    def state(self):
+        return self.brain.state.name
 
     def queue_batched_move(self, moves):
         moves = [m for m in moves if m in helpers.DirectionHelper.valid_moves]
@@ -70,18 +57,44 @@ class Player(creature.Creature):
             if move_action:
                 move_action.parent = batched_move
                 self.brain.add_action(move_action)
-                self._has_taken_action = True
 
         self.brain.add_action(batched_move)
 
-    def handle_events(self, event):
-        super().handle_events(event)
+    def exit(self):
+        self.brain.set_state(PlayerExitedState)
+        self.position = -2, -2
 
-        if self.state == "EXITED":
+
+class PlayerBrain(brain.Brain):
+    def __init__(self, owner):
+        super().__init__(owner)
+        self.set_state(PlayerReadyState)
+
+    def reset(self):
+        self.set_state(PlayerReadyState)
+        self.clear()
+
+
+class PlayerReadyState(creature.CreatureState):
+    """State class that encapsulates normal player behavior"""
+
+    def __init__(self, brain):
+        self.brain = brain
+        self.last_action = instances.game.tick_count
+
+    def took_action(self):
+        self.last_action = instances.game.tick_count
+
+    @property
+    def idle(self):
+        return instances.game.tick_count - self.last_action > 30
+
+    def handle_events(self, event):
+        if self.owner.state == 'PlayerExitedState':
             return
 
         if event.type == 'TWITCHCHATMESSAGE':
-            if event.nickname == self.name:
+            if event.nickname == self.owner.name:
                 commands = event.message.split(' ')
 
                 if commands[0].upper() == '!MOVE' or commands[0].upper() == '!MV':
@@ -99,7 +112,8 @@ class Player(creature.Creature):
                         path = instances.scene_root.level.player_pathfinder.get_path(*self.position, *target.position)[:-1]
                         moves = helpers.MoveHelper.path_to_moves(self.position, path)
 
-                    self.queue_batched_move(moves)
+                    self.owner.queue_batched_move(moves)
+                    self.took_action()
 
                 elif commands[0].upper() == '!ATTACK' or commands[0].upper() == '!AT':
                     moves = ''.join(commands[1:])
@@ -109,18 +123,17 @@ class Player(creature.Creature):
                         batched_attack = action.BatchedAction(self)
 
                         for attack_dir in moves:
-                            #act = attackaction.AttackAction(self, direction=attack_dir)
-                            act = self.weapon.Action(self, direction=attack_dir)
+                            act = self.owner.weapon.Action(self.owner, direction=attack_dir)
                             act.parent = batched_attack
                             self.brain.add_action(act)
 
                         self.brain.add_action(batched_attack)
 
-                    self._has_taken_action = True
+                    self.took_action()
 
                 elif commands[0].upper() == '!DROP':
-                    self.drop_weapon()
-                    self._has_taken_action = True
+                    self.owner.drop_weapon()
+                    self.took_action()
 
                 elif commands[0].upper() == '!THROW':
                     direction = commands[1] if len(commands) > 1 else None
@@ -129,30 +142,37 @@ class Player(creature.Creature):
                     if not direction:
                         return
 
-                    dest = utils.math.add(self.position, direction)
+                    dest = utils.math.add(self.owner.position, direction)
 
                     # Throw entity next to player in given direction
                     for target_entity in instances.scene_root.get_entity_at(*dest):
-                        act = throwaction.ThrowAction(self, target_entity)
+                        act = throwaction.ThrowAction(self.owner, target_entity)
                         if act.prerequisite():
                             self.brain.add_action(act)
                             return
 
                     # Throw held weapon in given direction
-                    if not self.weapon.isinstance('Fist'):
-                        w = self.weapon
+                    if not self.owner.weapon.isinstance('Fist'):
+                        w = self.owner.weapon
                         w.remove()
                         w.position = dest
                         instances.scene_root.append(w)
-                        self.equip_weapon(fist.Fist())
-                        act = throwaction.ThrowAction(self, w)
+                        self.owner.equip_weapon(fist.Fist())
+                        act = throwaction.ThrowAction(self.owner, w)
                         self.brain.add_action(act)
 
-                elif commands[0].upper() == '!STAIRS' and game.Game.args.debug:
+                    self.took_action()
+
+                elif commands[0].upper() == '!STAIRS':
                     stair = instances.scene_root.downward_stair
-                    path = instances.scene_root.level.player_pathfinder.get_path(self.x, self.y, stair.x, stair.y)
-                    moves = helpers.MoveHelper.path_to_moves(self.position, path)
-                    self.queue_batched_move(moves)
+
+                    if instances.game.args.debug:
+                        path = instances.scene_root.level.pathfinder.get_path(self.owner.x, self.owner.y, stair.x, stair.y)
+                    else:
+                        path = instances.scene_root.level.player_pathfinder.get_path(self.owner.x, self.owner.y, stair.x, stair.y)
+
+                    moves = helpers.MoveHelper.path_to_moves(self.owner.position, path)
+                    self.owner.queue_batched_move(moves)
 
                 elif commands[0].upper() == '!STOP':
                     next_action = self.brain.actions[0] if self.brain.actions else None
@@ -161,21 +181,12 @@ class Player(creature.Creature):
                         next_action.fail()
 
         elif event.type == 'HALF-TICK':
-            self.half_tick()
+            self.owner.half_tick()
 
 
-class PlayerBrain(brain.Brain):
-    def perform_action(self):
-        if self.actions:
-            current_action = self.actions.pop(0)
+class PlayerExitedState(creature.CreatureState):
+    """State class that encapsulates normal player behavior"""
 
-            # Make sure our owner is the entity actually doing the action
-            if current_action.performer is not self.owner:
-                raise RuntimeError('Performing action not as owner!')
-
-            if current_action.prerequisite():
-                current_action.perform()
-                self.owner.on_perform_action(current_action)
-
-            else:
-                current_action.fail()
+    @property
+    def idle(self):
+        return False

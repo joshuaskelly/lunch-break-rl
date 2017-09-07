@@ -25,6 +25,9 @@ class GameScene(scene.Scene):
         self.init_scene()
 
     def init_scene(self):
+        con = console.Console(11, 24, 31, 6, title=None)
+        self.children.append(con)
+
         w = levelwindow.LevelWindow(11, 0, 31, 24, 'Lunch Break RL')
         w.seconds_per_tick = self.seconds_per_tick
         self.children.append(w)
@@ -39,5 +42,3 @@ class GameScene(scene.Scene):
         w = entitieswindow.EntitiesWindow(0, 0, 11, 30)
         self.children.append(w)
 
-        con = console.Console(11, 24, 31, 6, title=None)
-        self.children.append(con)

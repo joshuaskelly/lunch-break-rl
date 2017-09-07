@@ -88,7 +88,7 @@ class TwitchChatManager(entity.Entity):
                     if len(s) <= 1:
                         return
 
-                    player_names = [p.name for p in instances.scene_root.players if p.state != 'EXITED']
+                    player_names = [p.name for p in instances.scene_root.players if p.state != 'PlayerExitedState']
                     if event.nickname in player_names:
                         return
 
@@ -96,7 +96,7 @@ class TwitchChatManager(entity.Entity):
                     if player_name[0] == '@':
                         player_name = player_name[1:]
 
-                    target_player = [p for p in instances.scene_root.players if p.state != 'EXITED' and p.name == player_name]
+                    target_player = [p for p in instances.scene_root.players if p.state != 'PlayerExitedState' and p.name == player_name]
                     target_player = target_player[0] if target_player else None
                     if target_player:
                         target_player.cheer_counter += 4

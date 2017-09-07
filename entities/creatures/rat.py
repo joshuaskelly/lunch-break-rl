@@ -15,13 +15,13 @@ from ai.actions import swappositionaction
 
 from entities import animation
 from entities import entity
-from entities.creatures import monster
+from entities import creature
 from entities.items.weapons import fist
 
 
-class Rat(monster.Monster):
+class Rat(creature.Creature):
     def __init__(self, char='r', position=(0, 0)):
-        super().__init__(char, position)
+        super().__init__(char, position, fg=palette.BRIGHT_GREEN, bg=palette.BLACK)
         self.name = 'rat'
         self.brain = RatBrain(self)
         self.max_health = 1
@@ -35,7 +35,7 @@ class Rat(monster.Monster):
     def get_action(self, requester=None):
         # Rats won't hurt other rats. :)
         if requester.isinstance('Rat'):
-            if (requester.isinstance('RatKing') or self.isinstance('RatKing') or random.random() < 1 / 96):
+            if (requester.isinstance('RatKing') or self.isinstance('RatKing') or random.random() < 1 / 64):
                 return CreateRatKingAction(requester, self)
 
             return swappositionaction.SwapPositionAction(requester, self)
@@ -53,7 +53,7 @@ class RatTeeth(fist.Fist):
 
     def get_special_action(self, requester, target):
         # TODO: Makes the below actions
-        if target.isinstance('Corpse') or target.isinstance('Creature') and hasattr(target.brain, 'state') and isinstance(target.brain.state, monster.MonsterSleepState):
+        if target.isinstance('Corpse') or target.isinstance('Creature') and hasattr(target.brain, 'state') and isinstance(target.brain.state, creature.CreatureSleepState):
             # Add babies
             return InfestAction(requester, target)
 
@@ -166,7 +166,7 @@ class RatBrain(brain.Brain):
             if entity.isinstance('Rat'):
                 return False
 
-            elif hasattr(entity.brain, 'state') and isinstance(entity.brain.state, monster.MonsterSleepState):
+            elif hasattr(entity.brain, 'state') and isinstance(entity.brain.state, creature.CreatureSleepState):
                 return False
 
             elif entity.current_health >= self.owner.current_health:
@@ -188,7 +188,7 @@ class RatBrain(brain.Brain):
         self.state.on_state_enter(old_state)
 
 
-class RatIdleState(monster.MonsterState):
+class RatIdleState(creature.CreatureState):
     """State class that encapsulates idle behavior"""
 
     def __init__(self, brain):
@@ -198,7 +198,7 @@ class RatIdleState(monster.MonsterState):
         if not self.brain.actions:
             # Lay babies...
             if random.random() < 1 / 32:
-                corpses = [e for e in self.owner.visible_entities if (e.isinstance('Corpse') or e.isinstance('Creature') and hasattr(e.brain, 'state') and isinstance(e.brain.state, monster.MonsterSleepState)) and e.position != self.owner.position]
+                corpses = [e for e in self.owner.visible_entities if (e.isinstance('Corpse') or e.isinstance('Creature') and hasattr(e.brain, 'state') and isinstance(e.brain.state, creature.CreatureSleepState)) and e.position != self.owner.position]
                 corpses = sorted(corpses, key=lambda c: utils.math.distance(self.owner.position, c.position))
 
                 target = corpses[0] if corpses else None
@@ -240,7 +240,7 @@ class RatIdleState(monster.MonsterState):
             self.brain.set_state(RatFleeState)
 
 
-class RatAggroState(monster.MonsterState):
+class RatAggroState(creature.CreatureState):
     """State class the encapsulates aggressive behavior"""
 
     def __init__(self, brain):
@@ -294,7 +294,7 @@ class RatAggroState(monster.MonsterState):
             self.threat_visible = False
 
 
-class RatFleeState(monster.MonsterState):
+class RatFleeState(creature.CreatureState):
     """Class that encapsulates hurt fleeing behavior"""
 
     def __init__(self, brain):

@@ -140,8 +140,6 @@ def generate_level(width, height, player_count):
         '.': palette.BRIGHT_BLACK
     }
 
-    #temp_level = new_level.data.__copy__()
-
     # Colorize tiles
     for x, y in new_level.data:
         char, fg, bg = new_level.data.get_char(x, y)

@@ -81,18 +81,16 @@ class LevelScene(scene.Scene):
         for en in new_entities:
             self.append(en)
 
-        health_bonus = len([p for p in self.players if p.state == 'EXITED'])
+        health_bonus = len([p for p in self.players if p.state == 'PlayerExitedState'])
 
         # Place players near stair
         for p in self.players:
-            if p.state == 'EXITED':
+            if p.state == 'PlayerExitedState':
                 # Overheal exited players up to 2x max health
                 p.current_health = min(p.current_health + health_bonus, p.max_health * 2)
 
-            p.brain.actions = []
+            p.brain.reset()
             p.visible_tiles = set()
-            p.state = 'NORMAL'
-            p.brain.fail_next_action()
             p.cheer_counter = 0
             p.position = self.get_location_near_stairs()
 
@@ -172,7 +170,7 @@ class LevelScene(scene.Scene):
         return [p for p in self.children if p.isinstance('Player')]
 
     def active_player_count(self):
-        return len([p for p in self.players if p.state != 'EXITED'])
+        return len([p for p in self.players if p.state != 'PlayerExitedState'])
 
     @property
     def downward_stair(self):

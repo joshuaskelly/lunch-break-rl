@@ -2,9 +2,13 @@ class Brain(object):
     def __init__(self, owner):
         self.owner = owner
         self.actions = []
+        self.state = None
 
     def tick(self, tick):
-        pass
+        self.state.tick(tick)
+
+    def handle_events(self, event):
+        self.state.handle_events(event)
 
     def perform_action(self):
         if self.actions:
@@ -28,5 +32,22 @@ class Brain(object):
         if self.actions:
             self.actions[0].fail()
 
+    def set_state(self, state_class):
+        if not self.owner.alive:
+            return
+
+        old_state = self.state
+        new_state = state_class(self)
+
+        if old_state:
+            old_state.on_state_exit(new_state)
+
+        self.state = new_state
+        self.state.on_state_enter(old_state)
+
     def clear(self):
         self.actions = []
+
+    def reset(self):
+        # Potentially set a default state here
+        self.clear()

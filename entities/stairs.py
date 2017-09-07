@@ -30,8 +30,7 @@ class StairsDown(Stairs):
                 return self.performer.isinstance('Player')
 
             def perform(self):
-                self.performer.state = 'EXITED'
-                self.performer.position = -2, -2
+                self.performer.exit()
 
                 # Start a countdown timer
                 instances.scene_root.change_level()

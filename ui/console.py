@@ -23,6 +23,9 @@ class Console(window.Window):
         self.messages.append(message)
 
     def describe(self, entity, visible_text, not_visible_text=None):
+        if not hasattr(entity, 'visible'):
+            return
+
         if entity.visible:
             self.print(visible_text)
 

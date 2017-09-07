@@ -13,11 +13,11 @@ from ai.actions import moveaction
 from ai.actions import movetoaction
 
 from entities import animation
-from entities.creatures import monster
+from entities import creature
 from entities.items.weapons import dagger
 
 
-class Kobold(monster.Monster):
+class Kobold(creature.Creature):
     def __init__(self, char='k', position=(0, 0), fg=palette.BRIGHT_GREEN, bg=palette.BLACK):
         super().__init__(char, position, fg, bg)
         self.name = 'kobold'
@@ -27,7 +27,7 @@ class Kobold(monster.Monster):
         self.brain = KoboldBrain(self)
 
         if random.random() < 1 / 32:
-            self.brain.set_state(monster.MonsterSleepState)
+            self.brain.set_state(creature.CreatureSleepState)
 
         if random.random() <= 1 / 5:
             self.equip_weapon(dagger.Dagger())
@@ -109,7 +109,7 @@ class KoboldBrain(brain.Brain):
         self.set_state(KoboldIdleState)
 
 
-class KoboldIdleState(monster.MonsterIdleState):
+class KoboldIdleState(creature.CreatureIdleState):
     """State class that encapsulates idle behavior"""
     def __init__(self, brain):
         super().__init__(brain)
@@ -133,8 +133,7 @@ class KoboldIdleState(monster.MonsterIdleState):
 
         self.turns_util_sleep -= 1
         if self.turns_util_sleep <= 0 and random.random() < 1 / 32:
-            self.brain.set_state(monster.MonsterSleepState)
-            instances.console.describe(self.owner, '{} falls asleep!'.format(self.owner.display_string))
+            self.brain.set_state(creature.CreatureSleepState)
 
     def on_threat_spotted(self, threat):
         # Forget whatever we were doing.
@@ -150,7 +149,7 @@ class KoboldIdleState(monster.MonsterIdleState):
         self.brain.set_state(KoboldHurtState)
 
 
-class KoboldAggroState(monster.MonsterAggroState):
+class KoboldAggroState(creature.CreatureAggroState):
     """State class the encapsulates aggressive behavior"""
     def __init__(self, brain):
         super().__init__(brain)
@@ -187,7 +186,7 @@ class KoboldAggroState(monster.MonsterAggroState):
         self.brain.set_state(KoboldFleeState)
 
 
-class KoboldHurtState(monster.MonsterHurtState):
+class KoboldHurtState(creature.CreatureHurtState):
     """Class that encapsulates hurt idle behavior"""
     def __init__(self, brain):
         super().__init__(brain)
@@ -234,7 +233,7 @@ class KoboldHurtState(monster.MonsterHurtState):
         self.brain.set_state(KoboldIdleState)
 
 
-class KoboldFleeState(monster.MonsterFleeState):
+class KoboldFleeState(creature.CreatureFleeState):
     """Class that encapsulates hurt fleeing behavior"""
     def __init__(self, brain):
         super().__init__(brain)

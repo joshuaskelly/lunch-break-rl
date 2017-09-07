@@ -11,5 +11,8 @@ class Status(object):
     def tick(self, tick):
         pass
 
+    def update(self, time):
+        pass
+
     def remove(self):
         self.owner.remove_status(self)
