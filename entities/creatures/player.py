@@ -163,14 +163,9 @@ class PlayerReadyState(creature.CreatureState):
 
                     self.took_action()
 
-                elif commands[0].upper() == '!STAIRS':
+                elif commands[0].upper() == '!STAIRS' and instances.game.args.debug:
                     stair = instances.scene_root.downward_stair
-
-                    if instances.game.args.debug:
-                        path = instances.scene_root.level.pathfinder.get_path(self.owner.x, self.owner.y, stair.x, stair.y)
-                    else:
-                        path = instances.scene_root.level.player_pathfinder.get_path(self.owner.x, self.owner.y, stair.x, stair.y)
-
+                    path = instances.scene_root.level.pathfinder.get_path(self.owner.x, self.owner.y, stair.x, stair.y)
                     moves = helpers.MoveHelper.path_to_moves(self.owner.position, path)
                     self.owner.queue_batched_move(moves)
 
