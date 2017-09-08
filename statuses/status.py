@@ -14,5 +14,8 @@ class Status(object):
     def update(self, time):
         pass
 
+    def stack(self, other):
+        pass
+
     def remove(self):
         self.owner.remove_status(self)

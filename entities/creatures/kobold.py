@@ -238,7 +238,12 @@ class KoboldFleeState(creature.CreatureFleeState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
-        self.threat = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
+        threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
+        if threats:
+            self.threat = threats[0]
+
+        else:
+            self.brain.reset()
 
     def tick(self, tick):
         if self.threat and self.threat.position:

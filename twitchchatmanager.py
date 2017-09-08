@@ -7,6 +7,7 @@ import registry
 
 from entities import entity
 from entities.creatures import player
+from statuses import hastestatus
 
 
 class TwitchChatManager(entity.Entity):
@@ -99,7 +100,7 @@ class TwitchChatManager(entity.Entity):
                     target_player = [p for p in instances.scene_root.players if p.state != 'PlayerExitedState' and p.name == player_name]
                     target_player = target_player[0] if target_player else None
                     if target_player:
-                        target_player.cheer_counter += 4
+                        target_player.add_status(hastestatus.HasteStatus(target_player))
 
                 elif event.message.upper() == '!HELP':
                     current_time = time.time()

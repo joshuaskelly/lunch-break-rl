@@ -191,8 +191,16 @@ class Creature(entity.Entity):
         return result
 
     def add_status(self, status):
-        status.on_status_begin()
-        self.statuses.append(status)
+        # Check and handle duplicate statuses
+        duplicate_status = [s for s in self.statuses if status.__class__ == s.__class__]
+        if duplicate_status:
+            duplicate = duplicate_status[0]
+            duplicate.stack(status)
+
+        # Otherwise apply status
+        else:
+            status.on_status_begin()
+            self.statuses.append(status)
 
     def remove_status(self, status):
         status.on_status_end()
@@ -501,7 +509,11 @@ class CreatureFleeState(CreatureState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
-        self.threat = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
+        threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
+        if threats:
+            self.threat = threats[0]
+        else:
+            self.brain.reset()
 
     def tick(self, tick):
         if self.threat and self.threat.position:

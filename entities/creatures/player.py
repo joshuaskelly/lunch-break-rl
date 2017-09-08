@@ -26,12 +26,6 @@ class Player(creature.Creature):
     def tick(self, tick):
         super().tick(tick)
 
-    def half_tick(self):
-        if self.cheer_counter <= 0:
-            return
-
-        super().tick(instances.game.tick_count)
-
     def draw(self, console):
         if self.state != 'PlayerExitedState':
             super().draw(console)
@@ -109,8 +103,8 @@ class PlayerReadyState(creature.CreatureState):
                     target = target[0] if target else None
 
                     if target and target is not self:
-                        path = instances.scene_root.level.player_pathfinder.get_path(*self.position, *target.position)[:-1]
-                        moves = helpers.MoveHelper.path_to_moves(self.position, path)
+                        path = instances.scene_root.level.player_pathfinder.get_path(*self.owner.position, *target.position)[:-1]
+                        moves = helpers.MoveHelper.path_to_moves(self.owner.position, path)
 
                     self.owner.queue_batched_move(moves)
                     self.took_action()
@@ -120,7 +114,7 @@ class PlayerReadyState(creature.CreatureState):
                     moves = [helpers.DirectionHelper.get_direction(m) for m in moves if m in helpers.DirectionHelper.valid_moves]
 
                     if moves:
-                        batched_attack = action.BatchedAction(self)
+                        batched_attack = action.BatchedAction(self.owner)
 
                         for attack_dir in moves:
                             act = self.owner.weapon.Action(self.owner, direction=attack_dir)
@@ -174,9 +168,6 @@ class PlayerReadyState(creature.CreatureState):
 
                     if next_action and next_action.isinstance('MoveAction'):
                         next_action.fail()
-
-        elif event.type == 'HALF-TICK':
-            self.owner.half_tick()
 
 
 class PlayerExitedState(creature.CreatureState):

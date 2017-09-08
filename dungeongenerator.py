@@ -165,7 +165,7 @@ def generate_level(width, height, player_count):
     for (x, y) in new_level.data:
         ch, fg, bg = new_level.data.get_char(x, y)
         if ch == ord('.'):
-            if random.random() < 1 / 22 * max(1.0, player_count / 3) and (x, y) not in dont_place_monsters_here:
+            if random.random() < 1 / 10 * max(1.0, player_count / 3) and (x, y) not in dont_place_monsters_here:
                 MonsterClass = registry.Registry.get('monster')
                 mon = MonsterClass(position=(x, y))
                 new_entities.append(mon)

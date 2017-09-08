@@ -4,6 +4,7 @@ import registry
 
 from entities.items import consumable
 from statuses import blindstatus
+from statuses import hastestatus
 from statuses import sleepstatus
 
 
@@ -44,3 +45,13 @@ class SleepingPotion(consumable.Consumable):
         target.add_status(sleepstatus.SleepStatus(target))
 
 registry.Registry.register(SleepingPotion, 'item', 3)
+
+
+class HastePotion(consumable.Consumable):
+    def __init__(self, char='!', position=(0, 0), fg=palette.CYAN, bg=palette.BLACK):
+        super().__init__(char, position, fg, bg)
+
+    def use(self, target):
+        target.add_status(hastestatus.HasteStatus(target))
+
+registry.Registry.register(HastePotion, 'item', 3)

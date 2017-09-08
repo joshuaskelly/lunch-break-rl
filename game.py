@@ -16,11 +16,6 @@ class TickEvent(object):
         self.tick_number = tick_number
 
 
-class HalfTickEvent(object):
-    def __init__(self):
-        self.type = 'HALF-TICK'
-
-
 class Game(object):
     args = None
     scene_root = None
@@ -68,8 +63,6 @@ class Game(object):
     def run(self):
         timer = 0
         last_time = 0
-        do_half_tick = True
-
 
         running = True
         self.start_time = time.time()
@@ -99,8 +92,3 @@ class Game(object):
                 timer = 0
                 Game.tick_count += 1
                 Game.scene_root.tick(Game.tick_count)
-                do_half_tick = True
-
-            elif timer >= Game.seconds_per_tick / 2 and do_half_tick:
-                tdl.event.push(HalfTickEvent())
-                do_half_tick = False
