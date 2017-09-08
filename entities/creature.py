@@ -10,7 +10,6 @@ import utils
 from ai import action
 from ai import brain
 from ai.actions import attackaction
-from ai.actions import swappositionaction
 from ai.actions import wanderaction
 from ai.actions import moveaction
 from ai.actions import movetoaction
@@ -166,10 +165,6 @@ class Creature(entity.Entity):
         self.brain.handle_events(event)
 
     def get_action(self, requester=None):
-        # TODO: Put this specialization into player.py?
-        if self.isinstance('Player') and requester.isinstance('Player'):
-            return swappositionaction.SwapPositionAction(requester, self)
-
         direction = utils.math.sub(self.position, requester.position)
         return attackaction.AttackAction(requester, self, direction)
 

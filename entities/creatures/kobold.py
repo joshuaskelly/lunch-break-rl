@@ -11,6 +11,7 @@ from ai import brain
 from ai.actions import wanderaction
 from ai.actions import moveaction
 from ai.actions import movetoaction
+from ai.actions import swappositionaction
 
 from entities import animation
 from entities import creature
@@ -31,6 +32,12 @@ class Kobold(creature.Creature):
 
         if random.random() <= 1 / 5:
             self.equip_weapon(dagger.Dagger())
+
+    def get_action(self, requester=None):
+        if requester.isinstance('Kobold') and random.random() < 0.5:
+            return swappositionaction.SwapPositionAction(requester, self)
+
+        return super().get_action(requester)
 
 registry.Registry.register(Kobold, 'monster', 5)
 

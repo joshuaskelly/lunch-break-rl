@@ -7,6 +7,7 @@ from ai import action
 from ai import brain
 
 from ai.actions import throwaction
+from ai.actions import swappositionaction
 
 from entities import creature
 from entities.items.weapons import fist
@@ -37,6 +38,12 @@ class Player(creature.Creature):
     @property
     def state(self):
         return self.brain.state.name
+
+    def get_action(self, requester=None):
+        if requester.isinstance('Player'):
+            return swappositionaction.SwapPositionAction(requester, self)
+
+        return super().get_action(requester)
 
     def queue_batched_move(self, moves):
         moves = [m for m in moves if m in helpers.DirectionHelper.valid_moves]
