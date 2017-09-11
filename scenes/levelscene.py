@@ -7,8 +7,12 @@ import game
 import instances
 import level
 import twitchchatmanager
-import utils
 from scenes import scene
+
+
+class StartIntermissionEvent(object):
+    def __init__(self):
+        self.type = 'StartIntermission'
 
 
 class LevelScene(scene.Scene):
@@ -22,6 +26,7 @@ class LevelScene(scene.Scene):
         self.tick_count = 0
         self.change_level_requested = False
         self._change_level_on_tick = 0
+        self.info = {'level': 0}
 
         if not LevelScene.instance:
             LevelScene.instance = self
@@ -40,14 +45,19 @@ class LevelScene(scene.Scene):
             instances.console.print('{} turns left.'.format(self._change_level_on_tick - tick))
 
             if self._change_level_on_tick - tick <= 0 or self.active_player_count() == 0:
-                instances.console.print('NEXT LEVEL!')
-                self.init_scene()
+                self.next_level()
+
+    def next_level(self):
+        instances.console.print('NEXT LEVEL!')
+        self.info['level'] += 1
+        tdl.event.push(StartIntermissionEvent())
+        self.init_scene()
 
     def handle_events(self, event):
         super().handle_events(event)
 
         if game.Game.args.debug and event.type == 'KEYDOWN' and event.char.upper() == 'G':
-            self.init_scene()
+            self.next_level()
 
     def draw(self, console):
         self.console.clear()
@@ -74,7 +84,7 @@ class LevelScene(scene.Scene):
         # Persist players in level
         self._children = [p for p in self.players if not p.idle]
 
-        self.level, new_entities, self.player_spawn_area = dungeongenerator.generate_level(29, 22, len(self._children))
+        self.level, new_entities, self.player_spawn_area = dungeongenerator.generate_level(29, 22, len(self._children), self.info)
         self.append(self.level)
 
         # Add generated entities to scene

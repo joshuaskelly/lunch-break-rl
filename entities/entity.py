@@ -124,7 +124,7 @@ class Entity(object):
         if parent and child in parent._children:
             parent._children.remove(child)
             child.parent = None
-            child.position = None
+            #child.position = None
 
     def get_action(self, requester=None):
         """Returns an action

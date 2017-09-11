@@ -18,7 +18,7 @@ creatures.register()
 items.register()
 
 
-def generate_level(width, height, player_count):
+def generate_level(width, height, player_count, scene_info):
     new_entities = []
     new_level = level.Level(0, 0, width, height)
 
@@ -161,11 +161,14 @@ def generate_level(width, height, player_count):
 
         new_level.data.draw_char(x, y, char, fg, bg)
 
+    level_scaling_factor = (scene_info['level'] / 10) + 1
+    monster_spawn_rate = 1 / 16 * max(1.0, player_count / 3) * level_scaling_factor
+
     # Placing Entities
     for (x, y) in new_level.data:
         ch, fg, bg = new_level.data.get_char(x, y)
         if ch == ord('.'):
-            if random.random() < 1 / 10 * max(1.0, player_count / 3) and (x, y) not in dont_place_monsters_here:
+            if random.random() < monster_spawn_rate and (x, y) not in dont_place_monsters_here:
                 MonsterClass = registry.Registry.get('monster')
                 mon = MonsterClass(position=(x, y))
                 new_entities.append(mon)

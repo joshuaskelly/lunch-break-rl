@@ -7,6 +7,7 @@ from ui import levelwindow
 
 from scenes import levelscene
 from scenes import scene
+from scenes import intermissionscene
 
 
 class GameScene(scene.Scene):
@@ -42,3 +43,16 @@ class GameScene(scene.Scene):
         w = entitieswindow.EntitiesWindow(0, 0, 11, 30)
         self.children.append(w)
 
+    def handle_events(self, event):
+        super().handle_events(event)
+
+        if event.type == 'StartIntermission':
+            self.remove(self.level_scene)
+            self.intermission_scene = intermissionscene.IntermissionScene(12, 1, 29, 22)
+            self.append(self.intermission_scene)
+
+        elif event.type == 'StartLevel':
+            if self.intermission_scene:
+                self.remove(self.intermission_scene)
+
+            self.append(self.level_scene)

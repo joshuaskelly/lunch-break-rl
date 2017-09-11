@@ -272,6 +272,9 @@ class KoboldFleeState(creature.CreatureFleeState):
         self.brain.set_state(KoboldAggroState)
 
     def on_threat_lost(self, threat):
+        if not self.threat:
+            self.brain.reset()
+
         if threat == self.threat:
             self.threat = None
             self.brain.set_state(KoboldHurtState)

@@ -42,7 +42,7 @@ class Rat(creature.Creature):
 
         return super().get_action(requester)
 
-registry.Registry.register(Rat, 'monster', 3)
+registry.Registry.register(Rat, 'monster', 2.5)
 
 
 class RatTeeth(fist.Fist):
