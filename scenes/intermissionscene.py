@@ -31,6 +31,19 @@ class IntermissionScene(scene.Scene):
         pass
 
     def draw(self, console):
-        message = 'Level {}'.format(instances.scene_root.info['level'])
-        self.console.draw_str(self.console.width // 2 - len(message) // 2, self.console.height / 2, message)
+        info = instances.scene_root.info
+        message = 'Level {}'.format(info['level'])
+        self.console.draw_str(self.console.width // 2 - len(message) // 2, 4, message)
+
+        line_offset = 0
+        for monster_class, monster_statuses in info['enemies']:
+            self.console.draw_str(8, 6 + line_offset, monster_class.__name__)
+            line_offset += 1
+
+            for status in monster_statuses:
+                self.console.draw_str(10, 6 + line_offset, status.name)
+                line_offset += 1
+
+            line_offset += 1
+
         console.blit(self.console, self.x, self.y, self.width, self.height)

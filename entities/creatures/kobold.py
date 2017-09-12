@@ -40,6 +40,7 @@ class Kobold(creature.Creature):
         return super().get_action(requester)
 
 registry.Registry.register(Kobold, 'monster', 5)
+registry.Registry.register(Kobold, 'uncommon_monster', 5)
 
 
 class KoboldBrain(brain.Brain):

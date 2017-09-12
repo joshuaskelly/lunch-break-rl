@@ -4,7 +4,8 @@ from statuses import status
 
 class SleepStatus(status.Status):
     def __init__(self, owner):
-        self.owner = owner
+        super().__init__(owner)
+        SleepStatus.name = 'Sleep'
         self.timer = 30
 
     def on_status_begin(self):

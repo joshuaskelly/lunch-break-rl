@@ -14,6 +14,8 @@ from entities import door
 from entities import items
 from entities import stairs
 
+from statuses import hastestatus
+
 creatures.register()
 items.register()
 
@@ -164,13 +166,37 @@ def generate_level(width, height, player_count, scene_info):
     level_scaling_factor = (scene_info['level'] / 10) + 1
     monster_spawn_rate = 1 / 16 * max(1.0, player_count / 3) * level_scaling_factor
 
+    uncommon_monster_class = registry.Registry.get('uncommon_monster')
+    common_monster_class = registry.Registry.get('common_monster')
+
+    uncommon_monster_statuses = [] #hastestatus.HasteStatus]
+    common_monster_statuses = []
+
+    registry.Registry.register(uncommon_monster_class, 'monster_drop_table', 3)
+    registry.Registry.register(common_monster_class, 'monster_drop_table', 5)
+
+    scene_info['enemies'] = []
+    scene_info['enemies'].append((uncommon_monster_class, uncommon_monster_statuses))
+    scene_info['enemies'].append((common_monster_class, common_monster_statuses))
+
     # Placing Entities
     for (x, y) in new_level.data:
         ch, fg, bg = new_level.data.get_char(x, y)
         if ch == ord('.'):
             if random.random() < monster_spawn_rate and (x, y) not in dont_place_monsters_here:
-                MonsterClass = registry.Registry.get('monster')
+                MonsterClass = registry.Registry.get('monster_drop_table')
                 mon = MonsterClass(position=(x, y))
+
+                if MonsterClass is uncommon_monster_class:
+                    for status in uncommon_monster_statuses:
+                        s = status(mon)
+                        mon.add_status(s)
+
+                else:
+                    for status in common_monster_statuses:
+                        s = status(mon)
+                        mon.add_status(s)
+
                 new_entities.append(mon)
 
             elif random.random() < 1 / 80:

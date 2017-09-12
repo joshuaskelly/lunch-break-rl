@@ -6,7 +6,7 @@ class Registry(object):
     _registered_categories = {}
 
     @staticmethod
-    def register(klass, category, weight):
+    def register(item, category, weight):
         entry = Registry._registered_categories.get(category)
         category_list = entry[0] if entry else None
         weight_table = entry[1] if entry else None
@@ -17,8 +17,8 @@ class Registry(object):
         if not weight_table:
             weight_table = []
 
-        if (klass, weight) not in category_list:
-            category_list.append((weight, klass))
+        if (item, weight) not in category_list:
+            category_list.append((weight, item))
 
         weight_table = list(accumulate([i[0] for i in category_list]))
 
@@ -35,3 +35,7 @@ class Registry(object):
         chosen = category_list[bisect(weight_table, random.random() * weight_table[-1])][1]
 
         return chosen
+
+    @staticmethod
+    def clear(category):
+        entry = Registry._registered_categories[category] = None

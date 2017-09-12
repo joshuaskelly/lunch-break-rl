@@ -6,6 +6,8 @@ from statuses import status
 
 class HasteStatus(status.Status):
     def __init__(self, owner, turns_per_tick=2, counter=4):
+        super().__init__(owner)
+        HasteStatus.name = 'Haste'
         self.owner = owner
         self.counter = counter
         self.turn_length = instances.game.seconds_per_tick

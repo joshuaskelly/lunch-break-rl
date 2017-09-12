@@ -1,6 +1,9 @@
 class Status(object):
+    name = None
+
     def __init__(self, owner):
         self.owner = owner
+        __class__.name = self.__class__.__name__
 
     def on_status_begin(self):
         pass

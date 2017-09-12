@@ -5,7 +5,8 @@ from statuses import status
 
 class BlindStatus(status.Status):
     def __init__(self, owner):
-        self.owner = owner
+        super().__init__(owner)
+        BlindStatus.name = 'Blind'
         self.original_sight_radius = self.owner.sight_radius
         self.timer = 30
 
