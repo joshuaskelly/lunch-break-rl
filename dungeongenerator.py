@@ -172,17 +172,17 @@ def generate_level(width, height, player_count, scene_info):
     uncommon_monster_statuses = []
     common_monster_statuses = []
 
-    #if random.random() < 1 / 2:
-    #    uncommon_monster_statuses = list(set([registry.Registry.get('statuses_drop_table') for _ in range(random.randint(0,2))]))
-    #    uncommon_monster_statuses = [_ for _ in uncommon_monster_statuses if _]
-#
-    #if random.random() < 1 / 2:
-    #    common_monster_statuses = list(set([registry.Registry.get('statuses_drop_table') for _ in range(random.randint(0,2))]))
-    #    common_monster_statuses = [_ for _ in common_monster_statuses if _]
+    if random.random() < 1 / 2:
+        uncommon_monster_statuses = list(set([registry.Registry.get('statuses_drop_table') for _ in range(random.randint(0,2))]))
+        uncommon_monster_statuses = [_ for _ in uncommon_monster_statuses if _]
+
+    if random.random() < 1 / 2:
+        common_monster_statuses = list(set([registry.Registry.get('statuses_drop_table') for _ in range(random.randint(0,2))]))
+        common_monster_statuses = [_ for _ in common_monster_statuses if _]
 
     registry.Registry.clear('monster_drop_table')
     registry.Registry.register(uncommon_monster_class, 'monster_drop_table', 3)
-    registry.Registry.register(common_monster_class, 'monster_drop_table', 0.5)
+    registry.Registry.register(common_monster_class, 'monster_drop_table', 5)
 
     scene_info['enemies'] = []
     scene_info['enemies'].append((uncommon_monster_class, uncommon_monster_statuses))
