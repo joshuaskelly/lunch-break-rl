@@ -163,7 +163,11 @@ class KoboldAggroState(creature.CreatureAggroState):
         super().__init__(brain)
         self.aggro_counter = 0
         self.aggro_cooldown = 5
-        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
+        self.current_target = self.get_nearest_threat()
+
+    def get_nearest_threat(self):
+        threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
+        return threats[0] if threats else None
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_RED, bg=palette.BLACK)
@@ -178,14 +182,19 @@ class KoboldAggroState(creature.CreatureAggroState):
 
     def tick(self, tick):
         if self.aggro_counter <= 0:
-            self.brain.add_action(movetoaction.MoveToAction(self.owner, self.threat.position, self.brain.owner.sight_radius))
+            self.brain.add_action(movetoaction.MoveToAction(self.owner, self.current_target.position, self.brain.owner.sight_radius))
             self.aggro_counter = self.aggro_cooldown
 
         self.aggro_counter -= 1
 
     def on_threat_lost(self, threat):
-        if threat == self.threat:
-            self.threat = None
+        if threat == self.current_target:
+            self.current_target = self.get_nearest_threat()
+
+        if self.current_target:
+            self.brain.set_state(KoboldAggroState)
+
+        else:
             self.brain.set_state(KoboldIdleState)
 
     def on_wounded(self):
@@ -246,38 +255,38 @@ class KoboldFleeState(creature.CreatureFleeState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
-        threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
-        if threats:
-            self.threat = threats[0]
+        self.current_target = self.get_nearest_threat()
 
-        else:
-            self.brain.reset()
+    def get_nearest_threat(self):
+        threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
+        return threats[0] if threats else None
 
     def tick(self, tick):
-        if self.threat and self.threat.position:
-            # Neighboring tiles
-            possible_tiles = [utils.math.add(self.owner.position, d) for d in helpers.DirectionHelper.directions]
+        # Neighboring tiles
+        possible_tiles = [utils.math.add(self.owner.position, d) for d in helpers.DirectionHelper.directions]
 
-            # Possible tiles
-            possible_tiles = [d for d in possible_tiles if instances.scene_root.check_collision(*d)]
+        # Possible tiles
+        possible_tiles = [d for d in possible_tiles if instances.scene_root.check_collision(*d)]
 
-            # Determine furthest tiles
-            possible_tiles = sorted(possible_tiles, key=lambda x: utils.math.distance(x, self.threat.position), reverse=True)
+        # Determine furthest tiles
+        possible_tiles = sorted(possible_tiles, key=lambda x: utils.math.distance(x, self.current_target.position), reverse=True)
 
-            direction = utils.math.sub(possible_tiles[0], self.owner.position)
+        direction = utils.math.sub(possible_tiles[0], self.owner.position)
 
-            act = moveaction.MoveAction(self.owner, direction)
-            self.brain.add_action(act)
+        act = moveaction.MoveAction(self.owner, direction)
+        self.brain.add_action(act)
 
     def on_no_longer_wounded(self):
         self.brain.set_state(KoboldAggroState)
 
     def on_threat_lost(self, threat):
-        if not self.threat:
-            self.brain.reset()
+        if threat == self.current_target:
+            self.current_target = self.get_nearest_threat()
 
-        if threat == self.threat:
-            self.threat = None
+        if self.current_target:
+            self.brain.set_state(KoboldFleeState)
+
+        else:
             self.brain.set_state(KoboldHurtState)
 
     def on_state_enter(self, prev_state):

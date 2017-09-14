@@ -424,7 +424,11 @@ class CreatureAggroState(CreatureState):
         super().__init__(brain)
         self.aggro_counter = 0
         self.aggro_cooldown = 5
-        self.threat = sorted(self.brain.threats, key=lambda t: utils.math.distance(self.owner.position, t.position))[0]
+        self.current_target = self.get_nearest_threat()
+
+    def get_nearest_threat(self):
+        threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
+        return threats[0] if threats else None
 
     def on_state_enter(self, prev_state):
         ani = animation.Flash('!', fg=palette.BRIGHT_RED, bg=palette.BLACK)
@@ -439,14 +443,16 @@ class CreatureAggroState(CreatureState):
 
     def tick(self, tick):
         if self.aggro_counter <= 0:
-            self.brain.add_action(movetoaction.MoveToAction(self.owner, self.threat.position, self.brain.owner.sight_radius))
+            self.brain.add_action(movetoaction.MoveToAction(self.owner, self.current_target.position, self.brain.owner.sight_radius))
             self.aggro_counter = self.aggro_cooldown
 
         self.aggro_counter -= 1
 
     def on_threat_lost(self, threat):
-        if threat == self.threat:
-            self.threat = None
+        if threat == self.current_target:
+            self.current_target = self.get_nearest_threat()
+
+        if not self.current_target:
             self.brain.set_state(CreatureIdleState)
 
     def on_wounded(self):
@@ -504,14 +510,14 @@ class CreatureFleeState(CreatureState):
     def __init__(self, brain):
         super().__init__(brain)
         self.brain = brain
+        self.current_target = self.get_nearest_threat()
+
+    def get_nearest_threat(self):
         threats = sorted([b for b in self.brain.threats if b.position], key=lambda t: utils.math.distance(self.owner.position, t.position))
-        if threats:
-            self.threat = threats[0]
-        else:
-            self.brain.reset()
+        return threats[0] if threats else None
 
     def tick(self, tick):
-        if self.threat and self.threat.position:
+        if self.current_target and self.current_target.position:
             # Neighboring tiles
             possible_tiles = [utils.math.add(self.owner.position, d) for d in helpers.DirectionHelper.directions]
 
@@ -519,7 +525,7 @@ class CreatureFleeState(CreatureState):
             possible_tiles = [d for d in possible_tiles if instances.scene_root.check_collision(*d)]
 
             # Determine furthest tiles
-            possible_tiles = sorted(possible_tiles, key=lambda x: utils.math.distance(x, self.threat.position), reverse=True)
+            possible_tiles = sorted(possible_tiles, key=lambda x: utils.math.distance(x, self.current_target.position), reverse=True)
 
             direction = utils.math.sub(possible_tiles[0], self.owner.position)
 
@@ -530,8 +536,10 @@ class CreatureFleeState(CreatureState):
         self.brain.set_state(CreatureAggroState)
 
     def on_threat_lost(self, threat):
-        if threat == self.threat:
-            self.threat = None
+        if threat == self.current_target:
+            self.current_target = self.get_nearest_threat()
+
+        if not self.current_target:
             self.brain.set_state(CreatureHurtState)
 
     def on_state_enter(self, prev_state):
