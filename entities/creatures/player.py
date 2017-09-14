@@ -75,6 +75,9 @@ class PlayerBrain(brain.Brain):
         self.set_state(PlayerReadyState)
         self.clear()
 
+    def is_threat(self, entity):
+        return not entity.isinstance('Player') and entity.alive
+
 
 class PlayerReadyState(creature.CreatureState):
     """State class that encapsulates normal player behavior"""

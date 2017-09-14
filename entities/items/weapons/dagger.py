@@ -42,5 +42,4 @@ class DefaultCounterWeaponState(weapon.WeaponState):
                 instances.console.describe(action.target, '{} counters {}\'s attack!'.format(action.target.display_string,
                                                                            action.performer.display_string))
                 
-                action.target.brain.actions.append(counter)
-                action.target.brain.perform_action()
+                action.target.brain.perform_action(counter)

@@ -22,6 +22,12 @@ class Weapon(item.HeldItem):
         distance = utils.math.distance(self.parent.position, target.position)
         return distance <= self.range
 
+    def tick(self, tick):
+        super().tick(tick)
+
+        if self.parent.isinstance('Creature'):
+            self.state.tick(tick)
+
     @property
     def Action(self):
         return attackaction.AttackAction
@@ -30,6 +36,9 @@ class Weapon(item.HeldItem):
 class WeaponState(attackaction.AttackActionInterface):
     def __init__(self, weapon):
         self.weapon = weapon
+
+    def tick(self, tick):
+        pass
 
     def can_attack(self, other):
         return self.weapon.parent and self.weapon.parent.alive and self.weapon.in_range(other)

@@ -10,19 +10,24 @@ class Brain(object):
     def handle_events(self, event):
         self.state.handle_events(event)
 
-    def perform_action(self):
-        if self.actions:
-            current_action = self.actions.pop(0)
+    def perform_action(self, immediate_action=None):
+        current_action = immediate_action
 
-            # Make sure our owner is the entity actually doing the action
-            if current_action.performer is not self.owner:
-                raise RuntimeError('Performing action not as owner!')
-
-            if current_action.prerequisite():
-                current_action.perform()
-
+        if not current_action:
+            if self.actions:
+                current_action = self.actions.pop(0)
             else:
-                current_action.fail()
+                return
+
+        # Make sure our owner is the entity actually doing the action
+        if current_action.performer is not self.owner:
+            raise RuntimeError('Performing action not as owner!')
+
+        if current_action.prerequisite():
+            current_action.perform()
+
+        else:
+            current_action.fail()
 
     def add_action(self, new_action):
         if new_action.isinstance('Action'):
@@ -51,3 +56,6 @@ class Brain(object):
     def reset(self):
         # Potentially set a default state here
         self.clear()
+
+    def is_threat(self, entity):
+        return False
