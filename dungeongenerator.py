@@ -6,6 +6,7 @@ import helpers
 import level
 import palette
 import registry
+import statuses
 import utils
 
 from data import room_templates
@@ -14,10 +15,9 @@ from entities import door
 from entities import items
 from entities import stairs
 
-from statuses import hastestatus
-
 creatures.register()
 items.register()
+statuses.register()
 
 
 def generate_level(width, height, player_count, scene_info):
@@ -164,14 +164,17 @@ def generate_level(width, height, player_count, scene_info):
         new_level.data.draw_char(x, y, char, fg, bg)
 
     level_scaling_factor = (scene_info['level'] / 10) + 1
-    monster_spawn_rate = 1 / 16 * max(1.0, player_count / 3) * level_scaling_factor
+    monster_spawn_rate = 1 / 16 * max(1.0, player_count / 3) #* level_scaling_factor
 
     uncommon_monster_class = registry.Registry.get('uncommon_monster')
     common_monster_class = registry.Registry.get('common_monster')
 
-    uncommon_monster_statuses = [] #hastestatus.HasteStatus]
-    common_monster_statuses = []
+    uncommon_monster_statuses = list(set([registry.Registry.get('statuses_drop_table') for _ in range(random.randint(0,2))]))
+    uncommon_monster_statuses = [_ for _ in uncommon_monster_statuses if _]
+    common_monster_statuses = list(set([registry.Registry.get('statuses_drop_table') for _ in range(random.randint(0,2))]))
+    common_monster_statuses = [_ for _ in common_monster_statuses if _]
 
+    registry.Registry.clear('monster_drop_table')
     registry.Registry.register(uncommon_monster_class, 'monster_drop_table', 3)
     registry.Registry.register(common_monster_class, 'monster_drop_table', 5)
 

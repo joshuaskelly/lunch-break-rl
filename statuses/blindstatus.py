@@ -1,4 +1,5 @@
 import instances
+import registry
 
 from statuses import status
 
@@ -23,3 +24,5 @@ class BlindStatus(status.Status):
 
         if self.timer == 0:
             self.remove()
+
+registry.Registry.register(BlindStatus, 'statuses_drop_table', 1)

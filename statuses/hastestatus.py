@@ -1,5 +1,6 @@
 import time
 import instances
+import registry
 
 from statuses import status
 
@@ -45,3 +46,19 @@ class HasteStatus(status.Status):
 
         if self.counter == 0:
             self.remove()
+
+
+class HyperStatus(HasteStatus):
+    def __init__(self, owner):
+        super().__init__(owner, turns_per_tick=2)
+        HyperStatus.name = 'Hyper'
+        self.owner_current_health = owner.current_health
+
+    def tick(self, tick):
+        if not self.start_of_effect:
+            self.start_of_effect = time.time()
+
+        if self.owner.current_health < self.owner.current_health:
+            self.remove()
+
+registry.Registry.register(HyperStatus, 'statuses_drop_table', 3)

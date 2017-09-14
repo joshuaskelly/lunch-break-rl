@@ -1,3 +1,7 @@
+import random
+
+import registry
+
 from entities import creature
 from statuses import status
 
@@ -21,3 +25,15 @@ class SleepStatus(status.Status):
 
         if self.timer == 0:
             self.remove()
+
+
+class SleepyStatus(status.Status):
+    def __init__(self, owner):
+        super().__init__(owner)
+        SleepyStatus.name = 'Sleepy'
+
+    def tick(self, tick):
+        if random.random() < 1 / 32:
+            self.owner.add_status(SleepStatus(self.owner))
+
+registry.Registry.register(SleepyStatus, 'statuses_drop_table', 3)
