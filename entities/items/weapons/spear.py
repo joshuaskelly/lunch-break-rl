@@ -16,6 +16,7 @@ class Spear(weapon.Weapon):
         self.name = 'spear'
         self.verb = 'stabs'
         self.damage = 2
+        self.throw_distance = 5
         self.knockback_chance = 3 / 4
         self.state = DefaultSpearWeaponState(self)
 
