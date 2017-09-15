@@ -41,6 +41,7 @@ class Kobold(creature.Creature):
 
 registry.Registry.register(Kobold, 'monster', 5)
 registry.Registry.register(Kobold, 'uncommon_monster', 5)
+registry.Registry.register(Kobold, 'common_monster', 0.25)
 
 
 class KoboldBrain(brain.Brain):

@@ -62,13 +62,16 @@ class ReadySpearWeaponState(weapon.WeaponState):
                 self.neighbors.append(n)
                 self.on_engaged(n)
 
-        # Handle disegagine entities
+        # Handle disegage entities
         for n in self.neighbors:
             if n not in neighbors:
                 self.neighbors.remove(n)
                 self.on_disengaged(n)
 
     def on_engaged(self, entity):
+        if not entity.isinstance('Creature'):
+            return
+
         wielder = self.weapon.parent
 
         if wielder.brain.is_threat(entity):
@@ -82,7 +85,7 @@ class ReadySpearWeaponState(weapon.WeaponState):
         pass
 
     def after_attack(self, action):
-        if random.random() < self.weapon.knockback_chance:
+        if random.random() < self.weapon.knockback_chance and hasattr(action.target, 'move'):
             dir = utils.math.sub(action.target.position, action.performer.position)
             action.target.move(*dir)
             instances.console.describe(action.target, '{} is knocked back!'.format(action.target.display_string))

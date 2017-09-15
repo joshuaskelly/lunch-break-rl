@@ -201,6 +201,18 @@ class Creature(entity.Entity):
         status.on_status_end()
         self.statuses.remove(status)
 
+    def hurt(self, amount):
+        if amount > 0:
+            self.current_health -= amount
+
+            ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
+            self.append(ani)
+
+            self.make_blood_trail()
+
+            if not self.alive:
+                self.die()
+
     def can_attack(self, target):
         """Determines if performer can attack target
         
@@ -225,16 +237,9 @@ class Creature(entity.Entity):
 
         instances.console.describe(action.performer, '{} {} {}'.format(action.performer.display_string, verb, action.target.display_string))
 
-        self.current_health -= damage_dealt
+        self.hurt(damage_dealt)
 
-        if damage_dealt > 0:
-            ani = animation.FlashBackground(bg=palette.BRIGHT_RED)
-            self.append(ani)
 
-            self.make_blood_trail()
-
-        if not self.alive:
-            self.die()
 
     def after_attacked(self, action):
         """Called on target after attack has occurred"""

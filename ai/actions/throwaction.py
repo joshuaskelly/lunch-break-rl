@@ -2,6 +2,7 @@ import tdl
 
 import instances
 import utils
+
 from ai import action
 from entities import animation
 
@@ -39,7 +40,7 @@ class ThrowAction(action.Action):
                 for hit_entity in entities:
                     if hit_entity.isinstance('Creature'):
                         if self.target.isinstance('HeldItem'):
-                            act = hit_entity.get_action(self.performer)
+                            act = ThrownWeaponAttackAction(self.performer, hit_entity, self.target)
                             action_to_perform = act.perform
 
                         # Use potion on target
@@ -82,3 +83,15 @@ class ThrowActionInterface(object):
     def allow_throw(self, action):
         """Determine if target allows throw"""
         return True
+
+
+class ThrownWeaponAttackAction(action.Action):
+    def __init__(self, performer, target=None, weapon=None):
+        super().__init__(performer, target)
+        self.weapon = weapon
+
+    def prerequisite(self):
+        return utils.is_next_to(self.weapon, self.target)
+
+    def perform(self):
+        self.target.hurt(self.weapon.damage)

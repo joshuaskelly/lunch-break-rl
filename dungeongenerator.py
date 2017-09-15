@@ -182,7 +182,7 @@ def generate_level(width, height, player_count, scene_info):
 
     registry.Registry.clear('monster_drop_table')
     registry.Registry.register(uncommon_monster_class, 'monster_drop_table', 3)
-    registry.Registry.register(common_monster_class, 'monster_drop_table', 5)
+    registry.Registry.register(common_monster_class, 'monster_drop_table', 4)
 
     scene_info['enemies'] = []
     scene_info['enemies'].append((uncommon_monster_class, uncommon_monster_statuses))

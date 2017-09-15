@@ -390,7 +390,7 @@ class RatKing(Rat):
         neighbor_tiles = list(map(lambda x: utils.math.add(x, pos), helpers.DirectionHelper.directions))
         neighbor_tiles.append(pos)
         open_tiles = [t for t in neighbor_tiles if instances.scene_root.check_collision(*t)]
-        empty_tiles = [t for t in open_tiles if not instances.scene_root.get_entity_at(*t)]
+        empty_tiles = [t for t in open_tiles if not instances.scene_root.get_entity_at(*t).isinstance('Creature')]
 
         a_pos = empty_tiles.pop(int(random.random() * (len(empty_tiles) - 1)))
 
