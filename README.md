@@ -59,6 +59,16 @@ SpecialViewers =
 
 ```
 
+## Contributing
+Have a bug fix or a new feature you'd like to see in Lunch Break RL? Send it our way! Please make sure you create an issue that addresses your fix/feature so we can discuss the contribution.
+
+1. Fork it!
+2. Create your feature branch: `git checkout -b features/bug-fix-cookies`
+3. Commit your changes: `git commit -am 'Fixing AI failing to find cookies when cookies are visible'`
+4. Push to the branch: `git push origin bug-fix-cookies`
+5. Submit a pull request.
+6. Create an [issue](https://github.com/joshuaskelly/lunch-break-rl/issues/new).
+
 ## License
 
 MIT
